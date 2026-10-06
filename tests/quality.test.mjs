@@ -52,9 +52,15 @@ test('generic workflow follow-ups and a long chat retain the original proposal t
 test('a clear new topic drops the old topic even after a lengthy conversation',()=>{
  const context=conversationContext([...m('Was the AI degree approved?'),{role:'assistant',content:'Check its tracker.'},{role:'user',content:'Faculty Senate awards'}]);assert.deepEqual(context,m('Faculty Senate awards'));assert.deepEqual(activeMessages(context),context);
 });
+test('a temporary-course workflow follow-up includes the written minor-change review path',async()=>{
+ const context=[...m('How do I make a temporary course permanent?'),{role:'assistant',content:'Use a Course Modification Proposal.'},{role:'user',content:'What happens after I submit a request?'}];
+ const p=await hydrateEvidence(corpus,retrieve(corpus,context),local);
+ assert.ok(p.some(r=>r.source.url.includes('/appendix-e-')&&/changing an X-course into a permanent course/.test(r.p.text)));
+ assert.ok(p.some(r=>r.source.url.includes('/appendix-e-')&&/Minor course change proposals undergo review/.test(r.p.text)&&/full Faculty Senate/.test(r.p.text)));
+});
 test('general legislation concepts use the manual rather than the identifier route',async()=>{
  for(const q of ['What is a Faculty Senate bill?','How does a bill get approved?','What is the difference between a bill and a report?']){
-  assert.equal(isBillQuestion(m(q)),false,q);const p=await hydrateEvidence(corpus,retrieve(corpus,m(q)),local);assert.ok(p.some(r=>r.source.title.startsWith('Appendix C: By-Laws')&&/10\.1/.test(r.p.text)));
+  assert.equal(isBillQuestion(m(q)),false,q);const p=await hydrateEvidence(corpus,retrieve(corpus,m(q)),local);assert.ok(p.some(r=>r.source.title.startsWith('Appendix C: By-Laws')&&/10\.1/.test(r.p.text)));assert.ok(p.every(r=>r.source.kind!=='Faculty Senate PDF'));
  }
 });
 test('an exact identifier remains available through a subsequent bill follow-up',async()=>{
@@ -70,6 +76,11 @@ test('generated Markdown links are converted as a whole and repeated document ci
 });
 test('numbered list continuations retain their starting number and wrapped instruction',()=>{
  const blocks=answerBlocks('3. Open the proposal.\n   Select the current version.\n4. Submit for review.');assert.equal(blocks[0].start,3);assert.equal(blocks[0].items[0],'Open the proposal. Select the current version.');
+});
+test('a fully cited instruction sequence keeps all sources with one closing citation group',()=>{
+ const p=[1,2].map(n=>({source:{title:'Guidance '+n},p:{source:'https://web.uri.edu/facsen/'+n,heading:'Start'}}));
+ const a=parseAnswer(JSON.stringify({kind:'answer',answer:'1. Open the form [1].\n2. Complete it [1][2].\n3. Submit [1].',sourceIds:[1,2]}),p);
+ assert.equal(a.answer,'1. Open the form.\n2. Complete it.\n3. Submit. [1][2]');assert.equal(a.sources.length,2);
 });
 test('gateway failures provide bounded, qualified source excerpts without an irrelevant follow-up',async()=>{
  const a=await converse(corpus,m('How do I get Kuali access?'),{URI_API_KEY:'test-only'},async()=>{throw new Error('Timeout');},local);assert.equal(a.kind,'sources');assert.equal(a.retryable,true);assert.equal(a.followUp,'');assert.ok(a.answer.length<1300);assert.ok(a.sources.every(s=>s.section));
