@@ -46,4 +46,4 @@ Keep previously deployed immutable corpus revisions until no deployed Worker ref
 
 ## Validation
 
-Thirty-eight automated checks cover complete toolkit registration, published-page coverage, tracker tabs/rows and field labels, exact text hydration, historical program lookup, submission steps, follow-up context, citation validation, credential handling, and request caps. Real Sonnet evaluation includes a named program record, committee duties, meeting attendance/voting, unavailable tracker access, and prerequisite changes. Tests do not send emails.
+Thirty-nine automated checks cover complete toolkit registration, published-page coverage, tracker tabs/rows and field labels, exact text hydration, historical program lookup, submission steps, follow-up context, per-answer citation numbering, citation validation, credential handling, and request caps. Real Sonnet evaluation includes a named program record, committee duties, meeting attendance/voting, unavailable tracker access, and prerequisite changes. Tests do not send emails.

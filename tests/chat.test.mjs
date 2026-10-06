@@ -72,3 +72,7 @@ test('gateway failure returns exact source excerpts instead of an unable-to-answ
 test('unknown wording asks a useful routing question without an email-first dead end',async()=>{
   const a=await converse(data,[{role:'user',content:'Something is confusing and I need direction'}],{},()=>{throw new Error('No paid call needed');});assert.equal(a.kind,'clarification');assert.match(a.answer,/course.*program.*Kuali/);
 });
+test('prior citation numbers cannot be confused with the new evidence numbering',async()=>{
+ let request;await converse(data,[{role:'user',content:'Who can attend Faculty Senate meetings?'},{role:'assistant',content:'The bylaws support participation by ex officio members [3].'},{role:'user',content:'How can I ask to speak?'}],{URI_API_KEY:'test'},async(u,o)=>{request=JSON.parse(o.body);return new Response(JSON.stringify({choices:[{message:{content:'{"kind":"answer","answer":"Consult the speaking rules [1].","sourceIds":[1]}'}}]}));});
+ const previous=request.messages.find(m=>m.role==='assistant');assert.ok(previous);assert.ok(!/\[3\]/.test(previous.content));assert.match(request.messages[0].content,/Never audit or correct an earlier citation using the current numbering/);
+});
