@@ -1,3 +1,4 @@
+import {activeMessages} from './conversation.js?v=3';
 // Extractive retrieval only. Every returned character comes from an indexed source.
 const STOP = new Set('difference between compare versus vs a an the of to for and or in on at is are be was were it this that i my me we our you your how do does did can could would should what when where who which with have has want need please about from as by into all get getting like know find tell more help question teach teaching taught wondering trying someone anyone something use using information explain regarding'.split(' '));
 export const normalize = text => text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/4\s*\+\s*1/g,' fourplusone ').replace(/cross[ -]?list(?:ed|ing)?/g,' crosslist ').replace(/simultaneous/g,' simultaneous ').replace(/\b(?:approve|approved|approving|approvals)\b/g,' approval ').replace(/\b(?:modify|modifying|modifications|modification)\b/g,' modification ').replace(/\b(?:track|tracking)\b/g,' track ').replace(/\b(?:chairs)\b/g,' chair ').replace(/\b(?:courses|classes|class)\b/g,' course ').replace(/\b(?:propose|proposing|proposed)\b/g,' proposal ').replace(/\b(?:proposals)\b/g,' proposal ').replace(/\b(?:programs)\b/g,' program ').replace(/\b(?:committees)\b/g,' committee ');
@@ -61,28 +62,39 @@ export function emailLink(originalQuestion){
 
 // Keep the visible transcript and original email question, but bound API context.
 export function conversationContext(messages){
-  let recent=messages.slice(-15).map(m=>({role:m.role,content:m.content.slice(0,4000)}));
-  if(recent[0]?.role==='assistant')recent.shift();
-  while(recent.length>1&&recent.reduce((n,m)=>n+m.content.length,0)>20000)recent=recent.slice(2);
-  return recent;
+  const scoped=activeMessages(messages).map(m=>({role:m.role,content:m.content.slice(0,4000)}));
+  if(scoped.length<=13&&scoped.reduce((n,m)=>n+m.content.length,0)<=20000)return scoped;
+  const head=scoped.slice(0,2),tail=scoped.slice(Math.max(2,scoped.length-11));
+  if(tail[0]?.role==='assistant')tail.shift();
+  // Preserve the original subject and response, then the newest complete turns.
+  // Remove only middle turns when the payload reaches its bound.
+  while(tail.length>1&&[...head,...tail].reduce((n,m)=>n+m.content.length,0)>20000)tail.splice(0,2);
+  return [...head,...tail];
 }
 
 function buildCompiledSearch(data){
  const sourceFlags=new Map(data.sources.map(s=>{const years=[...s.title.matchAll(/(?:19|20)\d{2}/g)].map(x=>Number(x[0]));return [s.url,/archive|previous years|2017-2018|2023-2024/i.test(s.title)||years.length&&Math.max(...years)<2026];}));
  const docs=data.passages.map((p,i)=>({p,source:data.sources[data.docs[i][0]],length:data.docs[i][2]})),n=docs.length,avg=docs.reduce((a,d)=>a+d.length,0)/n;
+ const score=new Float64Array(n),matched=new Uint16Array(n),body=new Uint16Array(n),best=new Float64Array(n),hit=new Uint8Array(n),stamp=new Uint32Array(n),candidateStamp=new Uint32Array(n);let epoch=0,queryEpoch=0;
  return (question,limit=4,relaxed=false)=>{
+  if(relaxed&&!/course|program|specialization|kuali|curricul|proposal|syllab|prerequis|credit|department|faculty|senate|approval|crosslist|deadline|calendar|workflow|modality|graduat|undergraduat|catalog|online|teach|access|login|track|chair|dean|committee|bill|manual|award/.test(normalize(question)))return [];
   const original=[...new Set(tokens(question))],groups=original.map(w=>SYNONYMS[w]||[w]),meaningful=groups.filter(g=>g.some(w=>data.terms[w]));
   if(!meaningful.length||(!relaxed&&meaningful.length/original.length<.5))return [];
-  const hasYear=/(?:19|20)\d{2}/.test(question),tracking=/status|track|happened|proposal/i.test(question),procedure=/how|steps|prerequis|procedure|process|change|modif/i.test(question);
-  const score=new Float64Array(n),matched=new Uint16Array(n),body=new Uint16Array(n);
-  for(const group of groups){const best=new Float64Array(n),hit=new Uint8Array(n),touched=new Set();
+  const hasYear=/(?:19|20)\d{2}/.test(question),tracking=/\b(?:status|track|tracking|happened)\b|(?:was|were|has|is).*approv/i.test(question),procedure=/how|steps|prerequis|procedure|process|change|modif/i.test(question);
+  // Reuse small numeric workspaces. Only visit documents touched by postings;
+  // allocating and scanning the full corpus per query exhausted Worker CPU.
+  const candidates=[];queryEpoch++;
+  const bounded=meaningful.length>28?[...meaningful].sort((a,b)=>Math.min(...a.map(w=>data.terms[w]?.[1]||n))-Math.min(...b.map(w=>data.terms[w]?.[1]||n))).slice(0,28):meaningful;
+  for(const group of bounded){const touched=[];epoch++;
    for(const w of group){const range=data.terms[w];if(!range)continue;const [start,count]=range,idf=Math.log(1+(n-count+.5)/(count+.5));
-    for(let j=start;j<start+count;j++){const packed=data.postings[j],id=packed>>>16,tf=packed&32767,head=(packed&32768)!==0;const value=idf*((tf*2.2)/(tf+1.2*(.25+.75*docs[id].length/avg))+(head?1.3:0));best[id]=Math.max(best[id],value);if(tf)hit[id]=1;touched.add(id);}
+    for(let j=start;j<start+count;j++){const packed=data.postings[j],id=packed>>>16,tf=packed&32767,head=(packed&32768)!==0;
+     if(stamp[id]!==epoch){stamp[id]=epoch;best[id]=0;hit[id]=0;touched.push(id);}
+     const value=idf*((tf*2.2)/(tf+1.2*(.25+.75*docs[id].length/avg))+(head?1.3:0));best[id]=Math.max(best[id],value);if(tf)hit[id]=1;}
    }
-   for(const id of touched){score[id]+=best[id];matched[id]++;body[id]+=hit[id];}
+   for(const id of touched){if(candidateStamp[id]!==queryEpoch){candidateStamp[id]=queryEpoch;score[id]=0;matched[id]=0;body[id]=0;candidates.push(id);}score[id]+=best[id];matched[id]++;body[id]+=hit[id];}
   }
   const ranked=[];
-  for(let i=0;i<n;i++){const coverage=matched[i]/meaningful.length;if(!score[i]||!relaxed&&coverage<.5||body[i]<Math.min(relaxed?1:2,groups.length))continue;const d=docs[i];let value=score[i]*coverage*coverage;
+  for(const i of candidates){const coverage=matched[i]/bounded.length;if(!score[i]||!relaxed&&coverage<.5||body[i]<Math.min(relaxed?1:2,bounded.length))continue;const d=docs[i];let value=score[i]*coverage*coverage;
    if(d.source.kind==='Curriculum Toolkit')value*=1.15;
    if(/\btrack\b/.test(normalize(question))&&d.source.title==='Track Your Proposal')value*=1.5;
    if(!hasYear&&sourceFlags.get(d.source.url))value*=.6;

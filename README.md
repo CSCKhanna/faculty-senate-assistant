@@ -46,4 +46,11 @@ Keep previously deployed immutable corpus revisions until no deployed Worker ref
 
 ## Validation
 
-Forty-seven automated checks cover complete toolkit registration, published-page coverage, tracker tabs/rows and field labels, exact text hydration, historical program lookup, submission steps, follow-up context, per-answer citation numbering, citation validation, credential handling, and request caps. Real Sonnet evaluation includes a named program record, committee duties, meeting attendance/voting, unavailable tracker access, and prerequisite changes. Tests do not send emails.
+The automated regression suite cover complete toolkit registration, published-page coverage, tracker tabs/rows and field labels, exact text hydration, historical program lookup, submission steps, follow-up context, per-answer citation numbering, citation validation, credential handling, and request caps. Real Sonnet evaluation includes a named program record, committee duties, meeting attendance/voting, unavailable tracker access, and prerequisite changes. Tests do not send emails.
+
+
+## Quality assurance
+
+See [QUALITY.md](QUALITY.md) for the experience and verification contract. Chat starts with the small manifest and health check; source inventory and local search load on demand. Refresh preserves the transcript and draft in tab-scoped session storage, including a retry for interrupted requests. New conversation clears them. Failed requests retry in place without discarding a draft. The AI daily limit remains 100; after the limit, the same interface provides source search. Citation numbers are consolidated per document, and copied answers include the references.
+
+Run `npm test` for factual retrieval, corpus integrity, transport, context, and real SQLite budget tests. `node scripts/build_quality_preview.mjs` creates `quality-preview.html` with simulated replies, no credentials, and no paid AI calls. Browser scenarios use `?scenario=slow`, `error-once`, `invalid`, `daily-limit`, `offline`, `inventory-error`, `long`, or `unsafe`. Publish the generated preview alongside the source data to test the exact interface in Chrome. Its tab storage is separate from the live assistant. Use bounded real Sonnet evaluations to check answer quality; deterministic fixtures verify interface behavior only.

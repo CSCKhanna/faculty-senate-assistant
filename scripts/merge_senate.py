@@ -46,6 +46,7 @@ def main():
  data={'builtAt':core.STAMP,'sources':list(core.sources.values()),'passages':core.passages}
  cov.update(builtAt=core.STAMP,sourceCount=len(core.sources),passageCount=len(core.passages))
  cov['limitations']=[x for x in cov['limitations'] if not x.startswith('Faculty Senate website snapshot')]+['Faculty Senate website snapshot: every publicly published page/post was audited, including linked reports, minutes, legislation, University Manual pages and all publicly downloadable proposal-tracker tabs. Restricted, broken and unreadable links are listed as gaps; their contents are not available to the assistant.','PDF extraction includes embedded text and recovered OCR; diagrams, charts, handwriting and signatures need original visual review.','Trackers are dated snapshots. Historical records and proposed legislation must not be treated as current policy or live approval status.']
+ cov['limitations']=list(dict.fromkeys(cov['limitations']))
  (core.ROOT/'data/index.json').write_text(json.dumps(data,ensure_ascii=False))
  (core.ROOT/'data/coverage.json').write_text(json.dumps(cov,ensure_ascii=False,indent=2))
  print(json.dumps({'sources':len(core.sources),'passages':len(core.passages),'website':{k:v for k,v in cov['website'].items() if k not in ('trackers','gaps')},'trackers':len(cov['website']['trackers']),'gaps':len(cov['website']['gaps'])}))

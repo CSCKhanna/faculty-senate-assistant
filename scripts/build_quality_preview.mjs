@@ -1,0 +1,5 @@
+import fs from 'node:fs/promises';import {build} from 'esbuild';
+const result=await build({entryPoints:['app.js'],bundle:true,write:false,format:'esm',platform:'browser',define:{fetch:'qualityFetch'},inject:['scripts/quality-fixtures.js']});
+const css=await fs.readFile('styles.css','utf8'),code=result.outputFiles[0].text.replace(/<\/script/gi,'<\\/script');
+let html=await fs.readFile('index.html','utf8');html=html.replace(/<link rel="stylesheet"[^>]+>/,`<style>${css}</style>`).replace(/<script type="module"[^>]+><\/script>/,()=>`<script type="module">${code}</script>`).replace('Faculty Senate Assistant · Prototype','Faculty Senate Assistant · QA Preview').replace('AI-generated answers. Verify time-sensitive information in the original source.','QA preview: simulated replies; no AI requests.').replace('>Pilot</small>',' title="Simulated replies. No paid AI requests.">QA</small>');
+await fs.writeFile('quality-preview.html',html);console.log('Generated isolated browser QA preview; replies are simulated.');

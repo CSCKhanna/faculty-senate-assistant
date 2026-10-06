@@ -6,7 +6,7 @@ let billPromise;
 async function getBills(){
   if(!billPromise)billPromise=fetch('https://csckhanna.github.io/faculty-senate-assistant/'+billManifest.path).then(async r=>{
     if(!r.ok)throw new Error('Bill lookup unavailable');const index=await r.json();
-    if(index.builtAt!==billManifest.builtAt)throw new Error('Bill snapshot mismatch');return index;
+    if(index.builtAt!==billManifest.builtAt||index.builtAt!==manifest.builtAt||index.corpusBase!==manifest.corpusBase)throw new Error('Bill snapshot mismatch');return index;
   }).catch(e=>{billPromise=undefined;throw e;});
   return billPromise;
 }
@@ -58,6 +58,6 @@ export default {
         return reply(passages.length?await answerEvidence(index,messages,env,passages):missingBillAnswer(index,messages));
       }
       return reply(await converse(await getCorpus(),messages,env));
-    }catch{return reply({kind:'unanswered',answer:'The source service is temporarily unavailable. Please try again shortly; your question has not been emailed.',sources:[],followUp:'',snapshotDate:manifest.builtAt});}
+    }catch{return reply({kind:'unanswered',answer:'The source service is temporarily unavailable. Please try again shortly, or open the toolkit directly.',sources:[],followUp:'',retryable:true,snapshotDate:manifest.builtAt});}
   }
 };
