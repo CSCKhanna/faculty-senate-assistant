@@ -1,7 +1,7 @@
 import {loadCorpus,hydrateEvidence} from './corpus.js';
 import {buildSearch,emailLink,conversationContext} from './search.js?v=7';
 import {renderAnswer,sourceUrl,referenceLabel} from './presentation.js?v=2';
-import {isFollowUp} from './conversation.js';
+import {isFollowUp} from './conversation.js?v=2';
 import {CHAT_API_URL} from './config.js';
 const $=s=>document.querySelector(s);
 const results=$('#results'),status=$('#load-status'),input=$('#question'),submit=$('#submit');
@@ -61,7 +61,7 @@ async function run(){
   const waiting=messageBubble('assistant','Looking through Senate resources…');
   try{
     const response=await fetch(CHAT_API_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:conversationContext(messages)}),signal:AbortSignal.timeout(55000)});
-    const answer=await response.json();if(!response.ok)throw new Error(answer.error||'The assistant is unavailable.');
+    const answer=await response.json();if(!response.ok){const failure=new Error('Request rejected');failure.publicMessage=typeof answer.error==='string'?answer.error.slice(0,300):'The assistant is unavailable.';throw failure;}
     if(typeof answer.answer!=='string'||!Array.isArray(answer.sources))throw new Error('The assistant returned an incomplete answer.');
     waiting.remove();const bubble=messageBubble('assistant','');
     bubble.querySelector('.chat-text').replaceWith(renderAnswer(answer.answer,answer.sources));
@@ -85,7 +85,7 @@ async function run(){
     if(answer.kind==='sources')actions.append(el('small','Source excerpts; open the references for complete guidance.','chat-note'));
     bubble.append(actions);showAnswer(bubble);
     messages.push({role:'assistant',content:answer.answer+(answer.followUp?'\n'+answer.followUp:'')});
-  }catch(error){waiting.remove();const bubble=messageBubble('assistant','The assistant couldn’t finish this request. Please try again; your conversation is preserved.');
+  }catch(error){waiting.remove();const bubble=messageBubble('assistant',error.publicMessage||'The assistant couldn’t finish this request. Please try again; your conversation is preserved.');
     bubble.append(link('Email Genviéve about this question',emailLink(question),'chat-email'));showAnswer(bubble);
     messages.pop();input.value=original;}
   finally{busy=false;submit.disabled=false;results.setAttribute('aria-busy','false');input.focus({preventScroll:true});}
