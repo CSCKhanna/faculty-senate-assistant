@@ -88,7 +88,7 @@ export async function converse(data,messages,env,fetcher=fetch){
   }
   const res=await fetcher('https://llmgw.its.uri.edu/v1/chat/completions',{
     method:'POST',headers:{'Authorization':'Bearer '+env.URI_API_KEY,'Content-Type':'application/json'},
-    body:JSON.stringify({model:env.AI_MODEL||'its_direct/pt2-claude-haiku-4.5-us',max_tokens:1800,temperature:0.2,response_format:{type:"json_object"},messages:[{role:'system',content:systemPrompt(data,passages)},...messages.slice(0,-1),{role:'user',content:messages.at(-1).content+'\n\nReturn the required JSON object with kind, answer, sourceIds, and followUp. Include evidence citations [n] in factual answers.'}]}),
+    body:JSON.stringify({model:env.AI_MODEL||'its_direct/pt2-claude-haiku-4.5-us',max_tokens:1800,temperature:0.2,response_format:{type:"json_object"},messages:[{role:'system',content:systemPrompt(data,passages)},...messages.slice(0,-1),{role:'user',content:messages.at(-1).content+'\n\nUse the evidence to give the available answer and steps now. Treat a question about changing a class the user teaches as an existing course modification, not as a question about a brand new course. Do not ask them to repeat what they already told you. Ask a follow-up only if essential details remain missing. Return a JSON object with kind, answer, sourceIds, and followUp. Include evidence citations [n] for all factual guidance, including guidance in clarifications.'}]}),
     signal:AbortSignal.timeout(45000)
   });
   if(!res.ok)throw new Error('AI gateway unavailable ('+res.status+').');
