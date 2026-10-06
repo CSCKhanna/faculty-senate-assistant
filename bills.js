@@ -14,11 +14,22 @@ export function identifiers(text){
   }
   return found;
 }
-export function isBillQuestion(messages){const q=messages.at(-1)?.content||'';return /\bbill\b|\breport\s*(?:number|no\.?|#)/i.test(q)||identifiers(q).length>0;}
+export function isBillQuestion(messages){
+  const q=messages.at(-1)?.content||'';
+  if(identifiers(q).length)return true;
+  if(/\b(?:bill|report)\s*(?:number|no\.?|#)|\bnumber\b.*\bbill\b/i.test(q))return true;
+  if(/\b(?:this|that|the) bill\b/i.test(q)&&activeMessages(messages).length>1)return true;
+  // Concepts and approval procedures need the toolkit/manual, not a random
+  // legislation record that happens to contain the word "bill".
+  return /\bbill\b/i.test(q)&&!/\b(?:what is (?:a|an|a faculty senate)|definition|difference|different|how.*(?:approved|approval|become|process)|bills in general)\b/i.test(q)&&/\b(?:for|called|named|about|cover|details|lookup|look up)\b/i.test(q);
+}
 const OMIT=new Set('if its their they them bill bills number numbers no report reports lookup look up have has does approval approved yet status proposal program major degree bs ba ms phd academic year last current for called named'.split(' '));
 export function billEvidence(index,messages){
   const scoped=activeMessages(messages),latest=expandQuestion(scoped.at(-1).content,index.builtAt);
-  const explicit=identifiers(latest),ids=new Set();
+  let explicit=identifiers(latest);const ids=new Set();
+  if(!explicit.length&&/\b(?:this|that|the) bill\b/i.test(latest)&&scoped.length>1){
+    for(const m of scoped.slice(0,-1).reverse()){const inherited=identifiers(m.content);if(inherited.length){explicit=inherited;break;}}
+  }
   if(explicit.length){
     for(const id of explicit){
       const key=id.committee?id.key:`${id.year}:*:${id.number}`;
@@ -56,5 +67,7 @@ export function billEvidence(index,messages){
 }
 export function missingBillAnswer(index,messages){
   const ids=identifiers(messages.at(-1).content);
+  const named=tokens(activeMessages(messages).filter(m=>m.role==='user').map(m=>m.content).join(' ')).filter(w=>!OMIT.has(w)&&!/^\d+$/.test(w)).length>=2;
+  if(!ids.length&&named)return {kind:'unanswered',answer:'I couldn’t locate a bill identifier associated with that program or action in the indexed Senate records. Confirm the program title and academic year, or use the email option to ask Genviéve.',followUp:'',sources:[],snapshotDate:index.builtAt};
   return {kind:ids.length?'unanswered':'clarification',answer:ids.length?'I couldn’t locate that exact bill identifier in the indexed Senate records. Please check the academic year, committee prefix, and number, or use the email option to ask Genviéve.':'Which course, program, or Senate action is the bill for? If you have part of the identifier, include its academic year and committee (for example, CASC or Graduate Council).',followUp:'',sources:[],snapshotDate:index.builtAt};
 }

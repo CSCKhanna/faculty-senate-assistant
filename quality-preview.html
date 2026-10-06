@@ -410,7 +410,7 @@ function retrieve(data2, messages2) {
     }
   }
   let guide;
-  if (/how|steps|start|create|establish|propos|submit|need|require/i.test(combined)) {
+  if (/how|steps|start|create|establish|propose|proposing|submit|need|require/i.test(combined) && (!/\b(?:approved|status|happened|whether)\b/i.test(latest) || /\b(?:propose|start|create|establish|submit|change|modify)\b/i.test(latest))) {
     const modified = /chang|modif|revise|permanent/i.test(combined);
     if (/specialization/i.test(combined)) guide = (modified ? "Specialization Modification" : "New Specialization") + " Proposal Walkthrough";
     else if (/\bnew (?:undergraduate |graduate |temporary )?course\b/i.test(combined) && !modified) guide = "New Course Proposal Walkthrough";
@@ -729,8 +729,9 @@ function renderResponse(bubble, answer2) {
     actions.append(retry);
   }
   if (answer2.kind === "unanswered" || answer2.kind === "error" || answer2.kind === "sources") {
-    actions.append(emailAction(answer2.originalQuestion || question));
-    bubble.append(actions, el("small", "Opens an unsent draft in your email app. Review it before sending.", "chat-note"));
+    if (answer2.escalatable !== false) actions.append(emailAction(answer2.originalQuestion || question));
+    bubble.append(actions);
+    if (answer2.escalatable !== false) bubble.append(el("small", "Opens an unsent draft in your email app. Review it before sending.", "chat-note"));
   } else {
     if (answer2.kind === "answer") actions.append(button("Copy answer", async (e) => {
       const b = e.currentTarget, plain = answer2.answer.replace(/\*\*|`/g, "") + (sources2.length ? "\n\nSources\n" + sources2.map((s) => `[${s.id}] ${referenceLabel(s)} \u2014 ${sourceUrl(s)}`).join("\n") : "");
@@ -804,7 +805,7 @@ async function requestAnswer(original) {
     failure.retryable = response.status !== 400 && response.status !== 413 && !(response.status === 429 && /daily/i.test(failure.publicMessage));
     throw failure;
   }
-  if (!["answer", "clarification", "unanswered", "sources"].includes(answer2.kind) || typeof answer2.answer !== "string" || !answer2.answer.trim() || answer2.answer.length > 6500 || !Array.isArray(answer2.sources) || answer2.sources.some((s) => !s || !Number.isInteger(s.id) || typeof s.url !== "string" || typeof s.title !== "string")) throw new Error("Incomplete response");
+  if (!["answer", "clarification", "unanswered", "sources"].includes(answer2.kind) || typeof answer2.answer !== "string" || !answer2.answer.trim() || answer2.answer.length > 6500 || /<\/?[a-z][\w:-]*(?:\s[^>]*|\/)?>/i.test(answer2.answer) || !Array.isArray(answer2.sources) || answer2.sources.some((s) => !s || !Number.isInteger(s.id) || typeof s.url !== "string" || typeof s.title !== "string")) throw new Error("Incomplete response");
   return answer2;
 }
 async function deliver(original, bubble, user) {
@@ -905,6 +906,7 @@ input.addEventListener("input", () => {
   clearTimeout(draftTimer);
   draftTimer = setTimeout(persist, 250);
 });
+window.addEventListener("pagehide", persist);
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
     e.preventDefault();
