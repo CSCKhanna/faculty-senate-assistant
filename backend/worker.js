@@ -1,8 +1,18 @@
 import manifest from '../data/corpus-manifest.json' with {type:'json'};
-import {loadCorpus} from '../corpus.js';
+import {loadCorpus,hydrateEvidence} from '../corpus.js';
+import billManifest from '../data/bills-manifest.json' with {type:'json'};
+import {isBillQuestion,billEvidence,missingBillAnswer} from '../bills.js';
+let billPromise;
+async function getBills(){
+  if(!billPromise)billPromise=fetch('https://csckhanna.github.io/faculty-senate-assistant/'+billManifest.path).then(async r=>{
+    if(!r.ok)throw new Error('Bill lookup unavailable');const index=await r.json();
+    if(index.builtAt!==billManifest.builtAt)throw new Error('Bill snapshot mismatch');return index;
+  }).catch(e=>{billPromise=undefined;throw e;});
+  return billPromise;
+}
 let corpusPromise;
 async function getCorpus(){if(!corpusPromise)corpusPromise=loadCorpus(manifest).catch(e=>{corpusPromise=undefined;throw e;});return corpusPromise;}
-import {validateMessages,converse,sourceFallback} from './chat.js';
+import {validateMessages,converse,answerEvidence} from './chat.js';
 
 export async function reserveBudget(db,key,cap=100,now=Date.now()){
   if(!Number.isInteger(cap)||cap<1||cap>100)return {allowed:false,reason:'The pilot request limit is not configured correctly.'};
@@ -43,6 +53,10 @@ export default {
       const key=Array.from(new Uint8Array(digest),x=>x.toString(16).padStart(2,'0')).join('');
       const limit=await reserveBudget(env.PILOT_DB,key,Number(env.DAILY_REQUEST_LIMIT||100));
       if(!limit.allowed)return reply({error:limit.reason},429);
+      if(isBillQuestion(messages)){
+        const index=await getBills(),selected=billEvidence(index,messages),passages=await hydrateEvidence(index,selected);
+        return reply(passages.length?await answerEvidence(index,messages,env,passages):missingBillAnswer(index,messages));
+      }
       return reply(await converse(await getCorpus(),messages,env));
     }catch{return reply({kind:'unanswered',answer:'The source service is temporarily unavailable. Please try again shortly; your question has not been emailed.',sources:[],followUp:'',snapshotDate:manifest.builtAt});}
   }

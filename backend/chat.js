@@ -23,7 +23,12 @@ export function retrieve(data,messages){
   // A short reply needs the question the assistant just asked as well as the user's topic.
   const previous=messages.slice(0,-1).filter(m=>m.role==='assistant').at(-1)?.content||'';
   const combined=users.map(m=>expandQuestion(m.content,data.builtAt)).join(' ');
-  const queries=[latest,combined,latest+' '+previous,...users.slice(0,-1).reverse().map(m=>m.content)];
+  // Assistant prose can contain many unrelated names and dates. Only use its
+  // last question for a short reply, and keep factual retrieval on user topics.
+  const asked=previous.split(/\n/).at(-1)||'';
+  const queries=[combined,...users.slice(0,-1).reverse().map(m=>expandQuestion(m.content,data.builtAt))];
+  if(!/\b(?:it|that|this|they|them)\b/i.test(latest))queries.unshift(latest);
+  if(latest.length<60&&asked.endsWith('?'))queries.push(latest+' '+asked.slice(0,250));
   if(/temporary/i.test(combined)&&/permanent/i.test(combined))queries.splice(1,0,'course modification start proposal');
   if(/\babm\b/i.test(combined)&&/4\s*\+\s*1/.test(combined))queries.unshift('ABM','4+1');
   const seen=new Set(),found=[];
@@ -100,6 +105,7 @@ export async function gatherEvidence(data,messages,fetcher=fetch){
 export function systemPrompt(data,passages){
   const evidence=passages.map((r,i)=>({id:i+1,title:r.source.title,section:r.p.heading,url:r.p.source,notice:r.source.notice,text:r.p.text}));
   return `You are the URI Faculty Senate Assistant, a professional university information service. Give accurate, composed, useful answers grounded in published Senate resources.
+For bill identifiers, CASC means Curriculum and Standards Committee, a Faculty Senate committee. Never expand CASC as College of Arts and Sciences. GC means Graduate Council and GEC means General Education Committee. For a simple question asking for a bill number, use at most 80 words: give the number, identify the matching program/action, and cite its record. Do not recount objections, repeat an earlier status discussion, or discuss other bills unless asked. For a bill-number lookup, answer the identifier first and cite the record that explicitly associates it with the requested program or action. An earlier proposal-status question supplies the subject for 'Does it have a bill number?'. Distinguish Senate bill identifiers from committee report identifiers; call something a Senate bill when a source explicitly does. A bill's existence does not prove final approval. Do not substitute a specialization within an existing degree for a separate new degree program. A generic number without a committee may refer to multiple committee actions: identify the committee when the record establishes it, or ask which committee if matching records conflict. Do not add unrelated programs just because they share a report number. When answering an exact bill identifier, use a matching bill/report overview before listing individual tracker rows covered by it. State historical status only when useful to the question. Do not infer a later approval from an earlier tabled record.
 Return ONLY a JSON object (no Markdown fences or prose outside it): {"kind":"answer"|"clarification"|"unanswered","answer":"plain text","sourceIds":[1],"followUp":"one optional short question"}.
 Remember the conversation's topic and interpret short follow-ups in that context. Give the available general steps first. Ask one focused clarifying question only when necessary to choose between materially different procedures. A broad question about changing an existing course can be answered with the course modification steps, then ask what change is intended. Do not turn every answer into another question. Do not make people repeat details already given. For a greeting, reply briefly and ask how you can help (kind clarification).
 Start with the direct answer in one or two sentences. Add only the explanation or next steps needed to act. Usually use 60–160 words, fewer for simple questions. Be courteous, confident where the evidence is clear, and precise about uncertainty. Avoid conversational filler, self-referential commentary such as 'the evidence I have', repeated disclaimers, raw field labels, and needless lists. Use short paragraphs; use numbered lists only for a sequence and bullets for parallel items. Light Markdown bold is allowed for a few key terms. Never put JSON, field names such as kind or followUp, or code fences inside answer. Never repeat the answer in another format. Put an optional question only in followUp, never repeat it in answer. Omit followUp when the answer resolves the question. For general duties, definitions, locations, or an identified tracker record, leave followUp empty after answering; do not ask a question just to continue the chat. Every navigation step must be supported by the cited section; do not infer missing steps. Follow the identified proposal type consistently: never mix New Course start instructions with Course Modification instructions. For a temporary course becoming permanent, use Course Modification and its Start the Proposal section, never the + New Course button. Explain only what the quoted evidence establishes, without adding likely background details. If a source is listed in sourceIds, cite its ID in answer wherever its evidence is used. Cite claims with [1], [2] etc. using only evidence IDs below. sourceIds must list those sources. Never invent URLs, contacts, deadlines, policies, approvals, or live proposal status.
@@ -160,13 +166,16 @@ export async function converse(data,messages,env,fetcher=fetch,sourceFetcher=fet
   if(/^(?:hi|hello|hey|thanks|thank you)[!. ]*$/i.test(latest)||/^(?:what can you (?:help(?: me)? with|do)|how can you help(?: me)?|what (?:do you|can i) (?:ask|help with))[?!. ]*$/i.test(latest)){
     return {kind:'clarification',answer:'I can help with courses, programs, Kuali, proposal trackers, Senate committees and meetings, legislation, awards, and University Manual guidance. What would you like to do?',followUp:'',sources:[],snapshotDate:data.builtAt};
   }
-  let passages=retrieve(data,messages);
+  let passages=await gatherEvidence(data,messages,sourceFetcher);
   if(!passages.length){
     const greeting=/^(hi|hello|hey|thanks|thank you)[!. ]*$/i.test(messages.at(-1).content.trim());
     return {kind:'clarification',answer:'Let’s narrow this down so I can point you to the right guidance. Is this about a course, a program, Kuali or a proposal, a Senate committee or meeting, legislation, or University Manual guidance?',followUp:'',sources:[],snapshotDate:data.builtAt};
   }
+  return answerEvidence(data,messages,env,passages,fetcher);
+}
+
+export async function answerEvidence(data,messages,env,passages,fetcher=fetch){
   try{
-  passages=await gatherEvidence(data,messages,sourceFetcher);
   const res=await fetcher('https://llmgw.its.uri.edu/v1/chat/completions',{
     method:'POST',headers:{'Authorization':'Bearer '+env.URI_API_KEY,'Content-Type':'application/json'},
     body:JSON.stringify({model:env.AI_MODEL||'its_direct/pt3-claude-sonnet-5.5-1m-us',max_tokens:2200,response_format:{type:"json_object"},messages:[{role:'system',content:systemPrompt(data,passages)},...activeMessages(messages).slice(0,-1).map(m=>m.role==='assistant'?{...m,content:m.content.replace(/\[\d+\]/g,'')}:m),{role:'user',content:messages.at(-1).content+'\n\nUse the evidence to give the available answer and steps now. For a question specifically about modifying an existing course, use the course modification procedure. For Kuali access, answer access and login first; do not replace it with later proposal workflow stages. Do not ask them to repeat what they already told you. Ask a follow-up only if essential details remain missing. Return a JSON object with kind, answer, sourceIds, and followUp. Include evidence citations [n] for all factual guidance, including guidance in clarifications.'}]}),
