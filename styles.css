@@ -5,3 +5,45 @@
 @media(max-width:700px){.shell{display:block}.sidebar{min-height:auto;padding:18px 22px}.brand{font-size:12px}.sidebar-intro,.sidebar-foot{display:none}.sidebar nav{display:flex;gap:16px;border:0;margin:16px 0 0;flex-wrap:wrap}.sidebar nav a,.sidebar nav button{width:auto;border:0;padding:0;font-size:12px;gap:7px}.topbar{padding:18px 22px}.topbar span{font-size:12px}.workspace{padding:30px 20px 20px}.welcome h2{font-size:30px}.welcome p{font-size:15px}.eyebrow{font-size:11px}.form-bottom{display:block}.form-bottom>span{max-width:none;display:block}.primary{width:100%;margin-top:14px}textarea{font-size:16px}.source-card{padding:18px}.result-head{align-items:start}.result-head span{max-width:100px;text-align:right}.source-link{display:block}.source-link span{display:block;margin-top:6px}.email-link{width:100%;text-align:center}.dialog-top h2{font-size:23px}dialog{padding:22px}.excerpt{font-size:16px}}
 
 .chat-message{margin:18px 0;padding:24px;border:1px solid var(--line);border-radius:12px;background:white;overflow-wrap:anywhere}.chat-message.user{margin-left:12%;background:#e8f1f9;border-color:#c6daeb}.chat-role{display:block;font-size:11px;letter-spacing:1px;font-weight:700;color:var(--blue)}.chat-text{font-size:16px;line-height:1.8;white-space:pre-wrap;margin:12px 0}.chat-followup{font-size:16px;font-weight:600;line-height:1.6;margin-bottom:14px}.chat-citations{border-top:1px solid var(--line);padding-top:12px;margin-top:18px}.chat-citations a{display:block;font-size:13px;line-height:1.6;margin:5px 0}.chat-note{font-size:12px;color:var(--muted);display:block;margin:14px 0}.chat-email{display:inline-block;font-size:13px;line-height:1.5;margin-top:8px}.chat-message .fallback{padding:18px}
+
+/* Keep the transcript and reply composer together within the visible chat. */
+.shell{height:100dvh;min-height:0;overflow:hidden}
+.sidebar{min-height:0;overflow:auto}
+main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.topbar{flex:none}
+.workspace{display:flex;flex-direction:column;flex:1;min-height:0;width:100%;margin:0 auto;padding:24px 32px 16px}
+.chat-panel{display:flex;flex-direction:column;flex:1;min-height:0;border:1px solid #cbdbe9;border-radius:14px;background:white;box-shadow:0 5px 18px #19385708;overflow:hidden}
+.chat-scroll{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:28px;scrollbar-gutter:stable}
+.chat-scroll:focus-visible{outline:3px solid #e2a92b;outline-offset:-4px}
+.has-conversation .welcome,.has-conversation .suggestions{display:none}
+.question-panel{flex:none;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;background:#f8fafc}
+.question-panel form{padding:16px 22px}
+.question-panel label{margin-bottom:7px;font-size:13px}
+.question-panel textarea{display:block;min-height:48px;max-height:110px;font-size:16px;line-height:1.5;resize:vertical}
+.question-panel textarea:focus-visible{outline:2px solid #d7a132;outline-offset:3px;border-radius:3px}
+.question-panel .form-bottom{margin-top:10px;align-items:center}
+.question-panel .form-bottom>span{max-width:none;font-size:12px}
+.question-panel .primary{padding:10px 16px}
+.chat-scroll .chat-message{margin:0 0 18px;padding:18px;background:#f7f9fc;border:0}
+.chat-scroll .chat-message.user{background:#e8f1f9}
+.chat-scroll .chat-message:last-child{margin-bottom:0}
+.status{flex:none;margin:10px 0 0}
+.page-foot{flex:none;font-size:11px;line-height:1.5;margin-top:10px;padding-top:10px}
+@media(max-width:700px){
+  .shell{display:flex;flex-direction:column}
+  .sidebar{flex:none;overflow:visible;padding:12px 18px}
+  .sidebar nav{margin-top:10px;gap:12px}
+  main{flex:1}
+  .topbar{padding:12px 18px}
+  .workspace{padding:12px 12px 8px}
+  .chat-scroll{padding:18px}
+  .question-panel form{padding:12px 16px}
+  .question-panel .form-bottom{display:flex;gap:12px}
+  .question-panel .primary{width:auto;margin:0;padding:10px 12px;font-size:13px}
+  .question-panel .form-bottom>span{font-size:11px}
+  .chat-scroll .chat-message{padding:14px}
+  .chat-scroll .chat-message.user{margin-left:6%}
+  .chat-text,.chat-followup{font-size:15px;line-height:1.6}
+  .page-foot{font-size:10px;line-height:1.4;margin-top:6px;padding-top:6px}
+  .status{font-size:10px;line-height:1.4;margin-top:6px}
+}

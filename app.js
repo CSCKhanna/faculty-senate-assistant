@@ -3,6 +3,13 @@ import {CHAT_API_URL} from './config.js';
 const $=s=>document.querySelector(s);
 const results=$('#results'),status=$('#load-status'),input=$('#question'),submit=$('#submit');
 let data,coverage,search,question='',messages=[],busy=false,connected=false;
+const scroller=$('#chat-scroll'),panel=$('#chat-panel');
+function scrollChat(){scroller.scrollTop=scroller.scrollHeight;}
+function startConversation(){
+  panel.classList.add('has-conversation');
+  $('#question-label').textContent=connected?'Reply or ask a follow-up':'Your question';
+  input.placeholder=connected?'Type your reply here…':'Type your question here…';
+}
 const date=s=>new Date(s).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
 function link(label,url,cls){const n=el('a',label,cls);n.href=url;if(!url.startsWith('mailto:')){n.target='_blank';n.rel='noopener';}return n;}
@@ -17,7 +24,7 @@ function fallback(empty){
 }
 function runSourceSearch(){
   if(!search||!input.value.trim())return;
-  question=input.value;results.replaceChildren();results.setAttribute('aria-busy','true');
+  startConversation();question=input.value;results.replaceChildren();results.setAttribute('aria-busy','true');
   const found=search(question);
   const head=el('div',undefined,'result-head');head.append(el('h3',found.length?'Relevant guidance':'No clear match found'),el('span',found.length?'Original source excerpts':'Search prototype'));results.append(head,el('div',question,'searched'));
   if(!found.length)results.append(el('p','I couldn’t find a clear match in the indexed resources. This prototype searches source text; a missing match does not mean the guidance doesn’t exist.','empty-note'));
@@ -31,17 +38,18 @@ function runSourceSearch(){
       const foot=el('div',undefined,'source-link');foot.append(link('Read source: '+r.source.title,r.p.source),el('span','Snapshot '+date(r.source.fetchedAt)));card.append(foot);results.append(card);
     }
   }
-  results.append(fallback(!found.length));results.setAttribute('aria-busy','false');
+  results.append(fallback(!found.length));results.setAttribute('aria-busy','false');scrollChat();
 }
 function messageBubble(role,text){
   const bubble=el('article',undefined,'chat-message '+role);
   bubble.append(el('span',role==='user'?'YOU':'CURRICULUM ASSISTANT','chat-role'),el('p',text,'chat-text'));
-  results.append(bubble);return bubble;
+  results.append(bubble);scrollChat();return bubble;
 }
 async function run(){
   if(!input.value.trim()||busy)return;
   if(!connected){runSourceSearch();return;}
   if(messages.length>=16){status.textContent='Please start a new conversation to continue.';return;}
+  startConversation();
   const original=input.value;
   if(!messages.length){question=original;results.replaceChildren();}
   messages.push({role:'user',content:original});messageBubble('user',original);input.value='';
@@ -65,12 +73,12 @@ async function run(){
     else{const email=link('Email Genviéve with my original question',emailLink(question),'chat-email');bubble.append(email);}
     messages.push({role:'assistant',content:answer.answer+(answer.followUp?'\n'+answer.followUp:'')});
   }catch(error){waiting.remove();const bubble=messageBubble('assistant',error.message);bubble.append(fallback(true));messages.pop();input.value=original;}
-  finally{busy=false;submit.disabled=false;results.setAttribute('aria-busy','false');input.focus();}
+  finally{busy=false;submit.disabled=false;results.setAttribute('aria-busy','false');scrollChat();input.focus({preventScroll:true});}
 }
 $('#question-form').addEventListener('submit',e=>{e.preventDefault();run();});
 input.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();run();}});
 for(const b of document.querySelectorAll('[data-question]'))b.addEventListener('click',()=>{input.value=b.dataset.question;run();input.focus();});
-$('#new-question').addEventListener('click',()=>{if(busy)return;messages=[];question='';input.value='';results.replaceChildren();input.focus();});
+$('#new-question').addEventListener('click',()=>{if(busy)return;messages=[];question='';input.value='';results.replaceChildren();panel.classList.remove('has-conversation');$('#question-label').textContent='Your question';input.placeholder='Type your question here…';scroller.scrollTop=0;input.focus({preventScroll:true});});
 $('#sources-button').addEventListener('click',()=>$('#source-dialog').showModal());
 $('#close-dialog').addEventListener('click',()=>$('#source-dialog').close());
 $('#source-dialog').addEventListener('click',e=>{if(e.target===$('#source-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}});
