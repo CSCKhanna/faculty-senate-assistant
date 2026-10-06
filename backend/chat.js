@@ -89,6 +89,11 @@ export function parseAnswer(raw,passages){
     canonical.set(id,source.id);
   }
   obj.answer=obj.answer.replace(/\[(\d+)\]/g,(_,id)=>'['+canonical.get(Number(id))+']').replace(/(\[\d+\])(?:\s*\1)+/g,'$1');
+  obj.answer=obj.answer.split(/\n\s*\n/).map(paragraph=>{
+    const markers=[...paragraph.matchAll(/\[\d+\]/g)].map(m=>m[0]),unique=[...new Set(markers)];
+    if(markers.length===unique.length)return paragraph;
+    return paragraph.replace(/\s*\[\d+\]/g,'').replace(/ +([.,;:!?])/g,'$1').trimEnd()+' '+unique.join('');
+  }).join('\n\n');
   return {kind:obj.kind,answer:obj.answer,followUp:typeof obj.followUp==='string'&&!obj.answer.includes(obj.followUp.trim())?obj.followUp.slice(0,300):'',sources,snapshotDate:passages[0]?.source.fetchedAt||null};
 }
 
