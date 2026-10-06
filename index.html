@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Explore Faculty Senate guidance with source-linked search and an email fallback.">
   <title>Faculty Senate Assistant · Prototype</title>
-  <link rel="stylesheet" href="styles.css?v=4">
+  <link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
   <a class="skip" href="#question">Skip to question</a>
@@ -31,7 +31,7 @@
           <section class="question-panel" aria-label="Message the assistant">
             <form id="question-form">
               <label for="question" id="question-label">Your question</label>
-              <textarea id="question" name="question" rows="2" maxlength="4000" placeholder="Type your question here…" required aria-describedby="mode-note"></textarea>
+              <textarea id="question" name="question" rows="1" maxlength="4000" placeholder="Type your question here…" required aria-describedby="mode-note"></textarea>
               <div class="form-bottom"><span id="mode-note">A conversation grounded in the toolkit.</span><button class="primary" id="submit" type="submit" disabled>Send question</button></div>
             </form>
           </section>
@@ -42,6 +42,6 @@
     </main>
   </div>
   <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-top"><div><span class="eyebrow blue">SOURCE TRANSPARENCY</span><h2 id="source-title">What this prototype searches</h2></div><button id="close-dialog" type="button" aria-label="Close source list">✕</button></div><div id="coverage"></div><div id="source-list"></div></dialog>
-  <script type="module" src="app.js?v=9"></script>
+  <script type="module" src="app.js?v=10"></script>
 </body>
 </html>
