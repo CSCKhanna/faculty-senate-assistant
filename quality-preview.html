@@ -29,7 +29,7 @@ dialog{width:min(850px,calc(100vw - 32px));max-height:90dvh;border:0;border-radi
 @media(min-width:1600px){.shell{grid-template-columns:340px 1fr}.sidebar{padding-left:40px;padding-right:40px}}
 @media(max-width:1000px){.shell{grid-template-columns:240px 1fr}.sidebar{padding:28px 20px}.side-title{font-size:28px}.brand{font-size:11px}.brand-mark{width:36px;height:36px}.topbar{padding:18px 24px}.workspace{padding:20px 24px 12px}.welcome h2{font-size:33px}}
 @media(max-width:700px){.shell{display:flex;flex-direction:column}.sidebar{display:none}main{flex:1}.topbar{padding:10px 12px;gap:8px}.topbar h1{font-size:15px}.topbar span{font-size:11px}.topbar button{padding:8px 10px;font-size:12px}.topbar-actions{gap:6px}#sources-mobile{display:block}#new-question{max-width:96px;line-height:1.25}.workspace{padding:10px 10px 8px}.chat-scroll{padding:16px}.welcome h2{font-size:30px}.welcome p{font-size:15px;margin-bottom:18px}.eyebrow{font-size:11px}.suggestions{align-items:flex-start}.suggestions>span{width:100%}.chat-message{padding:17px 18px}.chat-message.user{margin-left:8%;padding:13px 16px}.inline-citation{min-height:28px;min-width:28px}.question-panel form{padding:10px 12px;gap:6px 8px}.primary{padding:9px 12px;font-size:13px;min-width:64px}.form-bottom>span{font-size:11px}.page-foot{font-size:11px;margin-top:6px;padding-top:5px}.page-foot button{min-height:32px}.privacy-line{display:none}.status{font-size:11px}.connection-status{margin-top:6px;gap:8px}.answer-actions{gap:8px}.dialog-top h2{font-size:23px}dialog{padding:20px}.service-info{font-size:13px}}
-@media(max-height:520px){.topbar{padding-top:8px;padding-bottom:8px}.topbar span{display:none}.workspace{padding-top:8px}.question-panel form{padding-top:8px;padding-bottom:8px}.question-panel label{display:none}.page-foot{margin-top:5px;padding-top:2px}.privacy-line{display:none}.sidebar-intro{margin-top:20px}.sidebar-foot{padding-top:20px}.connection-status{margin-top:5px}.chat-message{padding:16px 18px}}
+@media(max-height:520px){.shell{display:flex;flex-direction:column}.sidebar{display:none}main{flex:1}#sources-mobile{display:block}.topbar{padding-top:8px;padding-bottom:8px}.topbar span{display:none}.workspace{padding-top:8px}.question-panel form{padding-top:8px;padding-bottom:8px}.question-panel label{display:none}.page-foot{margin-top:5px;padding-top:2px}.privacy-line{display:none}.sidebar-intro{margin-top:20px}.sidebar-foot{padding-top:20px}.connection-status{margin-top:5px}.chat-message{padding:16px 18px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
 </style>
 </head>
@@ -58,23 +58,28 @@ dialog{width:min(850px,calc(100vw - 32px));max-height:90dvh;border:0;border-radi
           <section class="question-panel" aria-label="Message the assistant">
             <form id="question-form">
               <label for="question" id="question-label">Your question</label>
-              <textarea id="question" name="question" rows="1" maxlength="4000" placeholder="Type your question here…" required aria-describedby="mode-note"></textarea>
+              <textarea id="question" name="question" aria-label="Your question" rows="1" maxlength="4000" placeholder="Type your question here…" required aria-describedby="mode-note"></textarea>
               <div class="form-bottom"><span id="mode-note">A conversation grounded in the toolkit.</span><button class="primary" id="submit" type="submit" disabled>Send question</button></div>
             </form>
           </section>
         </section>
         <div class="connection-status"><div id="load-status" class="status" role="status">Connecting to Senate resources…</div><button id="reconnect" type="button" hidden>Reconnect AI</button></div><div id="action-status" class="sr-only" role="status"></div>
-        <footer class="page-foot">AI-generated answers. Verify time-sensitive information in the original source. <button id="about-service" type="button">About this pilot & privacy</button><span class="privacy-line">Messages are processed through URI’s AI gateway. This visit is preserved only in this browser tab. Email drafts are never sent automatically.</span></footer>
+        <footer class="page-foot">QA preview: simulated replies; no AI requests. <button id="about-service" type="button">About this pilot & privacy</button><span class="privacy-line">Messages are processed through URI’s AI gateway. This visit is preserved only in this browser tab. Email drafts are never sent automatically.</span></footer>
       </div>
     </main>
   </div>
   <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-top"><div><span class="eyebrow blue">SOURCE TRANSPARENCY</span><h2 id="source-title">Sources and service information</h2></div><button id="close-dialog" type="button" aria-label="Close source list">✕</button></div><div class="service-info"><p>This pilot is not an official URI service. It answers questions using public Faculty Senate resources and a dated source snapshot. Restricted or unreadable documents are listed below.</p><p>Messages are processed through URI’s AI gateway. Your current visit is saved in this tab’s session storage so refreshing does not erase the conversation. New conversation clears that visit. No transcript is stored by this application’s backend. Email links open an unsent draft containing your original question.</p><p><a href="https://gilded-toucan-d8a.notion.site/URI-Faculty-Senate-Curriculum-Toolkit-3a57535bf92c80c78bacd5b49e9c6c12" target="_blank" rel="noopener">Open Curriculum Toolkit ↗</a> · <a href="https://web.uri.edu/facsen/" target="_blank" rel="noopener">Open Faculty Senate website ↗</a></p></div><div id="coverage"></div><div id="source-list"></div></dialog>
-  <script type="module">// scripts/quality-fixtures.js
-var nativeFetch = globalThis.fetch.bind(globalThis);
-var state = new URL(location.href).searchParams.get("scenario") || "normal";
-var count = 0;
-var sources = [{ id: 1, title: "Course Modification Proposal Walkthrough", section: "Start the Proposal", url: "https://gilded-toucan-d8a.notion.site/3c57535bf92c80d88020dcb7b863e664" }];
-var answer = { kind: "answer", answer: "Use a **Course Modification Proposal** to make a temporary course permanent. Open the existing course in Kuali, select **Propose Changes**, and choose **Create a new version** [1].\n\n1. Complete the relevant changes.\n2. Leave Edit Mode, then submit for approval [1].", sources, followUp: "" };
+  <script type="module">var __defProp = Object.defineProperty;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+
+// scripts/quality-fixtures.js
 async function qualityFetch(url, options) {
   if (String(url).endsWith("/health")) {
     if (state === "slow-start") await new Promise((r) => setTimeout(r, 6e3));
@@ -94,9 +99,18 @@ async function qualityFetch(url, options) {
   if (state === "inventory-error" && String(url).endsWith("/routing.json")) return new Response("", { status: 503 });
   return nativeFetch(url, options);
 }
+var nativeFetch, state, count, sources, answer;
+var init_quality_fixtures = __esm({
+  "scripts/quality-fixtures.js"() {
+    nativeFetch = globalThis.fetch.bind(globalThis);
+    state = new URL(location.href).searchParams.get("scenario") || "normal";
+    count = 0;
+    sources = [{ id: 1, title: "Course Modification Proposal Walkthrough", section: "Start the Proposal", url: "https://gilded-toucan-d8a.notion.site/3c57535bf92c80d88020dcb7b863e664" }];
+    answer = { kind: "answer", answer: "Use a **Course Modification Proposal** to make a temporary course permanent. Open the existing course in Kuali, select **Propose Changes**, and choose **Create a new version** [1].\n\n1. Complete the relevant changes.\n2. Leave Edit Mode, then submit for approval [1].", sources, followUp: "" };
+  }
+});
 
 // corpus.js?v=2
-var BASE = "https://csckhanna.github.io/faculty-senate-assistant/";
 async function loadCorpus(manifest2, fetcher = qualityFetch, base = BASE) {
   if (!/^data\/corpus-[a-f0-9]{12}$/.test(manifest2.corpusBase)) throw new Error("Invalid corpus revision");
   const [a, b] = await Promise.all([fetcher(base + manifest2.corpusBase + "/routing.json"), fetcher(base + manifest2.corpusBase + "/postings.bin")]);
@@ -120,8 +134,15 @@ async function hydrateEvidence(data2, evidence, fetcher = qualityFetch) {
     return { ...r, p: { ...r.p, text } };
   });
 }
+var BASE;
+var init_corpus = __esm({
+  "corpus.js?v=2"() {
+    init_quality_fixtures();
+    BASE = "https://csckhanna.github.io/faculty-senate-assistant/";
+  }
+});
 
-// conversation.js
+// conversation.js?v=3
 function isFollowUp(text) {
   const q = text.trim();
   if (/^(?:yes|no|sure|okay|ok|the prerequisites|the credits|the title|the description)\b/i.test(q)) return true;
@@ -136,12 +157,21 @@ function activeMessages(messages2) {
   for (let i = 0; i < messages2.length; i++) if (messages2[i].role === "user" && !isFollowUp(messages2[i].content)) start = i;
   return messages2.slice(start);
 }
+function academicYear(snapshot) {
+  const d = new Date(snapshot), year = d.getUTCFullYear() - (d.getUTCMonth() < 6 ? 1 : 0);
+  return { current: `${year}-${year + 1}`, previous: `${year - 1}-${year}` };
+}
+function expandQuestion(text, snapshot) {
+  const y = academicYear(snapshot);
+  return text.replace(/\bAI\b/gi, "Artificial Intelligence").replace(/\blast academic year\b/gi, y.previous + " academic year").replace(/\b(?:this|current) academic year\b/gi, y.current + " academic year");
+}
+var init_conversation = __esm({
+  "conversation.js?v=3"() {
+    init_quality_fixtures();
+  }
+});
 
 // search.js?v=8
-var STOP = new Set("difference between compare versus vs a an the of to for and or in on at is are be was were it this that i my me we our you your how do does did can could would should what when where who which with have has want need please about from as by into all get getting like know find tell more help question teach teaching taught wondering trying someone anyone something use using information explain regarding".split(" "));
-var normalize = (text) => text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/4\s*\+\s*1/g, " fourplusone ").replace(/cross[ -]?list(?:ed|ing)?/g, " crosslist ").replace(/simultaneous/g, " simultaneous ").replace(/\b(?:approve|approved|approving|approvals)\b/g, " approval ").replace(/\b(?:modify|modifying|modifications|modification)\b/g, " modification ").replace(/\b(?:track|tracking)\b/g, " track ").replace(/\b(?:chairs)\b/g, " chair ").replace(/\b(?:courses|classes|class)\b/g, " course ").replace(/\b(?:propose|proposing|proposed)\b/g, " proposal ").replace(/\b(?:proposals)\b/g, " proposal ").replace(/\b(?:programs)\b/g, " program ").replace(/\b(?:committees)\b/g, " committee ");
-var tokens = (text) => normalize(text).match(/[a-z0-9]+/g)?.filter((x) => x.length > 1 && !STOP.has(x)) || [];
-var SYNONYMS = { deadline: ["deadline", "calendar", "date", "submission"], dates: ["date", "calendar", "deadline"], calendar: ["calendar", "date", "deadline"], access: ["access", "login", "logging"], login: ["login", "logging", "access"], status: ["status", "track", "workflow"], track: ["track", "status"], permanent: ["permanent"], temporary: ["temporary"], change: ["change", "modification"], changing: ["change", "modification"], submit: ["submit", "submission", "submitted"], submitting: ["submit", "submission", "submitted"], denied: ["denied", "rejected"], rejected: ["rejected", "denied"], credits: ["credit", "credits"], crosslist: ["crosslist"], syllabus: ["syllabus", "syllabi"] };
 function buildSearch(data2) {
   if (data2.postings && data2.terms) return buildCompiledSearch(data2);
   const sourceMap = new Map(data2.sources.map((s) => [s.url, s]));
@@ -200,16 +230,12 @@ function emailLink(originalQuestion) {
   return "mailto:genvieve.spitale@uri.edu?subject=" + encodeURIComponent("Faculty Senate curriculum question") + "&body=" + encodeURIComponent(originalQuestion);
 }
 function conversationContext(messages2) {
-  const scoped = activeMessages(messages2), anchor = scoped[0];
-  let recent = scoped.slice(-13).map((m) => ({ role: m.role, content: m.content.slice(0, 4e3) }));
-  if (recent[0]?.role === "assistant") recent.shift();
-  if (anchor && scoped.length > recent.length) recent.unshift({ role: anchor.role, content: anchor.content.slice(0, 4e3) });
-  while (recent.length > 1 && recent.reduce((n, m) => n + m.content.length, 0) > 2e4) recent = recent.slice(2);
-  if (anchor && recent[0]?.content !== anchor.content.slice(0, 4e3)) {
-    while (recent.length > 1 && recent.reduce((n, m) => n + m.content.length, 0) + Math.min(anchor.content.length, 4e3) > 2e4) recent.splice(0, 2);
-    recent.unshift({ role: anchor.role, content: anchor.content.slice(0, 4e3) });
-  }
-  return recent;
+  const scoped = activeMessages(messages2).map((m) => ({ role: m.role, content: m.content.slice(0, 4e3) }));
+  if (scoped.length <= 13 && scoped.reduce((n, m) => n + m.content.length, 0) <= 2e4) return scoped;
+  const head = scoped.slice(0, 2), tail = scoped.slice(Math.max(2, scoped.length - 11));
+  if (tail[0]?.role === "assistant") tail.shift();
+  while (tail.length > 1 && [...head, ...tail].reduce((n, m) => n + m.content.length, 0) > 2e4) tail.splice(0, 2);
+  return [...head, ...tail];
 }
 function buildCompiledSearch(data2) {
   const sourceFlags = new Map(data2.sources.map((s) => {
@@ -288,14 +314,198 @@ function buildCompiledSearch(data2) {
     return results2;
   };
 }
+var STOP, normalize, tokens, SYNONYMS;
+var init_search = __esm({
+  "search.js?v=8"() {
+    init_quality_fixtures();
+    init_conversation();
+    STOP = new Set("difference between compare versus vs a an the of to for and or in on at is are be was were it this that i my me we our you your how do does did can could would should what when where who which with have has want need please about from as by into all get getting like know find tell more help question teach teaching taught wondering trying someone anyone something use using information explain regarding".split(" "));
+    normalize = (text) => text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/4\s*\+\s*1/g, " fourplusone ").replace(/cross[ -]?list(?:ed|ing)?/g, " crosslist ").replace(/simultaneous/g, " simultaneous ").replace(/\b(?:approve|approved|approving|approvals)\b/g, " approval ").replace(/\b(?:modify|modifying|modifications|modification)\b/g, " modification ").replace(/\b(?:track|tracking)\b/g, " track ").replace(/\b(?:chairs)\b/g, " chair ").replace(/\b(?:courses|classes|class)\b/g, " course ").replace(/\b(?:propose|proposing|proposed)\b/g, " proposal ").replace(/\b(?:proposals)\b/g, " proposal ").replace(/\b(?:programs)\b/g, " program ").replace(/\b(?:committees)\b/g, " committee ");
+    tokens = (text) => normalize(text).match(/[a-z0-9]+/g)?.filter((x) => x.length > 1 && !STOP.has(x)) || [];
+    SYNONYMS = { deadline: ["deadline", "calendar", "date", "submission"], dates: ["date", "calendar", "deadline"], calendar: ["calendar", "date", "deadline"], access: ["access", "login", "logging"], login: ["login", "logging", "access"], status: ["status", "track", "workflow"], track: ["track", "status"], permanent: ["permanent"], temporary: ["temporary"], change: ["change", "modification"], changing: ["change", "modification"], submit: ["submit", "submission", "submitted"], submitting: ["submit", "submission", "submitted"], denied: ["denied", "rejected"], rejected: ["rejected", "denied"], credits: ["credit", "credits"], crosslist: ["crosslist"], syllabus: ["syllabus", "syllabi"] };
+  }
+});
+
+// retrieval.js?v=1
+var retrieval_exports = {};
+__export(retrieval_exports, {
+  gatherEvidence: () => gatherEvidence,
+  retrieve: () => retrieve
+});
+function metadata(data2) {
+  if (metadataCache.has(data2)) return metadataCache.get(data2);
+  const registry = new Map(data2.sources.map((s) => [s.url, s])), bySource = /* @__PURE__ */ new Map(), byTitle = /* @__PURE__ */ new Map(), byHeading = /* @__PURE__ */ new Map();
+  for (const p of data2.passages) {
+    if (!bySource.has(p.source)) bySource.set(p.source, []);
+    bySource.get(p.source).push(p);
+    const title = registry.get(p.source)?.title;
+    if (!byTitle.has(title)) byTitle.set(title, []);
+    byTitle.get(title).push(p);
+    if (!byHeading.has(p.heading)) byHeading.set(p.heading, []);
+    byHeading.get(p.heading).push(p);
+  }
+  const result = { registry, bySource, byTitle, byHeading };
+  metadataCache.set(data2, result);
+  return result;
+}
+function retrieve(data2, messages2) {
+  if (!searchCache.has(data2)) searchCache.set(data2, buildSearch(data2));
+  messages2 = activeMessages(messages2);
+  const meta = metadata(data2), { registry, bySource, byTitle, byHeading } = meta;
+  const allUsers = messages2.filter((m) => m.role === "user"), users = allUsers.length > 4 ? [allUsers[0], ...allUsers.slice(-3)] : allUsers;
+  const search2 = searchCache.get(data2);
+  const latest = expandQuestion(users.at(-1).content, data2.builtAt);
+  const previous = messages2.slice(0, -1).filter((m) => m.role === "assistant").at(-1)?.content || "";
+  const combined = users.map((m) => expandQuestion(m.content, data2.builtAt)).join(" ");
+  const asked = previous.split(/\n/).at(-1) || "";
+  const queries = [combined, ...users.slice(0, -1).reverse().map((m) => expandQuestion(m.content, data2.builtAt))];
+  if (users.length === 1 || !isFollowUp(latest)) queries.unshift(latest);
+  if (latest.length < 60 && asked.endsWith("?")) queries.push(latest + " " + asked.slice(0, 250));
+  if (/temporary/i.test(combined) && /permanent/i.test(combined)) queries.splice(1, 0, "course modification start proposal");
+  if (/\babm\b/i.test(combined) && /4\s*\+\s*1/.test(combined)) queries.unshift("ABM", "4+1");
+  const seen = /* @__PURE__ */ new Set(), found = [];
+  const lists = [...new Set(queries.map((q) => q.trim()))].map((q) => {
+    const exact = search2(q, 8);
+    return exact.length ? exact : search2(q, 8, true);
+  });
+  ranked: for (let rank = 0; rank < 8; rank++) for (const list of lists) {
+    const r = list[rank];
+    if (!r) continue;
+    const key = r.p.id === void 0 ? r.p.source + "\n" + r.p.heading + "\n" + r.p.text : r.p.id;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    found.push(r);
+    if (found.length === 12) break ranked;
+  }
+  for (const source of new Set(found.map((r) => r.p.source))) {
+    const p = bySource.get(source)?.find((p2) => p2.heading === "Start the Proposal");
+    if (p && !found.some((r) => r.p === p)) found.push({ p, source: registry.get(source) });
+    const image = [...bySource.entries()].filter(([url]) => url.startsWith(source + "#")).flatMap(([, p2]) => p2).find((p2) => /Create a new version/i.test(p2.text) && /Create a new revision/i.test(p2.text));
+    if (image && !found.some((r) => r.p === image) && found.length < 16) found.push({ p: image, source: registry.get(image.source) });
+    if (registry.get(source)?.title === "Course Modification Proposal Walkthrough") for (const heading of ["Submit to the Workflow", "So, what happens now?"]) {
+      const p2 = bySource.get(source)?.find((p3) => p3.heading === heading);
+      if (p2 && !found.some((r) => r.p === p2) && found.length < 16) found.push({ p: p2, source: registry.get(source) });
+    }
+    if (found.length >= 16) break;
+  }
+  if (/course|class|prerequis/i.test(combined) && /chang|modif/i.test(combined)) {
+    const taxonomy = byHeading.get("Course change classifications (full source)")?.[0];
+    if (taxonomy) {
+      const at = found.findIndex((r) => r.p === taxonomy);
+      if (at >= 0) found.splice(at, 1);
+      found.unshift({ p: taxonomy, source: registry.get(taxonomy.source) });
+      if (found.length > 16) found.length = 16;
+    }
+  }
+  if (/graduate council|grad council/i.test(combined) && /when|date|meeting|calendar/i.test(combined)) {
+    const dates = (byTitle.get("Graduate Council Meeting") || []).filter((p) => /^Date:/.test(p.text));
+    const extras = dates.filter((p) => !found.some((r) => r.p === p)).map((p) => ({ p, source: registry.get(p.source) }));
+    return [...extras, ...found].slice(0, 20);
+  }
+  const priority = [];
+  if (/kuali/i.test(combined) && /start|access|log.?in|using|begin|use|staff|faculty/i.test(combined)) {
+    for (const heading of ["Faculty Access", "Non-Faculty Access", "Logging In", "Accessing the Curriculum App", "The Kuali Dashboard"]) {
+      const p = byTitle.get("Kuali Basics")?.find((p2) => p2.heading === heading);
+      if (p) priority.push({ p, source: registry.get(p.source) });
+    }
+  }
+  let guide;
+  if (/how|steps|start|create|establish|propos|submit|need|require/i.test(combined)) {
+    const modified = /chang|modif|revise|permanent/i.test(combined);
+    if (/specialization/i.test(combined)) guide = (modified ? "Specialization Modification" : "New Specialization") + " Proposal Walkthrough";
+    else if (/\bnew (?:undergraduate |graduate |temporary )?course\b/i.test(combined) && !modified) guide = "New Course Proposal Walkthrough";
+    else if (/\b(?:program|degree|major|minor|certificate)\b/i.test(combined) && /\bnew\b|chang|modif/i.test(combined)) guide = (modified ? "Program Modification" : "New Program") + " Proposal Walkthrough";
+    else if (/course|class/i.test(combined) && modified) guide = "Course Modification Proposal Walkthrough";
+    if (guide) {
+      const pages = byTitle.get(guide) || [];
+      for (const heading of ["Start the Proposal", "Submit to the Workflow", "So, what happens now?"]) {
+        const p = pages.find((p2) => p2.heading === heading);
+        if (p) priority.push({ p, source: registry.get(p.source) });
+      }
+      for (let i = found.length - 1; i >= 0; i--) if (/Proposal Walkthrough$/.test(found[i].source.title) && found[i].source.title !== guide) found.splice(i, 1);
+    }
+  }
+  if (/after.*approv|once.*approv/i.test(latest) && !guide) {
+    const p = (byTitle.get("When will my proposal be approved?") || []).find((p2) => /after the Senate Meeting/.test(p2.heading));
+    if (p) priority.push({ p, source: registry.get(p.source) });
+  }
+  if (/contact|staff|office|located|location|address|phone|email/i.test(latest) && /faculty senate|spitale|genvi[eé]ve/i.test(latest)) for (const title of ["Staff", "Contact"]) priority.push(...(byTitle.get(title) || []).slice(1).map((p) => ({ p, source: registry.get(p.source) })));
+  const entityQuestion = users.length > 1 && isFollowUp(latest) ? expandQuestion(users[0].content, data2.builtAt) : latest;
+  const entity = tokens(entityQuestion).filter((w) => !new Set("approval program major degree status proposal happened academic year last current any not approved start denied rejected bs ba ms phd".split(" ")).has(w) && !/^\d+$/.test(w));
+  if (/approval|approved|status|happened|track/i.test(combined) && entity.length) {
+    const year = latest.match(/(20\d{2})\s*[-–]\s*(20\d{2}|\d{2})/)?.[1];
+    if (!meta.trackerRows) meta.trackerRows = data2.sources.filter((s) => s.kind === "Faculty Senate proposal tracker").flatMap((source) => (bySource.get(source.url) || []).filter((p) => Number(p.heading.match(/\| Row (\d+) \|/)?.[1]) >= 3).map((p) => ({ p, source, words: new Set(tokens(p.heading.split(/\| Row \d+ \|/)[1])) })));
+    const rows = meta.trackerRows.map((r) => ({ ...r, hits: entity.filter((w) => r.words.has(w)).length })).filter((r) => r.hits >= Math.min(2, entity.length) && r.hits / entity.length >= 0.6 && (!year || r.source.title.includes(year))).sort((a, b) => b.hits - a.hits || trackerYear(b.source) - trackerYear(a.source));
+    const best = rows[0]?.hits;
+    priority.push(...rows.filter((r) => r.hits === best).slice(0, 6));
+  }
+  if (/\bbills?\b|legislation/i.test(latest) && /what is|difference|different|how.*approv|process/i.test(latest)) {
+    priority.push(...(byTitle.get("Appendix C: By-Laws of the Faculty Senate \u2013 University Manual") || []).filter((p) => /^Section (?:8|10)\./.test(p.heading)).slice(0, 5).map((p) => ({ p, source: registry.get(p.source) })));
+    const overview = byTitle.get("Legislation")?.[1];
+    if (overview) priority.push({ p: overview, source: registry.get(overview.source) });
+  }
+  const merged = [], keys = /* @__PURE__ */ new Set();
+  for (const r of [...priority, ...found]) {
+    const k = r.p.id === void 0 ? r.p.source + "\n" + r.p.heading + "\n" + r.p.text : r.p.id;
+    if (!keys.has(k)) {
+      keys.add(k);
+      merged.push(r);
+    }
+    if (merged.length === 16) break;
+  }
+  return merged;
+}
+function trackerYear(source) {
+  return Math.max(...(source.title.match(/20\d{2}/g) || ["0"]).map(Number));
+}
+async function gatherEvidence(data2, messages2, fetcher = qualityFetch) {
+  const scoped = activeMessages(messages2), q = expandQuestion(scoped.at(-1).content, data2.builtAt);
+  let passages = await hydrateEvidence(data2, retrieve(data2, messages2), fetcher);
+  if (!/\b(?:any|all|which|how many)\b/i.test(q) || !/program/i.test(q) || !/not approved|denied|rejected|status|pending|incomplete/i.test(q)) return passages;
+  const year = q.match(/(20\d{2})\s*[-–]\s*(20\d{2}|\d{2})/)?.[1] || academicYear(data2.builtAt).current.split("-")[0];
+  const source = data2.sources.find((s) => s.kind === "Faculty Senate proposal tracker" && s.title.includes(year));
+  if (!source) return passages;
+  const primary = data2.passages.filter((p) => p.source === source.url && /Sheet: [BC]\./.test(p.heading) && /\| Row \d+ \|/.test(p.heading));
+  if (!primary.length) return passages;
+  const hydrated = await hydrateEvidence(data2, primary.map((p) => ({ p, source })), fetcher), records2 = hydrated.filter((r) => {
+    const status2 = r.p.text.match(/(?:^|\|)\s*Status:\s*([^|]+)/)?.[1].trim();
+    return status2 && status2 !== "Status";
+  });
+  const counts = {}, pending = [];
+  for (const r of records2) {
+    const status2 = r.p.text.match(/(?:^|\|)\s*Status:\s*([^|]+)/)[1].trim();
+    counts[status2] = (counts[status2] || 0) + 1;
+    if (status2 !== "Complete") pending.push(r);
+  }
+  const summary = { source, p: { source: source.url, heading: source.title + " \u2014 primary program tabs, complete status audit", text: `Snapshot audit of the primary B and C program tabs. ${records2.length} rows have a recorded status (header rows excluded; blank statuses are not counted). Recorded status counts: ${JSON.stringify(counts)}. These are tracker rows, not necessarily distinct degree programs. A status other than Complete does not mean denied. Rows whose recorded status is not Complete:
+` + pending.map((r) => r.p.heading + "\n" + r.p.text).join("\n\n") + (pending.length ? "" : "None among rows with recorded statuses.") } };
+  return [summary, ...pending, ...passages].slice(0, 20);
+}
+var searchCache, metadataCache;
+var init_retrieval = __esm({
+  "retrieval.js?v=1"() {
+    init_quality_fixtures();
+    init_corpus();
+    init_search();
+    init_conversation();
+    searchCache = /* @__PURE__ */ new WeakMap();
+    metadataCache = /* @__PURE__ */ new WeakMap();
+  }
+});
+
+// app.js
+init_quality_fixtures();
+init_corpus();
+init_search();
 
 // presentation.js?v=3
+init_quality_fixtures();
 var SOURCE_HOSTS = /* @__PURE__ */ new Set(["gilded-toucan-d8a.notion.site", "web.uri.edu", "digitalcommons.uri.edu", "docs.google.com", "drive.google.com"]);
 function sourceUrl(source) {
   try {
     const u = new URL(source.url);
     if (u.hostname === "web.uri.edu" && u.protocol === "http:") u.protocol = "https:";
-    return u.protocol === "https:" && SOURCE_HOSTS.has(u.hostname) ? u.href : null;
+    return u.protocol === "https:" && !u.username && !u.password && (!u.port || u.port === "443") && SOURCE_HOSTS.has(u.hostname) ? u.href : null;
   } catch {
     return null;
   }
@@ -373,18 +583,11 @@ function referenceLabel(source) {
   return source.title;
 }
 
-// conversation.js?v=3
-function isFollowUp2(text) {
-  const q = text.trim();
-  if (/^(?:yes|no|sure|okay|ok|the prerequisites|the credits|the title|the description)\b/i.test(q)) return true;
-  if (/\b(?:it|its|their|they|them|those|that|this|next|after that)\b/i.test(q)) return true;
-  if (/^(?:what(?:'s| is) (?:the )?bill number|is there a bill number|and (?:the )?bill number)[?.! ]*$/i.test(q)) return true;
-  if (/^(?:what about|and what|how about|can you explain|tell me more|why is that)\b/i.test(q)) return true;
-  if (/^(?:what happens (?:after|once)|how long (?:does|will|would)|what (?:are|is) (?:the )?(?:next steps?|deadline|timeline)|which committee|who (?:reviews|approves)|(?:can|could) you (?:summarize|clarify|link|give (?:me )?(?:the )?source))\b/i.test(q)) return true;
-  return /^(?:the\s+)?[\w +,-]{1,60}[.!]?$/.test(q) && !/[?]/.test(q) && !/^how|^what|^who|^where|^when|^were|^was|^is|^are/i.test(q) && !/\b(?:faculty senate|kuali|awards|university manual|calendar committee)\b/i.test(q);
-}
+// app.js
+init_conversation();
 
 // config.js
+init_quality_fixtures();
 var CHAT_API_URL = "https://faculty-senate-assistant-api.april-khanna.workers.dev";
 
 // app.js
@@ -395,7 +598,7 @@ var input = $("#question");
 var submit = $("#submit");
 var scroller = $("#chat-scroll");
 var panel = $("#chat-panel");
-var VISIT_KEY = "senate-assistant-visit-v1";
+var VISIT_KEY = "senate-assistant-visit-v1:" + location.pathname;
 var BASE2 = new URL("./", location.href).href;
 var manifest;
 var data;
@@ -409,6 +612,7 @@ var busy = false;
 var connected = false;
 var ready = false;
 var lastAnswer;
+var quotaUntil = 0;
 var date = (s) => new Date(s).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 function el(tag, text, cls) {
   const n = document.createElement(tag);
@@ -433,7 +637,7 @@ function button(label, action, cls) {
 }
 function persist() {
   try {
-    sessionStorage.setItem(VISIT_KEY, JSON.stringify({ question, records }));
+    sessionStorage.setItem(VISIT_KEY, JSON.stringify({ question, records, draft: input.value }));
   } catch {
   }
 }
@@ -446,14 +650,21 @@ function setBusy(value) {
 }
 function syncMode() {
   submit.textContent = connected ? "Send" : "Search";
-  $("#question-label").textContent = records.length ? "Reply or ask a follow-up" : "Your question";
+  const label = records.length ? "Reply or ask a follow-up" : "Your question";
+  $("#question-label").textContent = label;
+  input.setAttribute("aria-label", label);
   input.placeholder = records.length ? "Type your reply here\u2026" : "Type your question here\u2026";
   $("#mode-note").textContent = connected ? "Enter to send \xB7 Shift + Enter for a new line" : "Source search \xB7 Enter to search";
   const snapshot = manifest ? `${manifest.sourceCount.toLocaleString()} sources \xB7 Updated ${date(manifest.builtAt)} \xB7 ` : "";
-  status.textContent = snapshot + (connected ? "AI assistant connected" : "AI unavailable \xB7 source search available");
-  $("#reconnect").hidden = connected;
+  status.textContent = snapshot + (connected ? "AI assistant connected" : quotaUntil > Date.now() ? "Daily AI limit reached \xB7 source search available" : "AI unavailable \xB7 source search available");
+  $("#reconnect").hidden = connected || quotaUntil > Date.now();
 }
 async function checkConnection() {
+  if (quotaUntil > Date.now()) {
+    connected = false;
+    syncMode();
+    return false;
+  }
   try {
     const r = await qualityFetch(CHAT_API_URL + "/health", { signal: AbortSignal.timeout(1e4) }), h = r.ok && await r.json();
     connected = Boolean(h?.ready);
@@ -542,7 +753,7 @@ function renderResponse(bubble, answer2) {
 }
 async function ensureIndex() {
   if (!indexPromise) indexPromise = (async () => {
-    if (!manifest) {
+    if (!manifest?.corpusBase) {
       const r = await qualityFetch("data/corpus-manifest.json", { cache: "no-store" });
       if (!r.ok) throw new Error("Snapshot unavailable");
       manifest = await r.json();
@@ -558,12 +769,12 @@ async function ensureIndex() {
 }
 async function sourceAnswer(original) {
   await ensureIndex();
-  const scoped = conversationContext(messages).filter((m) => m.role === "user");
-  const query = scoped.map((m) => m.content).join(" "), found = await hydrateEvidence(data, search(query, 4), qualityFetch);
+  const { retrieve: retrieve2 } = await Promise.resolve().then(() => (init_retrieval(), retrieval_exports));
+  const found = await hydrateEvidence(data, retrieve2(data, conversationContext(messages)).slice(0, 8), qualityFetch);
   if (!found.length) return { kind: "unanswered", answer: "I couldn\u2019t find a clear source match for this question. You can add a course code, program name, committee, or academic year, or ask Genvi\xE9ve using the email option below.", sources: [], followUp: "" };
   const unique = [];
   for (const r of found) if (!unique.some((x) => x.p.source === r.p.source)) unique.push(r);
-  return { kind: "sources", answer: "The AI connection is unavailable. These published source excerpts may help; open the references for complete guidance.\n\n" + unique.map((r, i) => r.source.title + " [" + (i + 1) + "]\n\u201C" + r.p.text.slice(0, 480) + (r.p.text.length > 480 ? "\u2026" : "") + "\u201D").join("\n\n"), sources: unique.map((r, i) => ({ id: i + 1, url: r.p.source, title: r.source.title, section: r.p.heading, notice: r.source.notice })), followUp: "" };
+  return { kind: "sources", answer: "The AI response is unavailable. These published source excerpts may help; open the references for complete guidance.\n\n" + unique.map((r, i) => r.source.title + " [" + (i + 1) + "]\n\u201C" + r.p.text.slice(0, 480) + (r.p.text.length > 480 ? "\u2026" : "") + "\u201D").join("\n\n"), sources: unique.map((r, i) => ({ id: i + 1, url: r.p.source, title: r.source.title, section: r.p.heading, notice: r.source.notice })), followUp: "" };
 }
 async function requestAnswer(original) {
   if (!connected) await checkConnection();
@@ -574,6 +785,18 @@ async function requestAnswer(original) {
     answer2 = await response.json();
   } catch {
     throw new Error("Invalid response");
+  }
+  if (response.status === 429 && typeof answer2.error === "string" && /daily/i.test(answer2.error)) {
+    const now = /* @__PURE__ */ new Date();
+    quotaUntil = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
+    connected = false;
+    syncMode();
+    try {
+      const fallback = await sourceAnswer(original);
+      fallback.answer = "The pilot\u2019s daily AI request limit has been reached. " + fallback.answer.replace("The AI response is unavailable. ", "");
+      return fallback;
+    } catch {
+    }
   }
   if (!response.ok) {
     const failure = new Error("Request rejected");
@@ -620,7 +843,7 @@ async function run() {
   if (!ready || busy || !input.value.trim()) return;
   const original = input.value;
   for (const b of document.querySelectorAll(".retry-answer")) b.disabled = true;
-  if (!messages.length || !isFollowUp2(original)) question = original;
+  if (!messages.length || !isFollowUp(original)) question = original;
   records.push({ role: "user", content: original });
   messages.push({ role: "user", content: original });
   input.value = "";
@@ -631,7 +854,7 @@ async function run() {
   await deliver(original, waiting, user);
 }
 async function retryLast(bubble) {
-  if (busy || bubble !== results.lastElementChild) return;
+  if (!ready || busy || bubble !== results.lastElementChild) return;
   const original = messages.at(-1)?.content;
   if (messages.at(-1)?.role !== "user") return;
   records.pop();
@@ -644,6 +867,7 @@ function restore() {
     const saved = JSON.parse(sessionStorage.getItem(VISIT_KEY) || "null");
     if (!saved || !Array.isArray(saved.records) || saved.records.length > 300 || typeof saved.question !== "string") return;
     question = saved.question;
+    if (typeof saved.draft === "string" && saved.draft.length <= 4e3) input.value = saved.draft;
     for (const r of saved.records) {
       if (r.role === "user" && typeof r.content === "string" && r.content.length <= 4e3) {
         records.push(r);
@@ -657,6 +881,13 @@ function restore() {
         lastAnswer = bubble;
       }
     }
+    if (records.at(-1)?.role === "user") {
+      const pending = { role: "assistant", kind: "error", answer: "The previous request was interrupted by the page refresh. Your question is preserved; retry it below.", sources: [], followUp: "", retryable: true, originalQuestion: question };
+      records.push(pending);
+      const bubble = messageBubble("assistant", "");
+      renderResponse(bubble, pending);
+      lastAnswer = bubble;
+    }
     for (const b of [...document.querySelectorAll(".retry-answer")]) b.disabled = !results.lastElementChild.contains(b);
     if (records.length) {
       startConversation();
@@ -668,6 +899,11 @@ function restore() {
 $("#question-form").addEventListener("submit", (e) => {
   e.preventDefault();
   run();
+});
+var draftTimer;
+input.addEventListener("input", () => {
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(persist, 250);
 });
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
@@ -731,7 +967,7 @@ async function loadInventory() {
     const coverage = await r.json();
     c.replaceChildren(el("p", `${index.sources.length.toLocaleString()} sources and ${index.passages.length.toLocaleString()} passages. Snapshot collected ${date(index.builtAt)}.`));
     const ul = el("ul");
-    for (const text of coverage.limitations || []) ul.append(el("li", text));
+    for (const text of new Set(coverage.limitations || [])) ul.append(el("li", text));
     c.append(ul);
     if (coverage.website) {
       const w = coverage.website;
