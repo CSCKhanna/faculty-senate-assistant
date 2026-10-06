@@ -60,7 +60,7 @@ test('a temporary-course workflow follow-up includes the written minor-change re
 });
 test('general legislation concepts use the manual rather than the identifier route',async()=>{
  for(const q of ['What is a Faculty Senate bill?','How does a bill get approved?','What is the difference between a bill and a report?']){
-  assert.equal(isBillQuestion(m(q)),false,q);const p=await hydrateEvidence(corpus,retrieve(corpus,m(q)),local);assert.ok(p.some(r=>r.source.title.startsWith('Appendix C: By-Laws')&&/10\.1/.test(r.p.text)));assert.ok(p.every(r=>r.source.kind!=='Faculty Senate PDF'));
+  assert.equal(isBillQuestion(m(q)),false,q);const p=await hydrateEvidence(corpus,retrieve(corpus,m(q)),local);assert.ok(p.some(r=>r.source.title.startsWith('Appendix C: By-Laws')&&/10\.1/.test(r.p.text)));assert.ok(p.some(r=>r.source.url.includes('/appendix-e-')&&/Bill subject to review/.test(r.p.text)));assert.ok(p.every(r=>r.source.kind!=='Faculty Senate PDF'));
  }
 });
 test('an exact identifier remains available through a subsequent bill follow-up',async()=>{
