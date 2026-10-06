@@ -14,13 +14,13 @@ export function answerBlocks(text){
   });
 }
 function inline(parent,text,sources){
-  const pattern=/\*\*([^*\n]+)\*\*|`([^`\n]+)`|\[(\d+)\]/g;let end=0;
+  const pattern=/\*\*([^*\n]+)\*\*|`([^`\n]+)`|\[(\d+)\]|\*([^*\n]+)\*/g;let end=0;
   for(const m of text.matchAll(pattern)){
     parent.append(document.createTextNode(text.slice(end,m.index)));
     const source=m[3]&&sources.find(s=>s.id===Number(m[3])),url=source&&sourceUrl(source);
     let node;
     if(url){node=document.createElement('a');node.textContent=m[3];node.href=url;node.target='_blank';node.rel='noopener';node.className='inline-citation';node.setAttribute('aria-label',`Source ${m[3]}: ${source.title}`);node.title=source.title;}
-    else if(m[1]||m[2]){node=document.createElement(m[1]?'strong':'span');node.textContent=m[1]||m[2];}
+    else if(m[1]||m[2]||m[4]){node=document.createElement(m[1]?'strong':m[4]?'em':'span');node.textContent=m[1]||m[2]||m[4];}
     else node=document.createTextNode(m[0]);
     parent.append(node);end=m.index+m[0].length;
   }

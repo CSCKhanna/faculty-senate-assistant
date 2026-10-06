@@ -1,6 +1,6 @@
 import {loadCorpus,hydrateEvidence} from './corpus.js';
 import {buildSearch,emailLink,conversationContext} from './search.js?v=7';
-import {renderAnswer,sourceUrl,referenceLabel} from './presentation.js';
+import {renderAnswer,sourceUrl,referenceLabel} from './presentation.js?v=2';
 import {isFollowUp} from './conversation.js';
 import {CHAT_API_URL} from './config.js';
 const $=s=>document.querySelector(s);
@@ -8,7 +8,7 @@ const results=$('#results'),status=$('#load-status'),input=$('#question'),submit
 let data,coverage,search,question='',messages=[],busy=false,connected=false;
 const scroller=$('#chat-scroll'),panel=$('#chat-panel');
 function scrollChat(){scroller.scrollTop=scroller.scrollHeight;}
-function showAnswer(bubble){scroller.scrollTop=Math.max(0,bubble.offsetTop-scroller.offsetTop-18);}
+function showAnswer(bubble){scroller.scrollTop=Math.max(0,bubble.offsetTop-18);}
 function startConversation(){
   panel.classList.add('has-conversation');
   $('#question-label').textContent=connected?'Reply or ask a follow-up':'Your question';
