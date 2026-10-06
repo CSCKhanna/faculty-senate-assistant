@@ -77,7 +77,7 @@ async function ensureIndex(){
 }
 async function sourceAnswer(original){
   await ensureIndex();
-  const {retrieve}=await import('./retrieval.js?v=1');
+  const {retrieve}=await import('./retrieval.js?v=2');
   const found=await hydrateEvidence(data,retrieve(data,conversationContext(messages)).slice(0,8),fetch);
   if(!found.length)return {kind:'unanswered',answer:'I couldn’t find a clear source match for this question. You can add a course code, program name, committee, or academic year, or ask Genviéve using the email option below.',sources:[],followUp:''};
   const unique=[];for(const r of found)if(!unique.some(x=>x.p.source===r.p.source))unique.push(r);
