@@ -1,4 +1,4 @@
-import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {loadCorpus,hydrateEvidence} from '../corpus.js';import {retrieve,converse} from '../backend/chat.js';
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {loadCorpus,hydrateEvidence} from '../corpus.js';import {retrieve,converse,gatherEvidence} from '../backend/chat.js';
 const root=new URL('../',import.meta.url),read=p=>JSON.parse(fs.readFileSync(new URL(p,root))),manifest=read('data/corpus-manifest.json'),snapshot=read('data/senate-text.json');
 const local=async url=>{assert.ok(url.startsWith('https://csckhanna.github.io/faculty-senate-assistant/data/'));return new Response(fs.readFileSync(new URL(url.split('/faculty-senate-assistant/')[1],root)));};
 const corpus=await loadCorpus(manifest,local);
@@ -31,4 +31,10 @@ test('procedural lookup includes submission steps alongside the selected modific
 test('image-only Senate FAQ is searchable and carries its OCR qualification',async()=>{
  const evidence=await hydrateEvidence(corpus,retrieve(corpus,[{role:'user',content:'Who may attend Faculty Senate meetings, and can a non-senator vote?'}]),local);
  assert.ok(evidence.some(x=>x.source.kind==='Faculty Senate website image'&&/FAQ/.test(x.source.title)&&/general public may attend/.test(x.p.text)&&/OCR/.test(x.source.notice)));
+});
+test('compiled corpus retrieves Kuali login and actual AI program status across topic changes',async()=>{
+ const messages=[{role:'user',content:'Was the interdisciplinary AI major approved?'},{role:'assistant',content:'Check Senate records.'},{role:'user',content:'How can I start using kuali?'}];
+ const access=await gatherEvidence(corpus,messages,local);assert.ok(access.some(r=>r.p.heading==='Logging In'&&/Microsoft 365/.test(r.p.text)));
+ const status=await gatherEvidence(corpus,messages.slice(0,1),local);assert.ok(status.some(r=>/2026.2027/.test(r.source.title)&&/To President/.test(r.p.text)));
+ const audit=await gatherEvidence(corpus,[{role:'user',content:'Were there any programs not approved last academic year?'}],local);assert.match(audit[0].p.text,/159 rows/);assert.match(audit[0].p.text,/"To FS":1/);
 });
