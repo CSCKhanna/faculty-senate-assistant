@@ -132,7 +132,7 @@ def notion_page(pid):
         typ=b.get('type'); props=b.get('properties',{})
         if typ=='page' and bid!=pid:
             children.add(bid); return
-        txt=rich(props.get('title'))
+        txt='' if typ in ('image','video','audio','file') else rich(props.get('title'))
         if typ=='table_row': txt=' | '.join(rich(v) for v in props.values())
         if txt: lines.append(('# ' if typ in ('header','sub_header','sub_sub_header') else '')+txt)
         if typ=='link_to_page':
