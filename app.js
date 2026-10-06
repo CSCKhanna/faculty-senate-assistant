@@ -85,8 +85,8 @@ async function run(){
     if(answer.kind==='sources')actions.append(el('small','Source excerpts; open the references for complete guidance.','chat-note'));
     bubble.append(actions);showAnswer(bubble);
     messages.push({role:'assistant',content:answer.answer+(answer.followUp?'\n'+answer.followUp:'')});
-  }catch(error){waiting.remove();const bubble=messageBubble('assistant',error.message+' You can still consult the related guidance below.');
-    for(const r of await hydrateEvidence(data,search(original,2,true)).catch(()=>[])){bubble.append(el('p',r.p.text.slice(0,900),'excerpt'),link('Read '+r.source.title,r.p.source));}
+  }catch(error){waiting.remove();const bubble=messageBubble('assistant','The assistant couldn’t finish this request. Please try again; your conversation is preserved.');
+    bubble.append(link('Email Genviéve about this question',emailLink(question),'chat-email'));showAnswer(bubble);
     messages.pop();input.value=original;}
   finally{busy=false;submit.disabled=false;results.setAttribute('aria-busy','false');input.focus({preventScroll:true});}
 }
