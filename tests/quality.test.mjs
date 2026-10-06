@@ -82,6 +82,11 @@ test('a fully cited instruction sequence keeps all sources with one closing cita
  const a=parseAnswer(JSON.stringify({kind:'answer',answer:'1. Open the form [1].\n2. Complete it [1][2].\n3. Submit [1].',sourceIds:[1,2]}),p);
  assert.equal(a.answer,'1. Open the form.\n2. Complete it.\n3. Submit. [1][2]');assert.equal(a.sources.length,2);
 });
+test('a paragraph does not repeat the same source badge after every sentence',()=>{
+ const p=[{source:{title:'Policy'},p:{source:'https://web.uri.edu/facsen/',heading:'Approval'}}];
+ const a=parseAnswer(JSON.stringify({kind:'answer',answer:'Department review comes first [1]. College review follows [1]. Senate action is required [1].',sourceIds:[1]}),p);
+ assert.equal(a.answer,'Department review comes first. College review follows. Senate action is required. [1]');
+});
 test('gateway failures provide bounded, qualified source excerpts without an irrelevant follow-up',async()=>{
  const a=await converse(corpus,m('How do I get Kuali access?'),{URI_API_KEY:'test-only'},async()=>{throw new Error('Timeout');},local);assert.equal(a.kind,'sources');assert.equal(a.retryable,true);assert.equal(a.followUp,'');assert.ok(a.answer.length<1300);assert.ok(a.sources.every(s=>s.section));
 });
