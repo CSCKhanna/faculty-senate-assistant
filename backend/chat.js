@@ -94,6 +94,9 @@ export function parseAnswer(raw,passages){
 
 export async function converse(data,messages,env,fetcher=fetch,sourceFetcher=fetch){
   const latest=messages.at(-1).content.trim();
+  const requestedYear=latest.match(/\b(20\d{2})\s*[-–—]\s*(20\d{2}|\d{2})\b/);
+  const unavailable=requestedYear&&/tracker/i.test(latest)&&data.trackerCoverage?.unavailable?.find(s=>s.title.includes(requestedYear[1]));
+  if(unavailable)return {kind:'unanswered',answer:`The ${unavailable.title.replace(/\s*Curriculum Proposal Tracker$/,'')} curriculum tracker requires access and is not included in this source snapshot, so I can’t verify its program records. For a record from that year, use the email option below to ask Genviéve directly. Your original question will be included in the draft.`,followUp:'',sources:[],snapshotDate:data.builtAt};
   if(/^(?:thanks|thank you)[!. ]*$/i.test(latest))return {kind:'clarification',answer:'You’re welcome. You can continue here whenever another Faculty Senate question comes up.',followUp:'',sources:[],snapshotDate:data.builtAt};
   if(/^(?:hi|hello|hey)[!. ]*$/i.test(latest))return {kind:'clarification',answer:'Hello. How can I help with your Faculty Senate question?',followUp:'',sources:[],snapshotDate:data.builtAt};
   if(/\b(weather|rain|netflix|password)\b/i.test(latest)&&!/\b(kuali|curriculum|course|proposal)\b/i.test(latest))return {kind:'unanswered',answer:'I can help with Faculty Senate curriculum guidance, but this question is outside that scope. You can ask me about courses, programs, Kuali, or proposal approvals.',followUp:'',sources:[],escalatable:false,snapshotDate:data.builtAt};
