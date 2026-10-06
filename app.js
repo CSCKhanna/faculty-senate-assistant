@@ -1,4 +1,4 @@
-import {buildSearch,emailLink} from './search.js?v=4';
+import {buildSearch,emailLink,conversationContext} from './search.js?v=5';
 import {CHAT_API_URL} from './config.js';
 const $=s=>document.querySelector(s);
 const results=$('#results'),status=$('#load-status'),input=$('#question'),submit=$('#submit');
@@ -48,7 +48,6 @@ function messageBubble(role,text){
 async function run(){
   if(!input.value.trim()||busy)return;
   if(!connected){runSourceSearch();return;}
-  if(messages.length>=16){status.textContent='Please start a new conversation to continue.';return;}
   startConversation();
   const original=input.value;
   if(!messages.length){question=original;results.replaceChildren();}
@@ -56,7 +55,7 @@ async function run(){
   busy=true;submit.disabled=true;results.setAttribute('aria-busy','true');
   const waiting=messageBubble('assistant','Looking through the toolkit…');
   try{
-    const response=await fetch(CHAT_API_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages}),signal:AbortSignal.timeout(55000)});
+    const response=await fetch(CHAT_API_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:conversationContext(messages)}),signal:AbortSignal.timeout(55000)});
     const answer=await response.json();if(!response.ok)throw new Error(answer.error||'The assistant is unavailable.');
     if(typeof answer.answer!=='string'||!Array.isArray(answer.sources))throw new Error('The assistant returned an incomplete answer.');
     waiting.remove();const bubble=messageBubble('assistant',answer.answer);
@@ -68,11 +67,12 @@ async function run(){
         if(source.notice)citations.append(el('p',source.notice,'notice'));
       }bubble.append(citations);
     }
-    bubble.append(el('small','AI-generated guidance. Check the linked sources.','chat-note'));
-    if(answer.kind==='unanswered')bubble.append(fallback(true));
-    else{const email=link('Email Genviéve with my original question',emailLink(question),'chat-email');bubble.append(email);}
+    bubble.append(el('small',answer.kind==='sources'?'Original source excerpts. Open the linked source for complete guidance.':'AI-generated guidance. Check the linked sources.','chat-note'));
+    if(answer.kind!=='clarification'){const email=link('Email Genviéve with my original question',emailLink(question),'chat-email');bubble.append(email);}
     messages.push({role:'assistant',content:answer.answer+(answer.followUp?'\n'+answer.followUp:'')});
-  }catch(error){waiting.remove();const bubble=messageBubble('assistant',error.message);bubble.append(fallback(true));messages.pop();input.value=original;}
+  }catch(error){waiting.remove();const bubble=messageBubble('assistant',error.message+' You can still consult the related guidance below.');
+    for(const r of search(original,2,true)){bubble.append(el('p',r.p.text.slice(0,900),'excerpt'),link('Read '+r.source.title,r.p.source));}
+    messages.pop();input.value=original;}
   finally{busy=false;submit.disabled=false;results.setAttribute('aria-busy','false');scrollChat();input.focus({preventScroll:true});}
 }
 $('#question-form').addEventListener('submit',e=>{e.preventDefault();run();});

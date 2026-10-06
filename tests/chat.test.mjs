@@ -27,9 +27,9 @@ test('gateway receives history and evidence; credential remains only in authoriz
   });
   assert.equal(answer.kind,'answer');assert.match(sent.url,/llmgw\.its\.uri\.edu/);assert.equal(sent.headers.Authorization,'Bearer test-secret');assert.ok(!sent.body.includes('test-secret'));assert.ok(sent.body.includes('EVIDENCE'));assert.ok(!JSON.stringify(answer).includes('test-secret'));
 });
-test('unsupported question offers contact without a paid request',async()=>{
+test('unrelated question explains scope without a paid request',async()=>{
   const result=await converse(data,[{role:'user',content:'Will it rain in Kingston tomorrow?'}],{},async()=>{throw new Error('Should not call the gateway');});
-  assert.equal(result.kind,'unanswered');assert.match(result.answer,/Genviéve/);assert.deepEqual(result.sources,[]);
+  assert.equal(result.kind,'unanswered');assert.match(result.answer,/outside that scope/);assert.deepEqual(result.sources,[]);
 });
 
 test('user wording about proposing changes to a class retrieves modification instructions',()=>{
@@ -61,4 +61,14 @@ test('gateway JSON missing optional citation list derives IDs from explicit vali
 test('temporary to permanent includes the modification start steps',()=>{
   const p=retrieve(data,[{role:'user',content:'How do I make a temporary class permanent?'}]);
   assert.ok(p.some(r=>r.source.title==='Course Modification Proposal Walkthrough'&&r.p.heading==='Start the Proposal'));
+});
+
+test('gateway failure returns exact source excerpts instead of an unable-to-answer dead end',async()=>{
+  const m=[{role:'user',content:'How do I change a course?'}];
+  for(const fetcher of [async()=>{throw new Error('Network down');},async()=>Response.json({choices:[{message:{content:'invalid ungrounded output'}}]})]){
+    const a=await converse(data,m,{URI_API_KEY:'test'},fetcher);assert.equal(a.kind,'sources');assert.ok(a.sources.length);assert.ok(data.passages.some(p=>a.answer.includes(p.text.slice(0,1000))));assert.ok(!a.answer.includes('unable'));
+  }
+});
+test('unknown wording asks a useful routing question without an email-first dead end',async()=>{
+  const a=await converse(data,[{role:'user',content:'Something is confusing and I need direction'}],{},()=>{throw new Error('No paid call needed');});assert.equal(a.kind,'clarification');assert.match(a.answer,/course.*program.*Kuali/);
 });

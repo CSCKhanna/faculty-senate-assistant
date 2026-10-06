@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {buildSearch,emailLink} from '../search.js';
+import {buildSearch,emailLink,conversationContext} from '../search.js';
 const data=JSON.parse(fs.readFileSync(new URL('../data/index.json',import.meta.url)));
 const search=buildSearch(data);
 test('temporary-to-permanent retrieves the toolkit classification, not a fabricated answer',()=>{
@@ -23,4 +23,14 @@ test('email draft preserves exact question, including punctuation and newlines',
 test('index contains no raw Notion access or user metadata',()=>{
   const serialized=JSON.stringify(data);assert.doesNotMatch(serialized,/user_permission|bot_permission|api_key|token_v2|crdt_data/);
   assert.ok(data.sources.some(x=>x.kind==='Curriculum Toolkit'));
+});
+
+test('relaxed retrieval finds guidance in longer conversational requests',()=>{
+  const q='Someone told me I need a syllabus when redesigning my undergraduate seminar. What am I supposed to upload?';
+  assert.ok(search(q,4,true).some(r=>/syllabus/i.test(r.p.text)));
+  assert.deepEqual(search('Will it rain in Kingston tomorrow?',4,true),[]);
+});
+test('long conversations retain the recent topic within API bounds',()=>{
+  const m=Array.from({length:39},(_,i)=>({role:i%2?'assistant':'user',content:'topic '+i+' '+('x'.repeat(3500))}));
+  const c=conversationContext(m);assert.ok(c.length<=16);assert.equal(c.at(-1).content,m.at(-1).content);assert.equal(c[0].role,'user');assert.ok(c.reduce((n,m)=>n+m.content.length,0)<=20000);
 });

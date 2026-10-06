@@ -1,5 +1,5 @@
 import data from '../data/index.json' with {type:'json'};
-import {validateMessages,converse} from './chat.js';
+import {validateMessages,converse,sourceFallback} from './chat.js';
 
 export async function reserveBudget(db,key,cap=100,now=Date.now()){
   if(!Number.isInteger(cap)||cap<1||cap>100)return {allowed:false,reason:'The pilot request limit is not configured correctly.'};
@@ -41,6 +41,6 @@ export default {
       const limit=await reserveBudget(env.PILOT_DB,key,Number(env.DAILY_REQUEST_LIMIT||100));
       if(!limit.allowed)return reply({error:limit.reason},429);
       return reply(await converse(data,messages,env));
-    }catch{return reply({error:'I couldn’t complete that answer. Please try again or email Genviéve with your question.'},502);}
+    }catch{return reply(sourceFallback(data,messages,'The conversation service is temporarily unavailable. These source excerpts may help in the meantime.'));}
   }
 };

@@ -7,7 +7,7 @@ Backend: `https://faculty-senate-assistant-api.april-khanna.workers.dev`. D1 usa
 ## Behavior
 
 - Answers in conversational language using retrieved toolkit and Faculty Senate passages, with original source links.
-- Asks clarifying questions and retains follow-up context for up to eight exchanges.
+- Asks clarifying questions and retains recent follow-up context as the conversation continues.
 - Offers a user-reviewed email draft to Genviéve Spitale (`genvieve.spitale@uri.edu`) with the first question preserved exactly; nothing is sent automatically.
 - Falls back to local source search when the AI connection is unavailable at page load.
 - Shows source inventory, snapshot date, and partial or unfinished source notices.
@@ -62,7 +62,7 @@ Default model: `its_direct/pt2-claude-haiku-4.5-us`. Maximum output: 1,800 token
 3. Check `/health` and test a conversation from the GitHub website origin. URI gateway access from Cloudflare still needs verification; local API access does not prove remote access.
 4. Set `CHAT_API_URL` in `config.js` to the Worker URL, without a trailing slash. Push the frontend only once the backend is verified.
 
-The frontend falls back to source search if the backend is absent or unavailable. The frontend was upgraded after the hosted backend passed a real conversation test. Session history is in memory only, with a limit of eight exchanges before starting a new conversation. The first question is preserved exactly in the email fallback.
+The frontend falls back to source search if the backend is absent or unavailable. The frontend was upgraded after the hosted backend passed a real conversation test. Session history is in browser memory only. The request includes a rolling recent context within the API limits, so the visible conversation can continue past eight exchanges. The first question is preserved exactly in the email fallback.
 
 ### Moving to ITS
 
@@ -70,7 +70,7 @@ The conversation logic is provider-independent JavaScript using standard HTTP re
 
 ### Verification
 
-Twenty automated checks cover retrieval, follow-up context, message limits, citation rejection, email fidelity, and credential exclusion. A live two-turn test against the URI gateway on October 6, 2026 produced a clarification followed by a course-modification answer with toolkit citations. Cloudflare backend, D1 storage, and the encrypted production credential are deployed. A hosted two-turn test also passed on October 6, 2026.
+Twenty-four automated checks cover retrieval, follow-up context, message limits, citation rejection, email fidelity, and credential exclusion. A live two-turn test against the URI gateway on October 6, 2026 produced a clarification followed by a course-modification answer with toolkit citations. Cloudflare backend, D1 storage, and the encrypted production credential are deployed. A hosted two-turn test also passed on October 6, 2026.
 
 
 ### Answer reliability fix — October 6, 2026
@@ -78,3 +78,12 @@ Twenty automated checks cover retrieval, follow-up context, message limits, cita
 Search now recognizes conversational wording such as “class that I teach” and retrieves procedure-start sections alongside matched fields. Follow-up retrieval uses both the original topic and the assistant’s last question without treating previous answers as factual sources. The gateway is explicitly asked for JSON; cited plain text and JSON with a missing citation list are accepted only after validating every citation against supplied evidence. Capability questions are handled without a paid request. Unknown citations, unsupported plain text, and invented URLs remain rejected.
 
 The regression suite includes the actual failed user questions, prerequisite follow-ups, temporary-to-permanent navigation, and both gateway response formats. Real gateway tests cover course changes, Kuali/login, capability questions, permanent-course conversion, tracking, cross-listing, date ambiguity, and an unrelated request. Some embedded source content still needs separate ingestion. No emails are sent by the app or its tests.
+
+
+### Helpful fallback update — October 6, 2026
+
+The conversational retriever uses broader ranking when an exact keyword search has no match. It still supplies original evidence and preserves normal strict search for the standalone excerpt UI. Questions with partial evidence should receive the supported part, a specific limitation, and an appropriate next step. Unknown topics receive a routing question rather than an immediate staff referral.
+
+Gateway and model-format failures return clearly labeled original source excerpts. Backend infrastructure failures also fall back to excerpts. Rate limits stay enforced; the browser can show related local excerpts while a request is blocked. Long conversations keep a bounded recent API context while preserving the full visible transcript and exact first question for the optional email draft. Clarifications no longer display a staff-email option after every turn.
+
+Twenty-four automated tests cover these behaviors, including simulated network/invalid-output failures and a long transcript. Real gateway tests also included broad course redesign, prerequisite changes combined with an approval-guarantee question, sent-back proposals, and syllabus-upload wording. This improves usefulness without establishing complete source coverage or guaranteeing AI accuracy.

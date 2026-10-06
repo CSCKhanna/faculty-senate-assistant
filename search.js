@@ -13,13 +13,14 @@ export function buildSearch(data){
     return {p,counts,title:new Set(title),length:words.length,source:sourceMap.get(p.source)};
   });
   const avg=docs.reduce((s,d)=>s+d.length,0)/Math.max(docs.length,1);
-  return (question,limit=4)=>{
+  return (question,limit=4,relaxed=false)=>{
+    if(relaxed&&!/course|program|specialization|kuali|curricul|proposal|syllab|prerequis|credit|department|faculty|senate|approval|crosslist|deadline|calendar|workflow|modality|graduat|undergraduat|catalog|online|teach|access|login|track|chair|dean|committee/.test(normalize(question)))return [];
     const original=[...new Set(tokens(question))];
     if(!original.length)return [];
     const groups=original.map(w=>SYNONYMS[w]||[w]);
     const meaningful=groups.filter(g=>g.some(w=>frequency.has(w)));
     // Missing distinctive terms means we cannot claim the returned guidance answers the question.
-    if(meaningful.length/original.length<.5)return [];
+    if(!meaningful.length||(!relaxed&&meaningful.length/original.length<.5))return [];
     const ranked=docs.map(d=>{
       let score=0,matched=0,bodyMatched=0;
       for(const g of groups){
@@ -40,10 +41,10 @@ export function buildSearch(data){
       if(d.source.kind==='Curriculum Toolkit')score*=1.15;
       if(/archive|previous years|2017-2018|2023-2024/i.test(d.source.title)&&!/(?:19|20)\d{2}/.test(question))score*=.6;
       return {...d,score,coverage,bodyMatched};
-    }).filter(d=>d.score>1&&d.coverage>=.5&&d.bodyMatched>=Math.min(2,groups.length)).sort((a,b)=>b.score-a.score);
+    }).filter(d=>d.score>1&&(relaxed||d.coverage>=.5)&&d.bodyMatched>=Math.min(relaxed?1:2,groups.length)).sort((a,b)=>b.score-a.score);
     const results=[],perSource=new Map(),texts=new Set();
     for(const r of ranked){
-      if(r.score<(ranked[0]?.score||0)*.4)continue;
+      if(r.score<(ranked[0]?.score||0)*(relaxed?.2:.4))continue;
       if(results.length===limit)break;
       const key=r.p.text.toLowerCase();
       if(texts.has(key)||(perSource.get(r.p.source)||0)>=3)continue;
@@ -54,4 +55,12 @@ export function buildSearch(data){
 }
 export function emailLink(originalQuestion){
   return 'mailto:genvieve.spitale@uri.edu?subject='+encodeURIComponent('Faculty Senate curriculum question')+'&body='+encodeURIComponent(originalQuestion);
+}
+
+// Keep the visible transcript and original email question, but bound API context.
+export function conversationContext(messages){
+  let recent=messages.slice(-15).map(m=>({role:m.role,content:m.content.slice(0,4000)}));
+  if(recent[0]?.role==='assistant')recent.shift();
+  while(recent.length>1&&recent.reduce((n,m)=>n+m.content.length,0)>20000)recent=recent.slice(2);
+  return recent;
 }
