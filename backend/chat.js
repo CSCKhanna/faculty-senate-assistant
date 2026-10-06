@@ -40,6 +40,10 @@ export function retrieve(data,messages){
     if(image&&!found.some(r=>r.p===image)&&found.length<16)found.push({p:image,source:data.sources.find(s=>s.url===image.source)});
     if(found.length>=16)break;
   }
+  if(/course|class|prerequis/i.test(combined)&&/chang|modif/i.test(combined)){
+    const taxonomy=data.passages.find(p=>p.heading==='Course change classifications (full source)');
+    if(taxonomy){const at=found.findIndex(r=>r.p===taxonomy);if(at>=0)found.splice(at,1);found.unshift({p:taxonomy,source:data.sources.find(s=>s.url===taxonomy.source)});if(found.length>16)found.length=16;}
+  }
   // Calendar records carry the actual date property. Include those records beside
   // narrative schedules so the model can surface conflicting published dates.
   if(/graduate council|grad council/i.test(combined)&&/when|date|meeting|calendar/i.test(combined)){

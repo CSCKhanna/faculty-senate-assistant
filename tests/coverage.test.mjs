@@ -23,3 +23,8 @@ test('Sonnet request omits unsupported temperature and remains grounded',async()
  let request;await converse(data,[{role:'user',content:'How can I change my course?'}],{URI_API_KEY:'test'},async(url,options)=>{request=JSON.parse(options.body);return new Response(JSON.stringify({choices:[{message:{content:'{"kind":"answer","answer":"See the course modification guidance [1].","sourceIds":[1]}'}}]}),{status:200});});
  assert.equal(request.model,'its_direct/pt3-claude-sonnet-5.5-1m-us');assert.equal(request.temperature,undefined);assert.ok(request.messages[0].content.includes('EVIDENCE'));
 });
+
+test('prerequisite follow-up retains the full major/minor classification context',()=>{
+ const evidence=retrieve(data,[{role:'user',content:'How can I change a class I teach?'},{role:'assistant',content:'Use a Course Modification Proposal. What change do you intend?'},{role:'user',content:'I want to change the prerequisites. What should I do next?'}]);
+ assert.ok(evidence.some(x=>x.p.heading==='Course change classifications (full source)'&&/Minor Course Changes[\s\S]*Change prerequisites/.test(x.p.text)));
+});

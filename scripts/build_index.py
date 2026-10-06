@@ -61,6 +61,8 @@ def add_source(url, title, kind, lines, edited=None):
             if sum(len(x) for x in buffer)+len(part)>1200: flush()
             buffer.append(part)
     flush()
+    if title=='Major and Minor Changes':
+        passages.append({'source':url,'heading':'Course change classifications (full source)','text':text})
 
 class Page(HTMLParser):
     def __init__(self):
