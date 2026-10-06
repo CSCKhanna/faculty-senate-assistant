@@ -1,1 +1,1 @@
-{"name":"faculty-senate-assistant","version":"0.1.0","private":true,"type":"module","scripts":{"start":"node server.mjs","test":"node --test tests/search.test.mjs"}}
+{"name":"faculty-senate-assistant","version":"0.2.0","private":true,"type":"module","scripts":{"start":"node server.mjs","test":"node --test tests/*.test.mjs","deploy:backend":"wrangler deploy"},"devDependencies":{"wrangler":"^4.147.0"},"overrides":{"sharp":"^0.35.5"}}

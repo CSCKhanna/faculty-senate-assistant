@@ -1,36 +1,35 @@
-# Faculty Senate Curriculum Assistant — prototype
+# Faculty Senate Curriculum Assistant — conversational pilot
 
-A separate, unofficial review prototype for the University of Rhode Island Faculty Senate. Users ask questions in plain language, see original source passages with links, and can open an email draft to Genviéve Spitale with their original question preserved exactly.
+An unofficial review prototype for URI Faculty Senate. The frontend is hosted on GitHub Pages; the conversational backend is prepared for Cloudflare Workers and awaits account setup. The existing live website remains the source-search prototype until the backend is verified.
 
-## What works
+## Behavior
 
-- Local question-based retrieval across a saved public-source index.
-- Source citations, snapshot date, development/partial-source notices, and a browsable source inventory.
-- No-match fallback to `genvieve.spitale@uri.edu` with subject `Faculty Senate curriculum question`.
-- Email opens in the user's mail app; the user reviews and sends it. The prototype does not send messages.
-- Responsive, keyboard-accessible UI. No account, API key, upload, query history, or application analytics.
+- Answers in conversational language using retrieved toolkit and Faculty Senate passages, with original source links.
+- Asks clarifying questions and retains follow-up context for up to eight exchanges.
+- Offers a user-reviewed email draft to Genviéve Spitale (`genvieve.spitale@uri.edu`) with the first question preserved exactly; nothing is sent automatically.
+- Falls back to local source search when the AI connection is unavailable at page load.
+- Shows source inventory, snapshot date, and partial or unfinished source notices.
 
-## Important scope
+## Source coverage
 
-This version returns **source excerpts**, not AI-generated conversational answers. A match does not establish that a passage fully answers the question. A missing match does not establish that guidance is absent.
+The snapshot contains 57 sources, including 24 toolkit pages. It is not a live search of every current resource. `data/coverage.json` records partial imports, failed links, and linked resources outside the index; the interface exposes those limitations.
 
-It uses a snapshot, not a live search of all current resources. `data/coverage.json` records the actual indexed sources, failed/partial imports, and out-of-scope links. The on-screen source list exposes these limitations.
+The importer reads public Notion pages, reachable public Faculty Senate website pages, and directly linked text-readable URI PDFs. Notion's public read API is unofficial and may change. Embedded database rows, images and flowcharts, Google documents and spreadsheets, restricted files, external archives, and scanned PDFs need separate ingestion. Some sources are old or unfinished. The assistant is instructed to preserve uncertainty and cite its evidence, but staff review is still needed before campus release.
 
-The importer reads public Notion toolkit pages, reachable public Faculty Senate website pages, and directly linked text-readable URI PDFs. Notion's public read API is unofficial and may change. Embedded database rows, images/flowcharts, Google documents/spreadsheets, restricted files, external archives, and scanned PDFs need separate ingestion. Some sources may be old or unfinished; the app does not silently reconcile conflicts or assert a date is current.
+No separate approved-answer bank is required. Faculty Senate continues maintaining its toolkit and website.
 
-## Local preview and checks
+## Local preview
 
 ```sh
+npm install
 npm start
 # http://127.0.0.1:4173
 npm test
 ```
 
-No npm installation is required. The client uses vanilla HTML, CSS, and ES modules. Google Fonts is optional; local system fonts are fallbacks.
+The static preview requires only Node.js. Installing dependencies adds the Cloudflare deployment CLI. To test real AI locally, supply `URI_ENV_FILE` pointing to a private file outside the repository containing `URI_API_KEY=...`. Never commit this file. `PORT` optionally changes the local port.
 
 ## Refreshing the source snapshot
-
-Use Python 3. Install `pypdf` to include text-readable PDFs:
 
 ```sh
 python3 -m pip install pypdf
@@ -38,18 +37,35 @@ python3 scripts/build_index.py
 npm test
 ```
 
-Review `data/coverage.json` before publishing a refresh. Commit the updated data files and push `main` to update GitHub Pages. There is no scheduled refresh in this prototype.
+Review coverage and failed imports before publishing. Only extracted public text is committed; raw Notion records, permissions, user identifiers, authentication data, and fetch logs are excluded. There is no scheduled refresh.
 
-Only extracted public text is published. Raw Notion record maps, permissions, user identifiers, authentication data, and source-fetch logs are not stored in the repository.
+## Privacy and hosting
 
-## Hosting
+Conversation history stays in browser memory for the visit. Connected requests send that history and retrieved public evidence through the backend to URI's AI gateway. This app stores usage counters, not conversation content, on the backend. Cloudflare, GitHub, and the gateway operate under their own service policies. Users should avoid entering private student, personnel, or other sensitive information into this public pilot.
 
-The site is static and can run on GitHub Pages. GitHub Pages is configured to publish `main` from the repository root. `.nojekyll` disables Jekyll processing. GitHub operates the hosting service and may log visitor network information; the app itself does not transmit search questions to a server.
+GitHub Pages publishes `main` from the repository root with `.nojekyll`. GitHub Pages hosts the frontend; it cannot execute the AI backend. API credentials belong exclusively in the backend's encrypted secret configuration. `config.js` contains only the public backend URL.
 
-## Next step toward the conversational assistant
+## Conversational backend (version 0.2)
 
-1. Complete ingestion of the remaining linked documents, database rows, and flowchart content. Agree on source freshness and handling of conflicting guidance.
-2. Add a server-side retrieval and language-model endpoint. Keep credentials on the server; do not put an API key in client code or in this repository. GitHub Pages alone cannot run this endpoint.
-3. Generate short answers only from retrieved passages, with source links, clarification when necessary, and the existing user-reviewed email fallback when evidence is insufficient. Test real recurring questions with Faculty Senate staff before campus release.
+`backend/chat.js` retrieves up to eight indexed passages, sends those passages and the last conversation turns to URI's OpenAI-compatible gateway, and validates the structured response. It asks clarifying questions, interprets follow-ups, and returns only links from the source registry. Citation validation does not establish factual correctness: staff review of real answers remains necessary. The snapshot's existing coverage limitations still apply.
 
-Faculty Senate continues maintaining the toolkit and website. No separate approved-answer bank is required.
+`backend/worker.js` runs on Cloudflare Workers. A Durable Object reserves requests before AI calls, with a default hard limit of 100 calls per UTC day across the whole pilot and eight calls per minute per network address. Shared campus network addresses may share the minute limit. Failed API calls also consume a daily slot. Only usage counters are persisted; conversation messages are not stored by this app. Cloudflare and the URI gateway may process and retain data under their own service policies. CORS limits browser origins but is not authentication. This is a bounded public pilot, not an authenticated campus service.
+
+Default model: `its_direct/pt2-claude-haiku-4.5-us`. Maximum output: 1,100 tokens per call; maximum conversation request: 22,000 characters plus bounded retrieved evidence. Limits bound request volume, not an exact dollar amount.
+
+### Deployment
+
+1. Sign in to Cloudflare and deploy with `npx wrangler deploy` (or set up the repository using the Cloudflare Git integration). The included `wrangler.jsonc` declares the Durable Object and its migration.
+2. Add `URI_API_KEY` as an encrypted Worker secret with `npx wrangler secret put URI_API_KEY`. Enter the credential directly in the secret prompt. Never put it in GitHub or `config.js`.
+3. Check `/health` and test a conversation from the GitHub website origin. URI gateway access from Cloudflare still needs verification; local API access does not prove remote access.
+4. Set `CHAT_API_URL` in `config.js` to the Worker URL, without a trailing slash. Push the frontend only once the backend is verified.
+
+The frontend falls back to source search if the backend is absent or unavailable. The live GitHub site is not upgraded until the backend connection is ready. Session history is in memory only, with a limit of eight exchanges before starting a new conversation. The first question is preserved exactly in the email fallback.
+
+### Moving to ITS
+
+The conversation logic is provider-independent JavaScript using standard HTTP requests. ITS can host `backend/chat.js` behind a server-side `/chat` endpoint using the same response shape. Replace the Cloudflare-specific request limiter with ITS's equivalent, provision the API key on the ITS host, update allowed origins, and change `CHAT_API_URL`. Do not assume gateway credentials or a personal budget automatically transfer to a shared service.
+
+### Verification
+
+Fourteen automated checks cover retrieval, follow-up context, message limits, citation rejection, email fidelity, and credential exclusion. A live two-turn test against the URI gateway on October 6, 2026 produced a clarification followed by a course-modification answer with toolkit citations. Cloudflare deployment and remote gateway connectivity are pending account setup.
