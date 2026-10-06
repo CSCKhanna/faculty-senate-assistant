@@ -8,7 +8,6 @@
     "ALLOWED_ORIGINS": "https://csckhanna.github.io",
     "DAILY_REQUEST_LIMIT": "100"
   },
-  "durable_objects": {"bindings": [{"name": "PILOT_BUDGET", "class_name": "PilotBudget"}]},
-  "migrations": [{"tag": "v1", "new_sqlite_classes": ["PilotBudget"]}],
-  "observability": {"enabled": false}
+  "d1_databases": [{"binding":"PILOT_DB","database_name":"faculty-senate-pilot-usage","database_id":"a86deae6-997d-468a-a87e-c27e5614ae10"}],
+  "observability": {"enabled":true}
 }

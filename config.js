@@ -1,2 +1,2 @@
-// Public connection address only. API credentials belong on the backend.
-export const CHAT_API_URL = '';
+// Public backend URL only. API credentials are configured on Cloudflare.
+export const CHAT_API_URL = 'https://faculty-senate-assistant-api.april-khanna.workers.dev';
