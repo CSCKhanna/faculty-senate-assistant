@@ -1,6 +1,6 @@
 # Faculty Senate Curriculum Assistant — conversational pilot
 
-An unofficial review prototype for URI Faculty Senate. The frontend is hosted on GitHub Pages; the conversational backend code is deployed on Cloudflare Workers and awaits its encrypted AI credential. The existing live website remains the source-search prototype until the backend is verified.
+An unofficial review prototype for URI Faculty Senate. The frontend is hosted on GitHub Pages; the conversational backend runs on Cloudflare Workers with an encrypted URI AI gateway credential. The conversational frontend is published on GitHub Pages after successful hosted backend verification.
 
 Backend: `https://faculty-senate-assistant-api.april-khanna.workers.dev`. D1 usage database: `faculty-senate-pilot-usage`.
 
@@ -62,7 +62,7 @@ Default model: `its_direct/pt2-claude-haiku-4.5-us`. Maximum output: 1,100 token
 3. Check `/health` and test a conversation from the GitHub website origin. URI gateway access from Cloudflare still needs verification; local API access does not prove remote access.
 4. Set `CHAT_API_URL` in `config.js` to the Worker URL, without a trailing slash. Push the frontend only once the backend is verified.
 
-The frontend falls back to source search if the backend is absent or unavailable. The live GitHub site is not upgraded until the backend connection is ready. Session history is in memory only, with a limit of eight exchanges before starting a new conversation. The first question is preserved exactly in the email fallback.
+The frontend falls back to source search if the backend is absent or unavailable. The frontend was upgraded after the hosted backend passed a real conversation test. Session history is in memory only, with a limit of eight exchanges before starting a new conversation. The first question is preserved exactly in the email fallback.
 
 ### Moving to ITS
 
@@ -70,4 +70,4 @@ The conversation logic is provider-independent JavaScript using standard HTTP re
 
 ### Verification
 
-Fourteen automated checks cover retrieval, follow-up context, message limits, citation rejection, email fidelity, and credential exclusion. A live two-turn test against the URI gateway on October 6, 2026 produced a clarification followed by a course-modification answer with toolkit citations. Cloudflare backend code and D1 storage are deployed; its encrypted AI credential and remote gateway connectivity are pending.
+Fourteen automated checks cover retrieval, follow-up context, message limits, citation rejection, email fidelity, and credential exclusion. A live two-turn test against the URI gateway on October 6, 2026 produced a clarification followed by a course-modification answer with toolkit citations. Cloudflare backend, D1 storage, and the encrypted production credential are deployed. A hosted two-turn test also passed on October 6, 2026.
