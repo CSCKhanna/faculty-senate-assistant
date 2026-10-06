@@ -1,97 +1,49 @@
-# Faculty Senate Curriculum Assistant — conversational pilot
+# URI Faculty Senate Assistant — prototype
 
-An unofficial review prototype for URI Faculty Senate. The frontend is hosted on GitHub Pages; the conversational backend runs on Cloudflare Workers with an encrypted URI AI gateway credential. The conversational frontend is published on GitHub Pages after successful hosted backend verification.
+A conversational assistant grounded in public URI Faculty Senate resources. GitHub Pages hosts the frontend and immutable source files. Cloudflare Workers retrieves relevant passages and calls Sonnet 5.5 through the URI AI gateway. The gateway credential stays encrypted on Cloudflare and never appears in browser code or GitHub.
 
-Backend: `https://faculty-senate-assistant-api.april-khanna.workers.dev`. D1 usage database: `faculty-senate-pilot-usage`.
+[Live assistant](https://csckhanna.github.io/faculty-senate-assistant/)
 
-## Behavior
+## Current coverage
 
-- Answers in conversational language using retrieved toolkit and Faculty Senate passages, with original source links.
-- Asks clarifying questions and retains recent follow-up context as the conversation continues.
-- Offers a user-reviewed email draft to Genviéve Spitale (`genvieve.spitale@uri.edu`) with the first question preserved exactly; nothing is sent automatically.
-- Falls back to local source search when the AI connection is unavailable at page load.
-- Shows source inventory, snapshot date, and partial or unfinished source notices.
+The October 6, 2026 snapshot has **1,321 sources and 28,573 passages**:
 
-## Source coverage
+- The full reachable public Notion toolkit: 24 pages, 272 database entries, and all 59 embedded images/files. Synced content, collapsed sections, and database rows are included.
+- All 48 publicly published Faculty Senate pages/posts were audited, including pages missing from menus. The website crawl indexed 921 pages and linked documents, including University Manual sections, reports, minutes, legislation, and spreadsheets.
+- 33 instructional website images are available as OCR text, including the image-only Senate FAQ. PDF extraction includes recovered OCR from 780 pages in 211 documents. Image text has whitespace normalization; original letters and numbers are preserved.
+- Nine readable proposal trackers: the current 2026–2027 tracker plus eight archives, with **71 tabs and 5,697 nonempty rows**. Program/course identities, column labels, academic years, and recorded statuses stay together.
 
-The October 6, 2026 snapshot contains 406 sources and 1,420 searchable passages. Every reachable public toolkit page and database item is included: 24 toolkit pages plus 272 entries (69 calendar, 140 directory, 62 requirements, one FAQ entry). Collapsed answers, synced sections, and embedded database views are expanded. Some FAQ answers in the toolkit itself are placeholders; importing them does not create missing guidance.
+**The 2019–2020 tracker requires access (HTTP 401) and is not indexed.** The audit records 595 unavailable/unreadable linked resources, including broken legacy links, refused DigitalCommons downloads, restricted documents, malformed files, and a video without an imported transcript. These are link-level gaps; some historical material is also available through another indexed copy. See the live app’s source coverage dialog and `data/coverage.json` for the exact inventory.
 
-All 59 embedded images and files are included as sourced text: 46 images, 12 college workflow diagrams, and a DOCX guide. Sonnet 5.5 transcribed images; DOCX text was extracted directly. Image-derived sources carry a warning to verify small text and arrows in the original. Linked public Google documents, every spreadsheet tab including the proposal tracker, a PDF reference, linked URI guidance, and the two linked catalog courses are included. There are zero unresolved toolkit blocks or failed linked-document imports in this snapshot.
+This is a dated snapshot, not live Kuali access. Historical proposals, reports, and blank approval fields do not establish current policy or completed approvals. OCR cannot reliably establish diagram relationships, chart values, handwriting, checkmarks, or signatures; verify the original. Some published pages are explicitly under construction.
 
-Kuali account data and Microsoft access-request forms are operational destinations, not knowledge documents. The external NCES classification search remains a reference link. This is a complete snapshot of the toolkit's published guidance and directly linked knowledge resources, not a live view of Kuali or a copy of every external website. `data/coverage.json` and the interface disclose that scope. The calendar and older narrative schedules can contain conflicting dates; the assistant must expose conflicts.
+## Retrieval and chat
 
-No separate approved-answer bank is required. Faculty Senate continues maintaining its toolkit and website.
+`prepare_corpus.mjs` builds an immutable corpus revision: compact lexical postings, passage metadata, and text shards. The Worker searches the compact index and fetches only the selected source text before calling Sonnet. The full corpus remains available without embedding tens of megabytes in the Worker or sending every document in each prompt. Both frontend and backend use the same pinned source revision.
 
-## Local preview
+Answers include validated source citations and keep recent conversation context. Procedural retrieval includes course classifications, start instructions, and submission steps. Tracker coverage is supplied separately so the assistant can explicitly identify the unavailable 2019–2020 archive rather than substitute another year.
 
-```sh
-npm install
-npm start
-# http://127.0.0.1:4173
-npm test
-```
+The app offers a reviewed email draft to Genviéve Spitale (`genvieve.spitale@uri.edu`) with the first question preserved exactly. **Nothing sends emails automatically.** A single conversation panel keeps the composer available for follow-ups.
 
-The static preview requires only Node.js. Installing dependencies adds the Cloudflare deployment CLI. To test real AI locally, supply `URI_ENV_FILE` pointing to a private file outside the repository containing `URI_API_KEY=...`. Never commit this file. `PORT` optionally changes the local port.
+## Limits and hosting
 
-## Refreshing the source snapshot
+The Worker uses the existing D1 usage database, `faculty-senate-pilot-usage`. The pilot allows 100 requests per UTC day across all users and eight requests per minute per network. These limits remain in place; they do not guarantee a fixed dollar spend. Sonnet model: `its_direct/pt3-claude-sonnet-5.5-1m-us`. The gateway does not support nondefault temperature for this model, so that parameter is omitted.
 
-```sh
-python3 -m pip install pypdf
-python3 scripts/build_index.py
-npm test
-```
+The Worker permits the configured GitHub origin. Credentials are used only in the gateway Authorization header. Source downloads go to the public GitHub corpus without credentials or conversation text. Generated links and source IDs are checked against retrieved evidence.
 
-The crawler starts with a fresh temporary cache outside the repository. `TOOLKIT_CACHE` optionally reuses a reviewed cache. All current public Notion pages and rows are refreshed. Image/file transcriptions are reused only while their public attachment reference is unchanged; new or replaced attachments become explicit gaps requiring extraction and review. Linked-document text has its own collection date in `data/toolkit-linked-text.json`; refresh and review those files separately before claiming current complete coverage. The two catalog pages required browser rendering. Raw caches and signed attachment URLs must remain outside GitHub. Review coverage and failed imports before publishing. Only extracted public text is committed; raw Notion records, permissions, user identifiers, authentication data, and fetch logs are excluded. There is no scheduled refresh.
+## Refreshing sources
 
-## Privacy and hosting
+Keep raw downloads and private configuration outside the repository. Python requires `pypdf` and `openpyxl`; image recovery optionally uses `rapidocr-onnxruntime` and `wordninja`, plus Poppler `pdftoppm`.
 
-Conversation history stays in browser memory for the visit. Connected requests send that history and retrieved public evidence through the backend to URI's AI gateway. This app stores usage counters, not conversation content, on the backend. Cloudflare, GitHub, and the gateway operate under their own service policies. Users should avoid entering private student, personnel, or other sensitive information into this public pilot.
+1. Run `scripts/crawl_toolkit.py` / `scripts/build_index.py` for a fresh public toolkit import. Changed toolkit images/files are explicitly reported for review; their existing transcriptions are reused only when the attachment reference matches.
+2. Run `scripts/crawl_senate.py` to refresh the published website inventory and linked public documents. It follows Google redirects, preserves required query parameters, and exports all spreadsheet tabs. `SENATE_REFRESH=0` reuses an existing download cache; normal crawl runs refresh downloads. `SENATE_CACHE` selects an external cache directory.
+3. Run `scripts/crawl_senate_media.py` for instructional website image OCR. Decorative photos/headshots are excluded. Video transcript gaps remain explicit.
+4. Run `scripts/recover_senate_cached.py` to attach already recovered OCR and attempt image-only documents with a bounded extraction time. Existing readable text is preserved when image recovery fails.
+5. Run `scripts/merge_senate.py`, then `npm run prepare:corpus` and `npm test`.
+6. Publish the static corpus on GitHub Pages, bundle the backend with `npm run bundle:backend`, deploy it to the existing Worker, and verify live answers and matching snapshot counts.
 
-GitHub Pages publishes `main` from the repository root with `.nojekyll`. GitHub Pages hosts the frontend; it cannot execute the AI backend. API credentials belong exclusively in the backend's encrypted secret configuration. `config.js` contains only the public backend URL.
+Keep previously deployed immutable corpus revisions until no deployed Worker references them. Do not import account-only Kuali contents or publish restricted material without authorization. Public-link access failures require an accessible public copy or staff assistance.
 
-## Conversational backend (version 0.2)
+## Validation
 
-`backend/chat.js` retrieves up to sixteen indexed passages (twenty when including calendar records for conflict checks), sends those passages and the last conversation turns to URI's OpenAI-compatible gateway, and validates the structured response. It asks clarifying questions, interprets follow-ups, and returns only links from the source registry. Citation validation does not establish factual correctness: staff review of real answers remains necessary. The source coverage and image-transcription qualifications above still apply.
-
-`backend/worker.js` runs on Cloudflare Workers. An atomic D1 database transaction reserves requests before AI calls, with a default hard limit of 100 calls per UTC day across the whole pilot and eight calls per UTC minute per network address. Shared campus network addresses may share the minute limit. Failed API calls also consume a daily slot. Only daily usage counters and temporary hashed network-address counters are persisted; conversation messages are not stored by this app. Old counters are cleaned on the next request (network counters after two minute buckets, daily counters after the day changes); idle counters can remain until another request, and provider backups may retain prior data. Cloudflare and the URI gateway may process and retain data under their own service policies. CORS limits browser origins but is not authentication. This is a bounded public pilot, not an authenticated campus service.
-
-Default model: `its_direct/pt3-claude-sonnet-5.5-1m-us`. Maximum output: 2,200 tokens per call; maximum conversation request: 22,000 characters plus bounded retrieved evidence. Limits bound request volume, not an exact dollar amount.
-
-### Deployment
-
-1. Deploy with `npx wrangler deploy` after signing in, or run `npm run bundle:backend` and paste the bundled Worker from the reported path into Cloudflare’s code editor. The bundled corpus is losslessly compressed and decoded once at Worker startup. The GitHub app is installed for this repository, but Cloudflare’s Git account connection did not complete; automated backend builds are not configured. The included `wrangler.jsonc` declares the D1 database. Create tables with `backend/schema.sql` in the D1 console, then bind it as `PILOT_DB`.
-2. Add `URI_API_KEY` as an encrypted Worker secret with `npx wrangler secret put URI_API_KEY`. Enter the credential directly in the secret prompt. Never put it in GitHub or `config.js`.
-3. Check `/health` and test a conversation from the GitHub website origin. URI gateway access from Cloudflare still needs verification; local API access does not prove remote access.
-4. Set `CHAT_API_URL` in `config.js` to the Worker URL, without a trailing slash. Push the frontend only once the backend is verified.
-
-The frontend falls back to source search if the backend is absent or unavailable. The frontend was upgraded after the hosted backend passed a real conversation test. Session history is in browser memory only. The request includes a rolling recent context within the API limits, so the visible conversation can continue past eight exchanges. The first question is preserved exactly in the email fallback.
-
-### Moving to ITS
-
-The conversation logic is provider-independent JavaScript using standard HTTP requests. ITS can host `backend/chat.js` behind a server-side `/chat` endpoint using the same response shape. Replace the Cloudflare D1 request limiter with ITS's equivalent, provision the API key on the ITS host, update allowed origins, and change `CHAT_API_URL`. Do not assume gateway credentials or a personal budget automatically transfer to a shared service.
-
-### Verification
-
-Twenty-four automated checks cover retrieval, follow-up context, message limits, citation rejection, email fidelity, and credential exclusion. A live two-turn test against the URI gateway on October 6, 2026 produced a clarification followed by a course-modification answer with toolkit citations. Cloudflare backend, D1 storage, and the encrypted production credential are deployed. A hosted two-turn test also passed on October 6, 2026.
-
-
-### Answer reliability fix — October 6, 2026
-
-Search now recognizes conversational wording such as “class that I teach” and retrieves procedure-start sections alongside matched fields. Follow-up retrieval uses both the original topic and the assistant’s last question without treating previous answers as factual sources. The gateway is explicitly asked for JSON; cited plain text and JSON with a missing citation list are accepted only after validating every citation against supplied evidence. Capability questions are handled without a paid request. Unknown citations, unsupported plain text, and invented URLs remain rejected.
-
-The regression suite includes the actual failed user questions, prerequisite follow-ups, temporary-to-permanent navigation, and both gateway response formats. Real gateway tests cover course changes, Kuali/login, capability questions, permanent-course conversion, tracking, cross-listing, date ambiguity, and an unrelated request. Some embedded source content still needs separate ingestion. No emails are sent by the app or its tests.
-
-
-### Helpful fallback update — October 6, 2026
-
-The conversational retriever uses broader ranking when an exact keyword search has no match. It still supplies original evidence and preserves normal strict search for the standalone excerpt UI. Questions with partial evidence should receive the supported part, a specific limitation, and an appropriate next step. Unknown topics receive a routing question rather than an immediate staff referral.
-
-Gateway and model-format failures return clearly labeled original source excerpts. Backend infrastructure failures also fall back to excerpts. Rate limits stay enforced; the browser can show related local excerpts while a request is blocked. Long conversations keep a bounded recent API context while preserving the full visible transcript and exact first question for the optional email draft. Clarifications no longer display a staff-email option after every turn.
-
-Twenty-four automated tests cover these behaviors, including simulated network/invalid-output failures and a long transcript. Real gateway tests also included broad course redesign, prerequisite changes combined with an approval-guarantee question, sent-back proposals, and syllabus-upload wording. This improves usefulness without establishing complete source coverage or guaranteeing AI accuracy.
-
-### Sonnet and full toolkit ingestion — October 6, 2026
-
-Sonnet 5.5 replaces Haiku. The gateway rejects nondefault temperature for this model, so that parameter is omitted. Source indexing expanded from 57 sources / 308 passages to 406 sources / 1,420 passages. Reviewed extraction snapshots (`toolkit-pages.json`, `toolkit-media-text.json`, `toolkit-linked-text.json`) make completeness auditable. The public crawler resolves collection pointers stored in views, queries all database rows, parses date annotations, follows synced blocks and external-object mentions, and paginates each public block. It never publishes Notion permissions or user metadata.
-
-Thirty automated checks pass. Eight live Sonnet scenarios produced cited answers, and a hosted ABM/4+1 comparison confirmed the deployed backend uses the expanded evidence. Live evaluation covers course changes, ABM versus 4+1 definitions, engineering contacts and approval endpoints, sent-back proposals, assessment-plan contents, calendar conflicts, and tracking boundaries. Tests never send emails. The request-volume cap remains 100 per UTC day; Sonnet has different pricing from Haiku, and this cap does not guarantee a fixed dollar spend.
+Thirty-eight automated checks cover complete toolkit registration, published-page coverage, tracker tabs/rows and field labels, exact text hydration, historical program lookup, submission steps, follow-up context, citation validation, credential handling, and request caps. Real Sonnet evaluation includes a named program record, committee duties, meeting attendance/voting, unavailable tracker access, and prerequisite changes. Tests do not send emails.

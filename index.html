@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Explore Faculty Senate guidance with source-linked search and an email fallback.">
-  <title>Faculty Senate Curriculum Assistant · Prototype</title>
+  <title>Faculty Senate Assistant · Prototype</title>
   <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
@@ -20,9 +20,9 @@
       <div class="sidebar-foot"><span class="prototype-tag">REVIEW PROTOTYPE</span><p>Answers grounded in Senate resources.<br>This is not an official URI service.</p></div>
     </aside>
     <main>
-      <header class="topbar"><div><strong>Curriculum Assistant</strong><span>Toolkit & Senate guidance</span></div><button id="new-question" type="button">New question</button></header>
+      <header class="topbar"><div><strong>Faculty Senate Assistant</strong><span>Toolkit, Senate website & trackers</span></div><button id="new-question" type="button">New question</button></header>
       <div class="workspace">
-        <section class="chat-panel" id="chat-panel" aria-label="Curriculum conversation">
+        <section class="chat-panel" id="chat-panel" aria-label="Faculty Senate conversation">
           <div class="chat-scroll" id="chat-scroll" tabindex="0" aria-label="Conversation history">
             <section class="welcome" aria-labelledby="welcome-title"><span class="eyebrow blue">START WITH YOUR QUESTION</span><h2 id="welcome-title">How can I help?</h2><p>Ask about curriculum proposals, processes, or your next step.</p></section>
             <div class="suggestions" aria-label="Example questions"><span>Try asking</span><button type="button" data-question="How do I make a temporary course permanent?">Make a course permanent</button><button type="button" data-question="How do I get access to Kuali?">Get Kuali access</button><button type="button" data-question="How do I track my proposal?">Track a proposal</button></div>
@@ -42,6 +42,6 @@
     </main>
   </div>
   <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-top"><div><span class="eyebrow blue">SOURCE TRANSPARENCY</span><h2 id="source-title">What this prototype searches</h2></div><button id="close-dialog" type="button" aria-label="Close source list">✕</button></div><div id="coverage"></div><div id="source-list"></div></dialog>
-  <script type="module" src="app.js?v=7"></script>
+  <script type="module" src="app.js?v=8"></script>
 </body>
 </html>

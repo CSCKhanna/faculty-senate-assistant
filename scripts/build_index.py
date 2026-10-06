@@ -232,10 +232,15 @@ def main():
             try:
                 _,title,kind,lines,_=f.result();add_source(url,title,kind,lines)
             except Exception as e: failures.append({'url':url,'reason':str(e)[:180]})
+    website=None
+    if (ROOT/'data/senate-text.json').exists():
+        from merge_senate import apply_snapshot
+        website=apply_snapshot(json.loads((ROOT/'data/senate-text.json').read_text()),sys.modules[__name__])
     (ROOT/'data').mkdir(exist_ok=True)
     data={'builtAt':STAMP,'sources':list(sources.values()),'passages':passages}
     (ROOT/'data/index.json').write_text(json.dumps(data,ensure_ascii=False))
     coverage={'builtAt':STAMP,'sourceCount':len(sources),'passageCount':len(passages),'toolkit':{'pages':sum(p['kind']=='Curriculum Toolkit' for p in toolkit['pages']),'databaseEntries':sum(p['kind'].endswith('database item') for p in toolkit['pages']),'databases':{x['title']:len(x['rows']) for x in toolkit['catalog'].values()},'attachmentsAndImages':len(imported),'unresolvedBlocks':len(toolkit['issues'])},'failures':failures,'externalLinksNotIndexed':sorted(external),'limitations':['Snapshot, not a live connection. Toolkit pages and all public database rows were refreshed.','Image and file transcriptions are reused only when their attachment reference is unchanged. New or replaced files are reported as gaps. Verify small text and diagram arrows in the original.','Linked-document snapshot collected '+linked['builtAt']+'. Refresh and review linked files separately; the toolkit crawler does not silently replace that snapshot.','Kuali account contents and access-request forms are operational destinations. The external NCES classification search remains a reference link.','Historical, incomplete and conflicting source material may need staff clarification. The tracker is a dated snapshot, not live Kuali status.']}
+    if website: coverage['website']=website
     (ROOT/'data/coverage.json').write_text(json.dumps(coverage,ensure_ascii=False,indent=2))
     print(json.dumps({'sources':len(sources),'passages':len(passages),'failures':len(failures),'external':len(external)}),flush=True)
 

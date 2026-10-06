@@ -4,6 +4,7 @@ export const normalize = text => text.toLowerCase().normalize('NFD').replace(/[\
 export const tokens = text => normalize(text).match(/[a-z0-9]+/g)?.filter(x=>x.length>1&&!STOP.has(x)) || [];
 const SYNONYMS={deadline:['deadline','calendar','date','submission'],dates:['date','calendar','deadline'],calendar:['calendar','date','deadline'],access:['access','login','logging'],login:['login','logging','access'],status:['status','track','workflow'],track:['track','status'],permanent:['permanent'],temporary:['temporary'],change:['change','modification'],changing:['change','modification'],submit:['submit','submission','submitted'],submitting:['submit','submission','submitted'],denied:['denied','rejected'],rejected:['rejected','denied'],credits:['credit','credits'],crosslist:['crosslist'],syllabus:['syllabus','syllabi']};
 export function buildSearch(data){
+  if(data.postings&&data.terms)return buildCompiledSearch(data);
   const sourceMap=new Map(data.sources.map(s=>[s.url,s]));
   const frequency=new Map();
   const docs=data.passages.map(p=>{
@@ -64,4 +65,34 @@ export function conversationContext(messages){
   if(recent[0]?.role==='assistant')recent.shift();
   while(recent.length>1&&recent.reduce((n,m)=>n+m.content.length,0)>20000)recent=recent.slice(2);
   return recent;
+}
+
+function buildCompiledSearch(data){
+ const sourceFlags=new Map(data.sources.map(s=>{const years=[...s.title.matchAll(/(?:19|20)\d{2}/g)].map(x=>Number(x[0]));return [s.url,/archive|previous years|2017-2018|2023-2024/i.test(s.title)||years.length&&Math.max(...years)<2026];}));
+ const docs=data.passages.map((p,i)=>({p,source:data.sources[data.docs[i][0]],length:data.docs[i][2]})),n=docs.length,avg=docs.reduce((a,d)=>a+d.length,0)/n;
+ return (question,limit=4,relaxed=false)=>{
+  const original=[...new Set(tokens(question))],groups=original.map(w=>SYNONYMS[w]||[w]),meaningful=groups.filter(g=>g.some(w=>data.terms[w]));
+  if(!meaningful.length||(!relaxed&&meaningful.length/original.length<.5))return [];
+  const hasYear=/(?:19|20)\d{2}/.test(question),tracking=/status|track|happened|proposal/i.test(question),procedure=/how|steps|prerequis|procedure|process|change|modif/i.test(question);
+  const score=new Float64Array(n),matched=new Uint16Array(n),body=new Uint16Array(n);
+  for(const group of groups){const best=new Float64Array(n),hit=new Uint8Array(n),touched=new Set();
+   for(const w of group){const range=data.terms[w];if(!range)continue;const [start,count]=range,idf=Math.log(1+(n-count+.5)/(count+.5));
+    for(let j=start;j<start+count;j++){const packed=data.postings[j],id=packed>>>16,tf=packed&32767,head=(packed&32768)!==0;const value=idf*((tf*2.2)/(tf+1.2*(.25+.75*docs[id].length/avg))+(head?1.3:0));best[id]=Math.max(best[id],value);if(tf)hit[id]=1;touched.add(id);}
+   }
+   for(const id of touched){score[id]+=best[id];matched[id]++;body[id]+=hit[id];}
+  }
+  const ranked=[];
+  for(let i=0;i<n;i++){const coverage=matched[i]/meaningful.length;if(!score[i]||!relaxed&&coverage<.5||body[i]<Math.min(relaxed?1:2,groups.length))continue;const d=docs[i];let value=score[i]*coverage*coverage;
+   if(d.source.kind==='Curriculum Toolkit')value*=1.15;
+   if(/\btrack\b/.test(normalize(question))&&d.source.title==='Track Your Proposal')value*=1.5;
+   if(!hasYear&&sourceFlags.get(d.source.url))value*=.6;
+   if(tracking&&d.source.kind==='Faculty Senate proposal tracker')value*=2;
+   if(!hasYear&&d.source.kind==='Faculty Senate website')value*=1.3;
+   if(!hasYear&&procedure&&d.source.kind==='Faculty Senate PDF')value*=.35;
+   if(value>1)ranked.push({...d,score:value,coverage,bodyMatched:body[i]});
+  }
+  ranked.sort((a,b)=>b.score-a.score);const results=[],counts=new Map(),texts=new Set();
+  for(const r of ranked){if(r.score<(ranked[0]?.score||0)*(relaxed?.2:.4))continue;if(results.length===limit)break;const key=r.p.text?r.p.text.toLowerCase():String(r.p.id);if(texts.has(key)||(counts.get(r.p.source)||0)>=3)continue;texts.add(key);counts.set(r.p.source,(counts.get(r.p.source)||0)+1);results.push(r);}
+  return results;
+ };
 }
