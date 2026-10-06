@@ -106,6 +106,7 @@ export function retrieve(data,messages){
     for(let i=found.length-1;i>=0;i--)if(found[i].source.kind==='Faculty Senate PDF'||found[i].source.kind==='Faculty Senate proposal tracker')found.splice(i,1);
     priority.push(...(byTitle.get('Appendix C: By-Laws of the Faculty Senate – University Manual')||[]).filter(p=>/^Section (?:8|10)\./.test(p.heading)).slice(0,5).map(p=>({p,source:registry.get(p.source)})));
     const overview=byTitle.get('Legislation')?.[1];if(overview)priority.push({p:overview,source:registry.get(overview.source)});
+    const approval=(bySource.get('https://web.uri.edu/manual/appendix-e-specific-procedures-for-processing-curricular-materials/')||[]).find(p=>p.heading==='Part 3. Approval Process');if(approval)priority.push({p:approval,source:registry.get(approval.source)});
     priority.push(...(byTitle.get('When will my proposal be approved?')||[]).filter(p=>/after the Senate Meeting/i.test(p.heading)).map(p=>({p,source:registry.get(p.source)})));
   }
   const merged=[],keys=new Set();for(const r of [...priority,...found]){const k=r.p.id===undefined?r.p.source+'\n'+r.p.heading+'\n'+r.p.text:r.p.id;if(!keys.has(k)){keys.add(k);merged.push(r);}if(merged.length===16)break;}

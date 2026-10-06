@@ -448,6 +448,8 @@ function retrieve(data2, messages2) {
     priority.push(...(byTitle.get("Appendix C: By-Laws of the Faculty Senate \u2013 University Manual") || []).filter((p) => /^Section (?:8|10)\./.test(p.heading)).slice(0, 5).map((p) => ({ p, source: registry.get(p.source) })));
     const overview = byTitle.get("Legislation")?.[1];
     if (overview) priority.push({ p: overview, source: registry.get(overview.source) });
+    const approval = (bySource.get("https://web.uri.edu/manual/appendix-e-specific-procedures-for-processing-curricular-materials/") || []).find((p) => p.heading === "Part 3. Approval Process");
+    if (approval) priority.push({ p: approval, source: registry.get(approval.source) });
     priority.push(...(byTitle.get("When will my proposal be approved?") || []).filter((p) => /after the Senate Meeting/i.test(p.heading)).map((p) => ({ p, source: registry.get(p.source) })));
   }
   const merged = [], keys = /* @__PURE__ */ new Set();
