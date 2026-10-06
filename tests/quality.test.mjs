@@ -103,6 +103,10 @@ test('host allowlisting also rejects embedded credentials and alternate ports',(
 test('a thank-you gets a courteous acknowledgement without restarting the interview',async()=>{
  const a=await converse(corpus,m('Thank you!'),{},()=>{throw new Error('No paid call needed');});assert.match(a.answer,/welcome/);assert.doesNotMatch(a.answer,/What would you|\?/);assert.equal(a.followUp,'');
 });
+test('a known unavailable tracker gives a concise staff path without technical errors or another year',async()=>{
+ const a=await converse(corpus,m('Can you look up a program in the 2019–2020 curriculum tracker?'),{},()=>{throw new Error('No paid call needed');});
+ assert.equal(a.kind,'unanswered');assert.match(a.answer,/2019–2020/);assert.match(a.answer,/requires access/);assert.match(a.answer,/Genviéve/);assert.doesNotMatch(a.answer,/HTTP|401|2025|2026|unauthorized|Which program/);assert.equal(a.followUp,'');
+});
 test('the coverage disclosure has no repeated limitation paragraphs',()=>{
  const c=read('data/coverage.json');assert.equal(c.limitations.length,new Set(c.limitations).size);
 });
