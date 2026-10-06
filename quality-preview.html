@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore Faculty Senate guidance with source-linked search and an email fallback.">
+  <title>Faculty Senate Assistant · QA Preview</title>
+  <style>@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@400;500;600&display=swap');
+:root{font-family:'DM Sans',system-ui,sans-serif;color:#162a40;background:#f4f7fb;font-synthesis:none;--navy:#102c4d;--blue:#235b89;--muted:#52637a;--line:#dbe4ed}
+*{box-sizing:border-box}body{margin:0}button,input,textarea{font:inherit}button,a,input,textarea{-webkit-tap-highlight-color:transparent}button{cursor:pointer}a{color:var(--blue)}button:disabled{cursor:default;opacity:.6}[hidden]{display:none!important}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #a77100;outline-offset:3px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.skip{position:absolute;left:1rem;top:-100px;background:white;padding:1rem;z-index:10}.skip:focus{top:1rem}
+.shell{display:grid;grid-template-columns:300px minmax(0,1fr);height:var(--viewport-height,100dvh);overflow:hidden}.sidebar{padding:36px 28px 25px;background:var(--navy);color:#fff;display:flex;flex-direction:column;min-height:0;overflow:auto}
+.brand{display:flex;gap:12px;align-items:center;font-size:13px;font-weight:700;letter-spacing:1.2px}.brand span:not(.brand-mark){display:block;font-size:12px;font-weight:400;letter-spacing:0;margin-top:5px;color:#c4d5e7}.brand-mark{border:1px solid #7999b7;border-radius:50%;width:44px;height:44px;display:grid;place-items:center;font-family:'Source Serif 4',Georgia,serif;font-size:20px;letter-spacing:0;font-weight:400;flex:none}
+.sidebar-intro{margin-top:65px}.eyebrow{font-size:12px;font-weight:700;letter-spacing:1.5px;color:#abc6e0}.side-title{font-family:'Source Serif 4',Georgia,serif;font-size:33px;line-height:1.22;font-weight:400;margin:18px 0}.sidebar-intro>p:not(.side-title){font-size:15px;line-height:1.75;color:#c4d5e7}
+.sidebar nav{margin-top:35px;border-top:1px solid #315371}.sidebar nav a,.sidebar nav button{width:100%;color:#fff;border:0;border-bottom:1px solid #315371;padding:18px 0;background:none;display:flex;justify-content:space-between;text-decoration:none;font-size:14px;text-align:left;min-height:48px}.sidebar nav a:hover,.sidebar nav button:hover{color:#ffd168}
+.sidebar-foot{margin-top:auto;padding-top:45px}.prototype-tag{font-size:11px;font-weight:700;letter-spacing:1px;border:1px solid #527493;border-radius:4px;padding:6px 8px}.sidebar-foot p{font-size:12px;color:#abc6e0;line-height:1.8;margin:17px 0 0}
+main{display:flex;flex-direction:column;min-width:0;min-height:0}.topbar{flex:none;background:#fff;border-bottom:1px solid var(--line);padding:20px 32px;display:flex;justify-content:space-between;align-items:center;gap:16px}.topbar h1{font-size:17px;margin:0;line-height:1.4;font-weight:700}.topbar span{display:block;color:var(--muted);font-size:12px;margin-top:3px}.pilot-label{display:inline-block;font-size:10px;font-weight:600;vertical-align:middle;background:#edf3f8;color:#47647f;border-radius:3px;padding:2px 5px;margin-left:5px}.topbar-actions{display:flex;align-items:center;gap:8px;flex:none}.topbar button{border:1px solid var(--line);background:white;border-radius:7px;padding:10px 14px;color:#304760;font-size:13px;min-height:44px}#sources-mobile{display:none}
+.workspace{display:flex;flex-direction:column;flex:1;min-height:0;width:100%;max-width:1080px;margin:0 auto;padding:24px 32px 14px}.blue{color:var(--blue)}
+.chat-panel{display:flex;flex-direction:column;flex:1;min-height:0;border:1px solid #cbdbe9;border-radius:14px;background:white;box-shadow:0 5px 18px #19385708;overflow:hidden}.chat-scroll{position:relative;flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:26px;scrollbar-gutter:stable;scroll-behavior:auto}.chat-scroll:focus-visible{outline:3px solid #a77100;outline-offset:-4px}
+.welcome h2{font-family:'Source Serif 4',Georgia,serif;font-size:38px;line-height:1.2;font-weight:500;letter-spacing:-.7px;margin:12px 0}.welcome p{color:var(--muted);font-size:16px;margin:0 0 26px;line-height:1.6}.suggestions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:18px 0}.suggestions>span{font-size:12px;color:var(--muted);margin-right:2px}.suggestions button{background:#fff;border:1px solid var(--line);border-radius:22px;color:#3d536c;padding:10px 13px;font-size:13px;min-height:44px}.suggestions button:hover{background:#e9f2fb;border-color:#98b9d5}.has-conversation .welcome,.has-conversation .suggestions{display:none}
+.question-panel{flex:none;border-top:1px solid var(--line);background:#fff}.question-panel form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 12px;padding:12px 20px}.question-panel label{grid-column:1/-1;margin:0;font-size:13px;font-weight:700}.question-panel textarea{grid-column:1;grid-row:2;width:100%;display:block;border:1px solid #c8d5e1;border-radius:7px;padding:10px 12px;min-height:48px;max-height:110px;font-size:16px;line-height:1.5;resize:vertical;background:#fff;color:#162a40}.question-panel textarea::placeholder{color:#657589}.question-panel textarea:focus-visible{outline:2px solid #477ba5;outline-offset:2px}.form-bottom{display:contents}.form-bottom>span{grid-column:1/-1;grid-row:3;font-size:11px;color:var(--muted);line-height:1.4}.primary{grid-column:2;grid-row:2;align-self:end;min-height:48px;min-width:74px;border:0;border-radius:7px;color:white;background:var(--blue);padding:10px 16px;font-weight:600;white-space:nowrap}.primary:hover{background:#16466f}
+.chat-message{margin:0 0 18px;padding:22px 24px;background:#fff;border:1px solid #e1e8ef;border-radius:10px;overflow-wrap:anywhere}.chat-message.user{padding:15px 20px;background:#eef4fa;border:0;margin-left:16%}.chat-message:last-child{margin-bottom:0}.chat-role{display:block;font-size:11px;letter-spacing:.5px;font-weight:700;color:#506780}.chat-message.assistant .chat-role{color:#183b5d}.chat-text{font-size:15px;line-height:1.65;white-space:pre-wrap;margin:8px 0 0}.answer-body{font-size:15px;line-height:1.7;color:#22364b;margin:12px 0 0;max-width:78ch}.answer-body p{margin:0 0 14px}.answer-body p:last-child{margin-bottom:0}.answer-body ol,.answer-body ul{padding-left:24px;margin:12px 0 16px}.answer-body li{padding-left:4px;margin:7px 0}.answer-body strong{font-weight:650;color:#16324f}
+.inline-citation{display:inline-flex;align-items:center;justify-content:center;vertical-align:baseline;min-width:24px;min-height:24px;padding:0 5px;margin:0 2px;border-radius:4px;background:#edf3f8;color:#235b89;font-size:11px;line-height:1;text-decoration:none;font-weight:600}.inline-citation:hover{background:#d8e8f4}.chat-followup{font-size:15px;font-weight:500;line-height:1.65;margin:16px 0 0;color:#22364b}
+.chat-references{margin:16px 0 0;border-top:1px solid #e6ecf2;padding-top:6px;max-width:78ch}.chat-references summary{font-size:12px;font-weight:600;color:#3b5670;min-height:44px;padding:13px 0;cursor:pointer}.chat-citations{margin:0;padding:0}.chat-reference{padding:7px 0}.chat-reference a{display:block;font-size:13px;line-height:1.55;text-underline-offset:3px}.reference-section{display:block;font-size:12px;line-height:1.5;color:#53657a;margin:3px 0 0}.source-notes{margin-top:12px;padding:0 12px;background:#f5f7fa;border-radius:6px;font-size:12px;line-height:1.6;color:#52637a}.source-notes p{margin:6px 0 12px}
+.answer-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:8px}.answer-actions button,.inventory-more,#reconnect{font-size:12px;color:#365774;border:1px solid #ccd9e4;background:#f8fafc;border-radius:6px;min-height:44px;padding:9px 12px}.chat-email{display:inline-block;font-size:13px;line-height:1.5;min-height:44px;padding:12px 0;color:#365774;text-underline-offset:3px}.chat-note{font-size:12px;line-height:1.6;color:var(--muted);display:block;margin:5px 0 0}.staff-help{margin:0;font-size:12px;color:#365774}.staff-help summary{min-height:44px;padding:13px 0;cursor:pointer}.staff-help[open]{flex-basis:100%}.staff-help[open] .chat-email{display:block}
+.connection-status{display:flex;align-items:center;gap:12px;flex:none;margin-top:9px}.status{font-size:11px;color:var(--muted);line-height:1.5}#reconnect{min-height:36px;padding:6px 10px}.page-foot{flex:none;font-size:11px;color:var(--muted);line-height:1.5;border-top:1px solid var(--line);margin-top:9px;padding-top:8px}.page-foot button{font-size:inherit;color:#365774;border:0;background:none;padding:4px 0;min-height:24px;text-decoration:underline;text-underline-offset:3px}.privacy-line{display:block}.jump-latest{position:sticky;top:0;float:right;z-index:1;background:#235b89;color:white;border:0;border-radius:8px;min-height:44px;padding:10px 15px;font-size:13px;box-shadow:0 2px 8px #102c4d22}
+dialog{width:min(850px,calc(100vw - 32px));max-height:90dvh;border:0;border-radius:14px;padding:28px;color:#162a40;box-shadow:0 30px 80px #00152c55}dialog::backdrop{background:#00152c80}.dialog-top{display:flex;gap:20px;justify-content:space-between;align-items:start}.dialog-top h2{font-family:'Source Serif 4',Georgia,serif;margin:8px 0 20px;font-size:28px;font-weight:500}.dialog-top button{background:#f1f5f9;border:0;border-radius:5px;min-width:44px;min-height:44px;font-size:18px;color:#324963}.service-info,#coverage{font-size:14px;line-height:1.7}.service-info{padding-bottom:12px;border-bottom:1px solid var(--line)}#coverage ul{padding-left:20px}#coverage summary{min-height:44px;padding:12px 0;cursor:pointer}.coverage-fail{font-size:12px;overflow-wrap:anywhere}
+#source-list{border-top:1px solid var(--line);margin-top:20px;padding-top:16px}#source-list label{display:block;font-size:13px;font-weight:600;margin-bottom:8px}#source-filter{width:100%;font-size:16px;border:1px solid #bbcddd;border-radius:6px;padding:11px;min-height:44px}.inventory-count{font-size:12px;color:var(--muted)}.listed-source{padding:13px 0;border-bottom:1px solid var(--line)}.listed-source a{font-size:14px;line-height:1.6}.listed-source span{display:block;font-size:12px;color:var(--muted);margin-top:4px}.inventory-more{margin-top:14px}body:has(dialog[open]){overflow:hidden}
+@media(min-width:1600px){.shell{grid-template-columns:340px 1fr}.sidebar{padding-left:40px;padding-right:40px}}
+@media(max-width:1000px){.shell{grid-template-columns:240px 1fr}.sidebar{padding:28px 20px}.side-title{font-size:28px}.brand{font-size:11px}.brand-mark{width:36px;height:36px}.topbar{padding:18px 24px}.workspace{padding:20px 24px 12px}.welcome h2{font-size:33px}}
+@media(max-width:700px){.shell{display:flex;flex-direction:column}.sidebar{display:none}main{flex:1}.topbar{padding:10px 12px;gap:8px}.topbar h1{font-size:15px}.topbar span{font-size:11px}.topbar button{padding:8px 10px;font-size:12px}.topbar-actions{gap:6px}#sources-mobile{display:block}#new-question{max-width:96px;line-height:1.25}.workspace{padding:10px 10px 8px}.chat-scroll{padding:16px}.welcome h2{font-size:30px}.welcome p{font-size:15px;margin-bottom:18px}.eyebrow{font-size:11px}.suggestions{align-items:flex-start}.suggestions>span{width:100%}.chat-message{padding:17px 18px}.chat-message.user{margin-left:8%;padding:13px 16px}.inline-citation{min-height:28px;min-width:28px}.question-panel form{padding:10px 12px;gap:6px 8px}.primary{padding:9px 12px;font-size:13px;min-width:64px}.form-bottom>span{font-size:11px}.page-foot{font-size:11px;margin-top:6px;padding-top:5px}.page-foot button{min-height:32px}.privacy-line{display:none}.status{font-size:11px}.connection-status{margin-top:6px;gap:8px}.answer-actions{gap:8px}.dialog-top h2{font-size:23px}dialog{padding:20px}.service-info{font-size:13px}}
+@media(max-height:520px){.topbar{padding-top:8px;padding-bottom:8px}.topbar span{display:none}.workspace{padding-top:8px}.question-panel form{padding-top:8px;padding-bottom:8px}.question-panel label{display:none}.page-foot{margin-top:5px;padding-top:2px}.privacy-line{display:none}.sidebar-intro{margin-top:20px}.sidebar-foot{padding-top:20px}.connection-status{margin-top:5px}.chat-message{padding:16px 18px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+  <a class="skip" href="#question">Skip to question</a>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">FS</span><div>FACULTY SENATE<span>University of Rhode Island</span></div></div>
+      <div class="sidebar-intro"><span class="eyebrow">CURRICULUM RESOURCES</span><p class="side-title">Faculty Senate<br>information.</p><p>Clear answers from the toolkit,<br>Senate website, and proposal trackers.</p></div>
+      <nav aria-label="Source resources">
+        <a href="https://gilded-toucan-d8a.notion.site/URI-Faculty-Senate-Curriculum-Toolkit-3a57535bf92c80c78bacd5b49e9c6c12" target="_blank" rel="noopener">Curriculum Toolkit <span aria-hidden="true">↗</span></a>
+        <a href="https://web.uri.edu/facsen/" target="_blank" rel="noopener">Faculty Senate website <span aria-hidden="true">↗</span></a>
+        <button id="sources-button" type="button">View indexed sources <span aria-hidden="true">＋</span></button>
+      </nav>
+      <div class="sidebar-foot"><span class="prototype-tag">PILOT SERVICE</span><p>Answers grounded in Senate resources.<br>This is not an official URI service.</p></div>
+    </aside>
+    <main>
+      <header class="topbar"><div><h1>Faculty Senate Assistant <small class="pilot-label" title="Simulated replies. No paid AI requests.">QA</small></h1><span>Toolkit, Senate website & trackers</span></div><div class="topbar-actions"><button id="sources-mobile" type="button">Sources</button><button id="new-question" type="button">New conversation</button></div></header>
+      <div class="workspace">
+        <section class="chat-panel" id="chat-panel" aria-label="Faculty Senate conversation">
+          <div class="chat-scroll" id="chat-scroll" tabindex="0" aria-label="Conversation history">
+            <section class="welcome" aria-labelledby="welcome-title"><span class="eyebrow blue">START WITH YOUR QUESTION</span><h2 id="welcome-title">How can I help?</h2><p>Ask about curriculum proposals, Senate procedures, program approvals, or Kuali.</p></section>
+            <div class="suggestions" aria-label="Example questions"><span>Try asking</span><button type="button" data-question="How do I make a temporary course permanent?">Make a course permanent</button><button type="button" data-question="How do I get access to Kuali?">Get Kuali access</button><button type="button" data-question="How do I track my proposal?">Track a proposal</button></div>
+            <button id="jump-latest" class="jump-latest" type="button" hidden>View new answer ↓</button><section id="results" aria-label="Conversation messages" role="log" aria-live="polite" aria-busy="false"></section>
+          </div>
+          <section class="question-panel" aria-label="Message the assistant">
+            <form id="question-form">
+              <label for="question" id="question-label">Your question</label>
+              <textarea id="question" name="question" rows="1" maxlength="4000" placeholder="Type your question here…" required aria-describedby="mode-note"></textarea>
+              <div class="form-bottom"><span id="mode-note">A conversation grounded in the toolkit.</span><button class="primary" id="submit" type="submit" disabled>Send question</button></div>
+            </form>
+          </section>
+        </section>
+        <div class="connection-status"><div id="load-status" class="status" role="status">Connecting to Senate resources…</div><button id="reconnect" type="button" hidden>Reconnect AI</button></div><div id="action-status" class="sr-only" role="status"></div>
+        <footer class="page-foot">AI-generated answers. Verify time-sensitive information in the original source. <button id="about-service" type="button">About this pilot & privacy</button><span class="privacy-line">Messages are processed through URI’s AI gateway. This visit is preserved only in this browser tab. Email drafts are never sent automatically.</span></footer>
+      </div>
+    </main>
+  </div>
+  <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-top"><div><span class="eyebrow blue">SOURCE TRANSPARENCY</span><h2 id="source-title">Sources and service information</h2></div><button id="close-dialog" type="button" aria-label="Close source list">✕</button></div><div class="service-info"><p>This pilot is not an official URI service. It answers questions using public Faculty Senate resources and a dated source snapshot. Restricted or unreadable documents are listed below.</p><p>Messages are processed through URI’s AI gateway. Your current visit is saved in this tab’s session storage so refreshing does not erase the conversation. New conversation clears that visit. No transcript is stored by this application’s backend. Email links open an unsent draft containing your original question.</p><p><a href="https://gilded-toucan-d8a.notion.site/URI-Faculty-Senate-Curriculum-Toolkit-3a57535bf92c80c78bacd5b49e9c6c12" target="_blank" rel="noopener">Open Curriculum Toolkit ↗</a> · <a href="https://web.uri.edu/facsen/" target="_blank" rel="noopener">Open Faculty Senate website ↗</a></p></div><div id="coverage"></div><div id="source-list"></div></dialog>
+  <script type="module">// scripts/quality-fixtures.js
+var nativeFetch = globalThis.fetch.bind(globalThis);
+var state = new URL(location.href).searchParams.get("scenario") || "normal";
+var count = 0;
+var sources = [{ id: 1, title: "Course Modification Proposal Walkthrough", section: "Start the Proposal", url: "https://gilded-toucan-d8a.notion.site/3c57535bf92c80d88020dcb7b863e664" }];
+var answer = { kind: "answer", answer: "Use a **Course Modification Proposal** to make a temporary course permanent. Open the existing course in Kuali, select **Propose Changes**, and choose **Create a new version** [1].\n\n1. Complete the relevant changes.\n2. Leave Edit Mode, then submit for approval [1].", sources, followUp: "" };
+async function qualityFetch(url, options) {
+  if (String(url).endsWith("/health")) {
+    if (state === "slow-start") await new Promise((r) => setTimeout(r, 6e3));
+    return Response.json({ ready: state !== "offline", sourceCount: 1321, snapshot: "2026-10-06T20:35:35.933901+00:00" });
+  }
+  if (String(url).endsWith("/chat")) {
+    count++;
+    const messages2 = JSON.parse(options.body).messages;
+    if (state === "slow") await new Promise((r) => setTimeout(r, 12e3));
+    if (state === "error-once" && count === 1) return Response.json({ error: "The assistant is temporarily unavailable." }, { status: 503 });
+    if (state === "daily-limit") return Response.json({ error: "The pilot has reached its daily request limit. Please try again tomorrow or email Genvi\xE9ve." }, { status: 429 });
+    if (state === "invalid") return Response.json({ answer: null, sources: [null] });
+    if (state === "unsafe") return Response.json({ ...answer, answer: "<img src=x onerror=alert(1)>\n\nLiteral text **remains readable** [1].", sources: [...sources, { id: 2, title: "Untrusted URL", url: "javascript:alert(1)" }] });
+    if (state === "long") return Response.json({ ...answer, answer: Array.from({ length: 18 }, (_, i) => "Paragraph " + (i + 1) + ". " + answer.answer.split("\n")[0]).join("\n\n") });
+    return Response.json(messages2.length > 1 ? { ...answer, answer: "After submission, the course modification is routed to the appropriate review committees. You can check its workflow status from your Kuali dashboard [1]." } : answer);
+  }
+  if (state === "inventory-error" && String(url).endsWith("/routing.json")) return new Response("", { status: 503 });
+  return nativeFetch(url, options);
+}
+
+// corpus.js?v=2
+var BASE = "https://csckhanna.github.io/faculty-senate-assistant/";
+async function loadCorpus(manifest2, fetcher = qualityFetch, base = BASE) {
+  if (!/^data\/corpus-[a-f0-9]{12}$/.test(manifest2.corpusBase)) throw new Error("Invalid corpus revision");
+  const [a, b] = await Promise.all([fetcher(base + manifest2.corpusBase + "/routing.json"), fetcher(base + manifest2.corpusBase + "/postings.bin")]);
+  if (!a.ok || !b.ok) throw new Error("Corpus unavailable");
+  const [routing, buffer] = await Promise.all([a.json(), b.arrayBuffer()]);
+  if (routing.builtAt !== manifest2.builtAt) throw new Error("Corpus mismatch");
+  const sources2 = routing.sources;
+  return { ...routing, base, postings: new Uint32Array(buffer), passages: routing.docs.map((d, id) => ({ id, source: sources2[d[0]].url, heading: d[1], text: d[3] })) };
+}
+async function hydrateEvidence(data2, evidence, fetcher = qualityFetch) {
+  if (!data2.corpusBase) return evidence;
+  const shardIds = [...new Set(evidence.map((r) => Math.floor(r.p.id / data2.shardSize)))];
+  const shards = new Map(await Promise.all(shardIds.map(async (id) => {
+    const r = await fetcher((data2.base || BASE) + data2.corpusBase + "/text-" + id + ".json");
+    if (!r.ok) throw new Error("Source text unavailable");
+    return [id, await r.json()];
+  })));
+  return evidence.map((r) => {
+    const id = r.p.id, text = shards.get(Math.floor(id / data2.shardSize))[id % data2.shardSize];
+    if (typeof text !== "string") throw new Error("Source text mismatch");
+    return { ...r, p: { ...r.p, text } };
+  });
+}
+
+// conversation.js
+function isFollowUp(text) {
+  const q = text.trim();
+  if (/^(?:yes|no|sure|okay|ok|the prerequisites|the credits|the title|the description)\b/i.test(q)) return true;
+  if (/\b(?:it|its|their|they|them|those|that|this|next|after that)\b/i.test(q)) return true;
+  if (/^(?:what(?:'s| is) (?:the )?bill number|is there a bill number|and (?:the )?bill number)[?.! ]*$/i.test(q)) return true;
+  if (/^(?:what about|and what|how about|can you explain|tell me more|why is that)\b/i.test(q)) return true;
+  if (/^(?:what happens (?:after|once)|how long (?:does|will|would)|what (?:are|is) (?:the )?(?:next steps?|deadline|timeline)|which committee|who (?:reviews|approves)|(?:can|could) you (?:summarize|clarify|link|give (?:me )?(?:the )?source))\b/i.test(q)) return true;
+  return /^(?:the\s+)?[\w +,-]{1,60}[.!]?$/.test(q) && !/[?]/.test(q) && !/^how|^what|^who|^where|^when|^were|^was|^is|^are/i.test(q) && !/\b(?:faculty senate|kuali|awards|university manual|calendar committee)\b/i.test(q);
+}
+function activeMessages(messages2) {
+  let start = 0;
+  for (let i = 0; i < messages2.length; i++) if (messages2[i].role === "user" && !isFollowUp(messages2[i].content)) start = i;
+  return messages2.slice(start);
+}
+
+// search.js?v=8
+var STOP = new Set("difference between compare versus vs a an the of to for and or in on at is are be was were it this that i my me we our you your how do does did can could would should what when where who which with have has want need please about from as by into all get getting like know find tell more help question teach teaching taught wondering trying someone anyone something use using information explain regarding".split(" "));
+var normalize = (text) => text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/4\s*\+\s*1/g, " fourplusone ").replace(/cross[ -]?list(?:ed|ing)?/g, " crosslist ").replace(/simultaneous/g, " simultaneous ").replace(/\b(?:approve|approved|approving|approvals)\b/g, " approval ").replace(/\b(?:modify|modifying|modifications|modification)\b/g, " modification ").replace(/\b(?:track|tracking)\b/g, " track ").replace(/\b(?:chairs)\b/g, " chair ").replace(/\b(?:courses|classes|class)\b/g, " course ").replace(/\b(?:propose|proposing|proposed)\b/g, " proposal ").replace(/\b(?:proposals)\b/g, " proposal ").replace(/\b(?:programs)\b/g, " program ").replace(/\b(?:committees)\b/g, " committee ");
+var tokens = (text) => normalize(text).match(/[a-z0-9]+/g)?.filter((x) => x.length > 1 && !STOP.has(x)) || [];
+var SYNONYMS = { deadline: ["deadline", "calendar", "date", "submission"], dates: ["date", "calendar", "deadline"], calendar: ["calendar", "date", "deadline"], access: ["access", "login", "logging"], login: ["login", "logging", "access"], status: ["status", "track", "workflow"], track: ["track", "status"], permanent: ["permanent"], temporary: ["temporary"], change: ["change", "modification"], changing: ["change", "modification"], submit: ["submit", "submission", "submitted"], submitting: ["submit", "submission", "submitted"], denied: ["denied", "rejected"], rejected: ["rejected", "denied"], credits: ["credit", "credits"], crosslist: ["crosslist"], syllabus: ["syllabus", "syllabi"] };
+function buildSearch(data2) {
+  if (data2.postings && data2.terms) return buildCompiledSearch(data2);
+  const sourceMap = new Map(data2.sources.map((s) => [s.url, s]));
+  const frequency = /* @__PURE__ */ new Map();
+  const docs = data2.passages.map((p) => {
+    const words = tokens(p.text), title = tokens(p.heading + " " + sourceMap.get(p.source)?.title);
+    const counts = /* @__PURE__ */ new Map();
+    for (const w of words) counts.set(w, (counts.get(w) || 0) + 1);
+    for (const w of /* @__PURE__ */ new Set([...words, ...title])) frequency.set(w, (frequency.get(w) || 0) + 1);
+    return { p, counts, title: new Set(title), length: words.length, source: sourceMap.get(p.source) };
+  });
+  const avg = docs.reduce((s, d) => s + d.length, 0) / Math.max(docs.length, 1);
+  return (question2, limit = 4, relaxed = false) => {
+    if (relaxed && !/course|program|specialization|kuali|curricul|proposal|syllab|prerequis|credit|department|faculty|senate|approval|crosslist|deadline|calendar|workflow|modality|graduat|undergraduat|catalog|online|teach|access|login|track|chair|dean|committee/.test(normalize(question2))) return [];
+    const original = [...new Set(tokens(question2))];
+    if (!original.length) return [];
+    const groups = original.map((w) => SYNONYMS[w] || [w]);
+    const meaningful = groups.filter((g) => g.some((w) => frequency.has(w)));
+    if (!meaningful.length || !relaxed && meaningful.length / original.length < 0.5) return [];
+    const ranked = docs.map((d) => {
+      let score = 0, matched = 0, bodyMatched = 0;
+      for (const g of groups) {
+        let best = 0, hit = false;
+        for (const w of g) {
+          const tf = d.counts.get(w) || 0, head = d.title.has(w), df = frequency.get(w) || 0;
+          if (!tf && !head) continue;
+          const idf = Math.log(1 + (docs.length - df + 0.5) / (df + 0.5));
+          best = Math.max(best, idf * (tf * 2.2 / (tf + 1.2 * (0.25 + 0.75 * d.length / avg)) + (head ? 1.3 : 0)));
+          if (tf) hit = true;
+        }
+        if (best) matched++;
+        if (hit) bodyMatched++;
+        score += best;
+      }
+      const coverage = matched / meaningful.length;
+      score *= coverage * coverage;
+      if (d.source.kind === "Curriculum Toolkit") score *= 1.15;
+      if (/\btrack\b/.test(normalize(question2)) && d.source.title === "Track Your Proposal") score *= 1.5;
+      if (/archive|previous years|2017-2018|2023-2024/i.test(d.source.title) && !/(?:19|20)\d{2}/.test(question2)) score *= 0.6;
+      return { ...d, score, coverage, bodyMatched };
+    }).filter((d) => d.score > 1 && (relaxed || d.coverage >= 0.5) && d.bodyMatched >= Math.min(relaxed ? 1 : 2, groups.length)).sort((a, b) => b.score - a.score);
+    const results2 = [], perSource = /* @__PURE__ */ new Map(), texts = /* @__PURE__ */ new Set();
+    for (const r of ranked) {
+      if (r.score < (ranked[0]?.score || 0) * (relaxed ? 0.2 : 0.4)) continue;
+      if (results2.length === limit) break;
+      const key = r.p.text.toLowerCase();
+      if (texts.has(key) || (perSource.get(r.p.source) || 0) >= 3) continue;
+      texts.add(key);
+      perSource.set(r.p.source, (perSource.get(r.p.source) || 0) + 1);
+      results2.push(r);
+    }
+    return results2;
+  };
+}
+function emailLink(originalQuestion) {
+  return "mailto:genvieve.spitale@uri.edu?subject=" + encodeURIComponent("Faculty Senate curriculum question") + "&body=" + encodeURIComponent(originalQuestion);
+}
+function conversationContext(messages2) {
+  const scoped = activeMessages(messages2), anchor = scoped[0];
+  let recent = scoped.slice(-13).map((m) => ({ role: m.role, content: m.content.slice(0, 4e3) }));
+  if (recent[0]?.role === "assistant") recent.shift();
+  if (anchor && scoped.length > recent.length) recent.unshift({ role: anchor.role, content: anchor.content.slice(0, 4e3) });
+  while (recent.length > 1 && recent.reduce((n, m) => n + m.content.length, 0) > 2e4) recent = recent.slice(2);
+  if (anchor && recent[0]?.content !== anchor.content.slice(0, 4e3)) {
+    while (recent.length > 1 && recent.reduce((n, m) => n + m.content.length, 0) + Math.min(anchor.content.length, 4e3) > 2e4) recent.splice(0, 2);
+    recent.unshift({ role: anchor.role, content: anchor.content.slice(0, 4e3) });
+  }
+  return recent;
+}
+function buildCompiledSearch(data2) {
+  const sourceFlags = new Map(data2.sources.map((s) => {
+    const years = [...s.title.matchAll(/(?:19|20)\d{2}/g)].map((x) => Number(x[0]));
+    return [s.url, /archive|previous years|2017-2018|2023-2024/i.test(s.title) || years.length && Math.max(...years) < 2026];
+  }));
+  const docs = data2.passages.map((p, i) => ({ p, source: data2.sources[data2.docs[i][0]], length: data2.docs[i][2] })), n = docs.length, avg = docs.reduce((a, d) => a + d.length, 0) / n;
+  const score = new Float64Array(n), matched = new Uint16Array(n), body = new Uint16Array(n), best = new Float64Array(n), hit = new Uint8Array(n), stamp = new Uint32Array(n), candidateStamp = new Uint32Array(n);
+  let epoch = 0, queryEpoch = 0;
+  return (question2, limit = 4, relaxed = false) => {
+    if (relaxed && !/course|program|specialization|kuali|curricul|proposal|syllab|prerequis|credit|department|faculty|senate|approval|crosslist|deadline|calendar|workflow|modality|graduat|undergraduat|catalog|online|teach|access|login|track|chair|dean|committee|bill|manual|award/.test(normalize(question2))) return [];
+    const original = [...new Set(tokens(question2))], groups = original.map((w) => SYNONYMS[w] || [w]), meaningful = groups.filter((g) => g.some((w) => data2.terms[w]));
+    if (!meaningful.length || !relaxed && meaningful.length / original.length < 0.5) return [];
+    const hasYear = /(?:19|20)\d{2}/.test(question2), tracking = /\b(?:status|track|tracking|happened)\b|(?:was|were|has|is).*approv/i.test(question2), procedure = /how|steps|prerequis|procedure|process|change|modif/i.test(question2);
+    const candidates = [];
+    queryEpoch++;
+    const bounded = meaningful.length > 28 ? [...meaningful].sort((a, b) => Math.min(...a.map((w) => data2.terms[w]?.[1] || n)) - Math.min(...b.map((w) => data2.terms[w]?.[1] || n))).slice(0, 28) : meaningful;
+    for (const group of bounded) {
+      const touched = [];
+      epoch++;
+      for (const w of group) {
+        const range = data2.terms[w];
+        if (!range) continue;
+        const [start, count2] = range, idf = Math.log(1 + (n - count2 + 0.5) / (count2 + 0.5));
+        for (let j = start; j < start + count2; j++) {
+          const packed = data2.postings[j], id = packed >>> 16, tf = packed & 32767, head = (packed & 32768) !== 0;
+          if (stamp[id] !== epoch) {
+            stamp[id] = epoch;
+            best[id] = 0;
+            hit[id] = 0;
+            touched.push(id);
+          }
+          const value = idf * (tf * 2.2 / (tf + 1.2 * (0.25 + 0.75 * docs[id].length / avg)) + (head ? 1.3 : 0));
+          best[id] = Math.max(best[id], value);
+          if (tf) hit[id] = 1;
+        }
+      }
+      for (const id of touched) {
+        if (candidateStamp[id] !== queryEpoch) {
+          candidateStamp[id] = queryEpoch;
+          score[id] = 0;
+          matched[id] = 0;
+          body[id] = 0;
+          candidates.push(id);
+        }
+        score[id] += best[id];
+        matched[id]++;
+        body[id] += hit[id];
+      }
+    }
+    const ranked = [];
+    for (const i of candidates) {
+      const coverage = matched[i] / bounded.length;
+      if (!score[i] || !relaxed && coverage < 0.5 || body[i] < Math.min(relaxed ? 1 : 2, bounded.length)) continue;
+      const d = docs[i];
+      let value = score[i] * coverage * coverage;
+      if (d.source.kind === "Curriculum Toolkit") value *= 1.15;
+      if (/\btrack\b/.test(normalize(question2)) && d.source.title === "Track Your Proposal") value *= 1.5;
+      if (!hasYear && sourceFlags.get(d.source.url)) value *= 0.6;
+      if (tracking && d.source.kind === "Faculty Senate proposal tracker") value *= 2;
+      if (!hasYear && d.source.kind === "Faculty Senate website") value *= 1.3;
+      if (!hasYear && procedure && d.source.kind === "Faculty Senate PDF") value *= 0.35;
+      if (value > 1) ranked.push({ ...d, score: value, coverage, bodyMatched: body[i] });
+    }
+    ranked.sort((a, b) => b.score - a.score);
+    const results2 = [], counts = /* @__PURE__ */ new Map(), texts = /* @__PURE__ */ new Set();
+    for (const r of ranked) {
+      if (r.score < (ranked[0]?.score || 0) * (relaxed ? 0.2 : 0.4)) continue;
+      if (results2.length === limit) break;
+      const key = r.p.text ? r.p.text.toLowerCase() : String(r.p.id);
+      if (texts.has(key) || (counts.get(r.p.source) || 0) >= 3) continue;
+      texts.add(key);
+      counts.set(r.p.source, (counts.get(r.p.source) || 0) + 1);
+      results2.push(r);
+    }
+    return results2;
+  };
+}
+
+// presentation.js?v=3
+var SOURCE_HOSTS = /* @__PURE__ */ new Set(["gilded-toucan-d8a.notion.site", "web.uri.edu", "digitalcommons.uri.edu", "docs.google.com", "drive.google.com"]);
+function sourceUrl(source) {
+  try {
+    const u = new URL(source.url);
+    if (u.hostname === "web.uri.edu" && u.protocol === "http:") u.protocol = "https:";
+    return u.protocol === "https:" && SOURCE_HOSTS.has(u.hostname) ? u.href : null;
+  } catch {
+    return null;
+  }
+}
+function answerBlocks(text) {
+  return text.trim().split(/\n\s*\n/).flatMap((paragraph) => {
+    const lines = paragraph.split("\n"), blocks = [];
+    let list = null;
+    for (const line of lines) {
+      const match = line.match(/^\s*(?:(\d+)[.)]|([-*•]))\s+(.+)/);
+      if (match) {
+        const type = match[1] ? "ol" : "ul";
+        if (!list || list.type !== type) {
+          list = { type, items: [] };
+          if (type === "ol" && Number(match[1]) !== 1) list.start = Number(match[1]);
+          blocks.push(list);
+        }
+        list.items.push(match[3]);
+      } else if (list && /^\s{2,}\S/.test(line)) list.items[list.items.length - 1] += " " + line.trim();
+      else {
+        list = null;
+        const previous = blocks.at(-1);
+        if (previous?.type === "p") previous.text += " " + line.trim();
+        else blocks.push({ type: "p", text: line.replace(/^#{1,4}\s+/, "").trim() });
+      }
+    }
+    return blocks;
+  });
+}
+function inline(parent, text, sources2) {
+  const pattern = /\*\*([^*\n]+)\*\*|`([^`\n]+)`|\[(\d+)\]|\*([^*\n]+)\*/g;
+  let end = 0;
+  for (const m of text.matchAll(pattern)) {
+    parent.append(document.createTextNode(text.slice(end, m.index)));
+    const source = m[3] && sources2.find((s) => s.id === Number(m[3])), url = source && sourceUrl(source);
+    let node;
+    if (url) {
+      node = document.createElement("a");
+      node.textContent = m[3];
+      node.href = url;
+      node.target = "_blank";
+      node.rel = "noopener";
+      node.className = "inline-citation";
+      node.setAttribute("aria-label", `Source ${m[3]}: ${referenceLabel(source)} (opens in a new tab)`);
+      node.title = referenceLabel(source);
+    } else if (m[1] || m[2] || m[4]) {
+      node = document.createElement(m[1] ? "strong" : m[4] ? "em" : "span");
+      node.textContent = m[1] || m[2] || m[4];
+    } else node = document.createTextNode(m[0]);
+    parent.append(node);
+    end = m.index + m[0].length;
+  }
+  parent.append(document.createTextNode(text.slice(end)));
+}
+function renderAnswer(text, sources2 = []) {
+  const body = document.createElement("div");
+  body.className = "answer-body";
+  for (const block of answerBlocks(text)) {
+    const node = document.createElement(block.type);
+    if (block.start) node.start = block.start;
+    if (block.items) for (const item of block.items) {
+      const li = document.createElement("li");
+      inline(li, item, sources2);
+      node.append(li);
+    }
+    else inline(node, block.text, sources2);
+    body.append(node);
+  }
+  return body;
+}
+function referenceLabel(source) {
+  const page = source.section?.match(/\| Page (\d+)/)?.[1];
+  if (/^Linked from /i.test(source.title)) return "Senate meeting document" + (page ? " \xB7 page " + page : "");
+  if (/^Minutes$/i.test(source.title)) return "Faculty Senate minutes" + (page ? " \xB7 page " + page : "");
+  return source.title;
+}
+
+// conversation.js?v=3
+function isFollowUp2(text) {
+  const q = text.trim();
+  if (/^(?:yes|no|sure|okay|ok|the prerequisites|the credits|the title|the description)\b/i.test(q)) return true;
+  if (/\b(?:it|its|their|they|them|those|that|this|next|after that)\b/i.test(q)) return true;
+  if (/^(?:what(?:'s| is) (?:the )?bill number|is there a bill number|and (?:the )?bill number)[?.! ]*$/i.test(q)) return true;
+  if (/^(?:what about|and what|how about|can you explain|tell me more|why is that)\b/i.test(q)) return true;
+  if (/^(?:what happens (?:after|once)|how long (?:does|will|would)|what (?:are|is) (?:the )?(?:next steps?|deadline|timeline)|which committee|who (?:reviews|approves)|(?:can|could) you (?:summarize|clarify|link|give (?:me )?(?:the )?source))\b/i.test(q)) return true;
+  return /^(?:the\s+)?[\w +,-]{1,60}[.!]?$/.test(q) && !/[?]/.test(q) && !/^how|^what|^who|^where|^when|^were|^was|^is|^are/i.test(q) && !/\b(?:faculty senate|kuali|awards|university manual|calendar committee)\b/i.test(q);
+}
+
+// config.js
+var CHAT_API_URL = "https://faculty-senate-assistant-api.april-khanna.workers.dev";
+
+// app.js
+var $ = (s) => document.querySelector(s);
+var results = $("#results");
+var status = $("#load-status");
+var input = $("#question");
+var submit = $("#submit");
+var scroller = $("#chat-scroll");
+var panel = $("#chat-panel");
+var VISIT_KEY = "senate-assistant-visit-v1";
+var BASE2 = new URL("./", location.href).href;
+var manifest;
+var data;
+var search;
+var indexPromise;
+var inventoryPromise;
+var question = "";
+var messages = [];
+var records = [];
+var busy = false;
+var connected = false;
+var ready = false;
+var lastAnswer;
+var date = (s) => new Date(s).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+function el(tag, text, cls) {
+  const n = document.createElement(tag);
+  if (text !== void 0) n.textContent = text;
+  if (cls) n.className = cls;
+  return n;
+}
+function link(label, url, cls) {
+  const n = el("a", label, cls);
+  n.href = url;
+  if (!url.startsWith("mailto:")) {
+    n.target = "_blank";
+    n.rel = "noopener noreferrer";
+  }
+  return n;
+}
+function button(label, action, cls) {
+  const n = el("button", label, cls);
+  n.type = "button";
+  n.addEventListener("click", action);
+  return n;
+}
+function persist() {
+  try {
+    sessionStorage.setItem(VISIT_KEY, JSON.stringify({ question, records }));
+  } catch {
+  }
+}
+function setBusy(value) {
+  busy = value;
+  submit.disabled = !ready || busy;
+  $("#new-question").disabled = busy;
+  results.setAttribute("aria-busy", String(busy));
+  for (const b of document.querySelectorAll("[data-question]")) b.disabled = !ready || busy;
+}
+function syncMode() {
+  submit.textContent = connected ? "Send" : "Search";
+  $("#question-label").textContent = records.length ? "Reply or ask a follow-up" : "Your question";
+  input.placeholder = records.length ? "Type your reply here\u2026" : "Type your question here\u2026";
+  $("#mode-note").textContent = connected ? "Enter to send \xB7 Shift + Enter for a new line" : "Source search \xB7 Enter to search";
+  const snapshot = manifest ? `${manifest.sourceCount.toLocaleString()} sources \xB7 Updated ${date(manifest.builtAt)} \xB7 ` : "";
+  status.textContent = snapshot + (connected ? "AI assistant connected" : "AI unavailable \xB7 source search available");
+  $("#reconnect").hidden = connected;
+}
+async function checkConnection() {
+  try {
+    const r = await qualityFetch(CHAT_API_URL + "/health", { signal: AbortSignal.timeout(1e4) }), h = r.ok && await r.json();
+    connected = Boolean(h?.ready);
+    if (!manifest && h?.snapshot) manifest = { builtAt: h.snapshot, sourceCount: h.sourceCount };
+  } catch {
+    connected = false;
+  }
+  syncMode();
+  return connected;
+}
+function scrollChat() {
+  scroller.scrollTop = scroller.scrollHeight;
+}
+function revealAnswer(bubble, user) {
+  lastAnswer = bubble;
+  const target = user && user.offsetHeight < scroller.clientHeight * 0.35 ? user : bubble;
+  scroller.scrollTop = Math.max(0, target.offsetTop - 12);
+  $("#jump-latest").hidden = true;
+}
+function startConversation() {
+  panel.classList.add("has-conversation");
+  syncMode();
+}
+function messageBubble(role, text) {
+  const bubble = el("article", void 0, "chat-message " + role);
+  bubble.append(el("span", role === "user" ? "You" : "Faculty Senate Assistant", "chat-role"), el("p", text, "chat-text"));
+  results.append(bubble);
+  return bubble;
+}
+function emailAction(original = question) {
+  return link("Email Genvi\xE9ve with the original question", emailLink(original), "chat-email");
+}
+function renderResponse(bubble, answer2) {
+  bubble.querySelector(".chat-text")?.remove();
+  bubble.append(renderAnswer(answer2.answer, answer2.sources));
+  if (answer2.followUp) bubble.append(el("p", answer2.followUp, "chat-followup"));
+  const sources2 = answer2.sources.filter(sourceUrl);
+  if (sources2.length) {
+    const references = el("details", void 0, "chat-references");
+    references.append(el("summary", `Sources (${sources2.length})`));
+    const citations = el("div", void 0, "chat-citations");
+    for (const source of sources2) {
+      const row = el("div", void 0, "chat-reference");
+      row.append(link("[" + source.id + "] " + referenceLabel(source), sourceUrl(source)));
+      const sections = [...new Set(source.sections || [source.section])].filter((s) => s && s !== source.title);
+      if (sections.length) row.append(el("small", sections.join(" \xB7 "), "reference-section"));
+      citations.append(row);
+    }
+    const notices = [...new Set(sources2.map((s) => s.notice).filter(Boolean))];
+    if (notices.length) {
+      const notes = el("details", void 0, "source-notes");
+      notes.append(el("summary", "Source qualifications"));
+      for (const note of notices) notes.append(el("p", note));
+      citations.append(notes);
+    }
+    references.append(citations);
+    bubble.append(references);
+  }
+  const actions = el("div", void 0, "answer-actions");
+  if (answer2.retryable) {
+    const retry = button("Retry this question", () => retryLast(bubble), "retry-answer");
+    actions.append(retry);
+  }
+  if (answer2.kind === "unanswered" || answer2.kind === "error" || answer2.kind === "sources") {
+    actions.append(emailAction(answer2.originalQuestion || question));
+    bubble.append(actions, el("small", "Opens an unsent draft in your email app. Review it before sending.", "chat-note"));
+  } else {
+    if (answer2.kind === "answer") actions.append(button("Copy answer", async (e) => {
+      const b = e.currentTarget, plain = answer2.answer.replace(/\*\*|`/g, "") + (sources2.length ? "\n\nSources\n" + sources2.map((s) => `[${s.id}] ${referenceLabel(s)} \u2014 ${sourceUrl(s)}`).join("\n") : "");
+      try {
+        await navigator.clipboard.writeText(plain);
+        b.textContent = "Copied";
+        $("#action-status").textContent = "Answer and references copied.";
+      } catch {
+        b.textContent = "Select answer to copy";
+        $("#action-status").textContent = "Clipboard access is unavailable. Select the answer text to copy it.";
+      }
+    }, "copy-answer"));
+    if (answer2.kind === "answer") {
+      const help = el("details", void 0, "staff-help");
+      help.append(el("summary", "Contact Faculty Senate"), emailAction(answer2.originalQuestion || question), el("small", "Genvi\xE9ve Spitale \xB7 Specialist | Faculty Senate. Opens an unsent email draft.", "chat-note"));
+      actions.append(help);
+    }
+    if (actions.childNodes.length) bubble.append(actions);
+  }
+}
+async function ensureIndex() {
+  if (!indexPromise) indexPromise = (async () => {
+    if (!manifest) {
+      const r = await qualityFetch("data/corpus-manifest.json", { cache: "no-store" });
+      if (!r.ok) throw new Error("Snapshot unavailable");
+      manifest = await r.json();
+    }
+    data = await loadCorpus(manifest, qualityFetch, BASE2);
+    search = buildSearch(data);
+    return data;
+  })().catch((e) => {
+    indexPromise = void 0;
+    throw e;
+  });
+  return indexPromise;
+}
+async function sourceAnswer(original) {
+  await ensureIndex();
+  const scoped = conversationContext(messages).filter((m) => m.role === "user");
+  const query = scoped.map((m) => m.content).join(" "), found = await hydrateEvidence(data, search(query, 4), qualityFetch);
+  if (!found.length) return { kind: "unanswered", answer: "I couldn\u2019t find a clear source match for this question. You can add a course code, program name, committee, or academic year, or ask Genvi\xE9ve using the email option below.", sources: [], followUp: "" };
+  const unique = [];
+  for (const r of found) if (!unique.some((x) => x.p.source === r.p.source)) unique.push(r);
+  return { kind: "sources", answer: "The AI connection is unavailable. These published source excerpts may help; open the references for complete guidance.\n\n" + unique.map((r, i) => r.source.title + " [" + (i + 1) + "]\n\u201C" + r.p.text.slice(0, 480) + (r.p.text.length > 480 ? "\u2026" : "") + "\u201D").join("\n\n"), sources: unique.map((r, i) => ({ id: i + 1, url: r.p.source, title: r.source.title, section: r.p.heading, notice: r.source.notice })), followUp: "" };
+}
+async function requestAnswer(original) {
+  if (!connected) await checkConnection();
+  if (!connected) return sourceAnswer(original);
+  const response = await qualityFetch(CHAT_API_URL + "/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: conversationContext(messages) }), signal: AbortSignal.timeout(55e3) });
+  let answer2;
+  try {
+    answer2 = await response.json();
+  } catch {
+    throw new Error("Invalid response");
+  }
+  if (!response.ok) {
+    const failure = new Error("Request rejected");
+    failure.publicMessage = typeof answer2.error === "string" ? answer2.error.slice(0, 300) : "The assistant is temporarily unavailable.";
+    failure.retryable = response.status !== 400 && response.status !== 413 && !(response.status === 429 && /daily/i.test(failure.publicMessage));
+    throw failure;
+  }
+  if (!["answer", "clarification", "unanswered", "sources"].includes(answer2.kind) || typeof answer2.answer !== "string" || !answer2.answer.trim() || answer2.answer.length > 6500 || !Array.isArray(answer2.sources) || answer2.sources.some((s) => !s || !Number.isInteger(s.id) || typeof s.url !== "string" || typeof s.title !== "string")) throw new Error("Incomplete response");
+  return answer2;
+}
+async function deliver(original, bubble, user) {
+  setBusy(true);
+  try {
+    const answer2 = await requestAnswer(original);
+    answer2.originalQuestion = question;
+    const wasNearEnd = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 90;
+    bubble.replaceChildren(el("span", "Faculty Senate Assistant", "chat-role"));
+    renderResponse(bubble, answer2);
+    records.push({ role: "assistant", ...answer2 });
+    if (!answer2.retryable) messages.push({ role: "assistant", content: answer2.answer + (answer2.followUp ? "\n" + answer2.followUp : "") });
+    if (wasNearEnd) revealAnswer(bubble, user);
+    else {
+      lastAnswer = bubble;
+      $("#jump-latest").hidden = false;
+    }
+  } catch (error) {
+    const nearEnd = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 90;
+    const answer2 = { kind: "error", answer: error.publicMessage || "The assistant couldn\u2019t complete this request. Your question and conversation are preserved. Please retry, or use the email option below.", sources: [], followUp: "", originalQuestion: question, retryable: error.retryable !== false };
+    bubble.replaceChildren(el("span", "Faculty Senate Assistant", "chat-role"));
+    renderResponse(bubble, answer2);
+    records.push({ role: "assistant", ...answer2 });
+    if (nearEnd) revealAnswer(bubble, user);
+    else {
+      lastAnswer = bubble;
+      $("#jump-latest").hidden = false;
+    }
+  } finally {
+    setBusy(false);
+    persist();
+    if (!$("#source-dialog").open && (document.activeElement === submit || document.activeElement === document.body)) input.focus({ preventScroll: true });
+  }
+}
+async function run() {
+  if (!ready || busy || !input.value.trim()) return;
+  const original = input.value;
+  for (const b of document.querySelectorAll(".retry-answer")) b.disabled = true;
+  if (!messages.length || !isFollowUp2(original)) question = original;
+  records.push({ role: "user", content: original });
+  messages.push({ role: "user", content: original });
+  input.value = "";
+  startConversation();
+  const user = messageBubble("user", original), waiting = messageBubble("assistant", connected ? "Checking the published Senate resources\u2026" : "Searching the published sources\u2026");
+  scrollChat();
+  persist();
+  await deliver(original, waiting, user);
+}
+async function retryLast(bubble) {
+  if (busy || bubble !== results.lastElementChild) return;
+  const original = messages.at(-1)?.content;
+  if (messages.at(-1)?.role !== "user") return;
+  records.pop();
+  bubble.replaceChildren(el("span", "Faculty Senate Assistant", "chat-role"), el("p", "Checking the published Senate resources\u2026", "chat-text"));
+  scrollChat();
+  await deliver(original, bubble, bubble.previousElementSibling);
+}
+function restore() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(VISIT_KEY) || "null");
+    if (!saved || !Array.isArray(saved.records) || saved.records.length > 300 || typeof saved.question !== "string") return;
+    question = saved.question;
+    for (const r of saved.records) {
+      if (r.role === "user" && typeof r.content === "string" && r.content.length <= 4e3) {
+        records.push(r);
+        messages.push(r);
+        messageBubble("user", r.content);
+      } else if (r.role === "assistant" && typeof r.answer === "string" && r.answer.length <= 6500 && Array.isArray(r.sources)) {
+        records.push(r);
+        const bubble = messageBubble("assistant", "");
+        renderResponse(bubble, r);
+        if (!r.retryable && r.kind !== "error") messages.push({ role: "assistant", content: r.answer + (r.followUp ? "\n" + r.followUp : "") });
+        lastAnswer = bubble;
+      }
+    }
+    for (const b of [...document.querySelectorAll(".retry-answer")]) b.disabled = !results.lastElementChild.contains(b);
+    if (records.length) {
+      startConversation();
+      scrollChat();
+    }
+  } catch {
+  }
+}
+$("#question-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  run();
+});
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
+    e.preventDefault();
+    run();
+  }
+});
+for (const b of document.querySelectorAll("[data-question]")) b.addEventListener("click", () => {
+  input.value = b.dataset.question;
+  run();
+  input.focus({ preventScroll: true });
+});
+$("#new-question").addEventListener("click", () => {
+  if (busy) return;
+  messages = [];
+  records = [];
+  question = "";
+  input.value = "";
+  results.replaceChildren();
+  panel.classList.remove("has-conversation");
+  $("#jump-latest").hidden = true;
+  lastAnswer = null;
+  syncMode();
+  persist();
+  scroller.scrollTop = 0;
+  input.focus({ preventScroll: true });
+});
+$("#jump-latest").addEventListener("click", () => {
+  if (lastAnswer) revealAnswer(lastAnswer, lastAnswer.previousElementSibling);
+});
+scroller.addEventListener("scroll", () => {
+  if (scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 60) $("#jump-latest").hidden = true;
+});
+$("#reconnect").addEventListener("click", async (e) => {
+  const b = e.currentTarget;
+  b.disabled = true;
+  b.textContent = "Checking\u2026";
+  await checkConnection();
+  b.disabled = false;
+  b.textContent = "Reconnect AI";
+});
+function lazyDetails(label, items, render) {
+  const d = el("details");
+  d.append(el("summary", label));
+  d.addEventListener("toggle", () => {
+    if (d.open && !d.dataset.loaded) {
+      d.dataset.loaded = "true";
+      for (const item of items) d.append(render(item));
+    }
+  });
+  return d;
+}
+async function loadInventory() {
+  if (inventoryPromise) return inventoryPromise;
+  inventoryPromise = (async () => {
+    const c = $("#coverage"), list = $("#source-list");
+    c.replaceChildren(el("p", "Loading the source inventory\u2026"));
+    list.replaceChildren();
+    const [index, r] = await Promise.all([ensureIndex(), qualityFetch("data/coverage.json?v=7", { cache: "no-store" })]);
+    if (!r.ok) throw new Error("Coverage unavailable");
+    const coverage = await r.json();
+    c.replaceChildren(el("p", `${index.sources.length.toLocaleString()} sources and ${index.passages.length.toLocaleString()} passages. Snapshot collected ${date(index.builtAt)}.`));
+    const ul = el("ul");
+    for (const text of coverage.limitations || []) ul.append(el("li", text));
+    c.append(ul);
+    if (coverage.website) {
+      const w = coverage.website;
+      c.append(el("p", `${w.publishedPagesIndexed} of ${w.publishedPages} published Senate pages/posts indexed, plus linked public documents and ${w.trackers.length} readable proposal trackers with every downloadable tab.`));
+      if (w.gaps.length) c.append(lazyDetails(`${w.gaps.length} website links unavailable or unreadable`, w.gaps, (g) => {
+        const p = el("p", void 0, "coverage-fail");
+        p.append(link(g.url, g.url), document.createTextNode(" \u2014 " + g.reason));
+        return p;
+      }));
+    }
+    if (coverage.failures?.length) c.append(lazyDetails(`${coverage.failures.length} import issues or partial sources`, coverage.failures, (f) => el("p", `${f.url} \u2014 ${f.reason}`, "coverage-fail")));
+    if (coverage.externalLinksNotIndexed?.length) c.append(lazyDetails("Linked resources outside this index", coverage.externalLinksNotIndexed, (url) => {
+      const p = el("p", void 0, "coverage-fail");
+      p.append(link(url, url));
+      return p;
+    }));
+    const label = el("label", "Filter the source inventory");
+    label.htmlFor = "source-filter";
+    const filter = el("input");
+    filter.type = "search";
+    filter.id = "source-filter";
+    filter.placeholder = "Title or resource type";
+    const count2 = el("p", void 0, "inventory-count"), rows = el("div"), more = button("Show more sources", () => {
+      limit += 100;
+      draw();
+    }, "inventory-more");
+    let limit = 100;
+    const sorted = [...index.sources].sort((a, b) => a.kind.localeCompare(b.kind) || a.title.localeCompare(b.title));
+    function draw() {
+      const q = filter.value.trim().toLowerCase(), matches = sorted.filter((s) => (s.title + " " + s.kind).toLowerCase().includes(q));
+      rows.replaceChildren();
+      count2.textContent = `Showing ${Math.min(limit, matches.length).toLocaleString()} of ${matches.length.toLocaleString()} matching sources`;
+      more.hidden = matches.length <= limit;
+      for (const s of matches.slice(0, limit)) {
+        const row = el("div", void 0, "listed-source");
+        row.append(link(s.title, s.url), el("span", s.kind + (s.notice ? " \xB7 Source qualification" : "")));
+        rows.append(row);
+      }
+    }
+    filter.addEventListener("input", () => {
+      limit = 100;
+      draw();
+    });
+    list.append(label, filter, count2, rows, more);
+    draw();
+  })().catch(() => {
+    $("#coverage").replaceChildren(el("p", "The source inventory could not load. The direct toolkit and Senate links above remain available."), button("Retry loading sources", () => loadInventory(), "inventory-more"));
+    inventoryPromise = void 0;
+  });
+  return inventoryPromise;
+}
+function openSources() {
+  $("#source-dialog").showModal();
+  loadInventory();
+}
+for (const id of ["sources-button", "sources-mobile", "about-service"]) $("#" + id).addEventListener("click", openSources);
+$("#close-dialog").addEventListener("click", () => $("#source-dialog").close());
+$("#source-dialog").addEventListener("click", (e) => {
+  if (e.target === $("#source-dialog")) {
+    const r = e.target.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) e.target.close();
+  }
+});
+if (window.visualViewport) {
+  const viewport = () => document.documentElement.style.setProperty("--viewport-height", window.visualViewport.height + "px");
+  window.visualViewport.addEventListener("resize", viewport);
+  viewport();
+}
+restore();
+await Promise.allSettled([qualityFetch("data/corpus-manifest.json", { cache: "no-store" }).then(async (r) => {
+  if (r.ok) manifest = await r.json();
+}), checkConnection()]);
+ready = true;
+syncMode();
+setBusy(false);
+</script>
+</body>
+</html>
