@@ -2,7 +2,8 @@
 export function isFollowUp(text){
   const q=text.trim();
   if(/^(?:yes|no|sure|okay|ok|the prerequisites|the credits|the title|the description)\b/i.test(q))return true;
-  if(/\b(?:it|they|them|those|that proposal|this proposal|that course|this course|that program|this program|that meeting|this meeting|next|after that)\b/i.test(q))return true;
+  if(/\b(?:it|its|their|they|them|those|that proposal|this proposal|that course|this course|that program|this program|that meeting|this meeting|next|after that)\b/i.test(q))return true;
+  if(/^(?:what(?:'s| is) (?:the )?bill number|is there a bill number|and (?:the )?bill number)[?.! ]*$/i.test(q))return true;
   if(/^(?:what about|and what|how about|can you explain|tell me more|why is that)\b/i.test(q))return true;
   return /^(?:the\s+)?[\w +,-]{1,60}[.!]?$/.test(q)&&!/[?]/.test(q)&&!/^how|^what|^who|^where|^when|^were|^was|^is|^are/i.test(q);
 }

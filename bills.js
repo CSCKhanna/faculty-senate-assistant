@@ -15,7 +15,7 @@ export function identifiers(text){
   return found;
 }
 export function isBillQuestion(messages){const q=messages.at(-1)?.content||'';return /\bbill\b|\breport\s*(?:number|no\.?|#)/i.test(q)||identifiers(q).length>0;}
-const OMIT=new Set('bill bills number numbers no report reports lookup look up have has does approval approved yet status proposal program major degree bs ba ms phd academic year last current for called named'.split(' '));
+const OMIT=new Set('if its their they them bill bills number numbers no report reports lookup look up have has does approval approved yet status proposal program major degree bs ba ms phd academic year last current for called named'.split(' '));
 export function billEvidence(index,messages){
   const scoped=activeMessages(messages),latest=expandQuestion(scoped.at(-1).content,index.builtAt);
   const explicit=identifiers(latest),ids=new Set();
