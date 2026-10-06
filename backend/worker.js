@@ -23,7 +23,7 @@ export default {
     const headers={'Content-Type':'application/json','Cache-Control':'no-store','Vary':'Origin',...(permitted?{'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Content-Type'}:{})};
     const reply=(obj,status=200)=>new Response(JSON.stringify(obj),{status,headers});
     const url=new URL(request.url);
-    if(url.pathname==='/health')return reply({ready:Boolean(env.URI_API_KEY&&env.PILOT_DB),snapshot:data.builtAt,sourceCount:data.sources.length});
+    if(url.pathname==='/health')return reply({ready:Boolean(env.URI_API_KEY&&env.PILOT_DB),snapshot:data.builtAt,sourceCount:data.sources.length,model:env.AI_MODEL||'its_direct/pt3-claude-sonnet-5.5-1m-us'});
     if(!permitted)return reply({error:'This origin is not allowed.'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers});
     if(url.pathname!=='/chat'||request.method!=='POST')return reply({error:'Not found.'},404);

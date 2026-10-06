@@ -14,9 +14,11 @@ Backend: `https://faculty-senate-assistant-api.april-khanna.workers.dev`. D1 usa
 
 ## Source coverage
 
-The snapshot contains 57 sources, including 24 toolkit pages. It is not a live search of every current resource. `data/coverage.json` records partial imports, failed links, and linked resources outside the index; the interface exposes those limitations.
+The October 6, 2026 snapshot contains 406 sources and 1,419 searchable passages. Every reachable public toolkit page and database item is included: 24 toolkit pages plus 272 entries (69 calendar, 140 directory, 62 requirements, one FAQ entry). Collapsed answers, synced sections, and embedded database views are expanded. Some FAQ answers in the toolkit itself are placeholders; importing them does not create missing guidance.
 
-The importer reads public Notion pages, reachable public Faculty Senate website pages, and directly linked text-readable URI PDFs. Notion's public read API is unofficial and may change. Embedded database rows, images and flowcharts, Google documents and spreadsheets, restricted files, external archives, and scanned PDFs need separate ingestion. Some sources are old or unfinished. The assistant is instructed to preserve uncertainty and cite its evidence, but staff review is still needed before campus release.
+All 59 embedded images and files are included as sourced text: 46 images, 12 college workflow diagrams, and a DOCX guide. Sonnet 5.5 transcribed images; DOCX text was extracted directly. Image-derived sources carry a warning to verify small text and arrows in the original. Linked public Google documents, every spreadsheet tab including the proposal tracker, a PDF reference, linked URI guidance, and the two linked catalog courses are included. There are zero unresolved toolkit blocks or failed linked-document imports in this snapshot.
+
+Kuali account data and Microsoft access-request forms are operational destinations, not knowledge documents. The external NCES classification search remains a reference link. This is a complete snapshot of the toolkit's published guidance and directly linked knowledge resources, not a live view of Kuali or a copy of every external website. `data/coverage.json` and the interface disclose that scope. The calendar and older narrative schedules can contain conflicting dates; the assistant must expose conflicts.
 
 No separate approved-answer bank is required. Faculty Senate continues maintaining its toolkit and website.
 
@@ -39,7 +41,7 @@ python3 scripts/build_index.py
 npm test
 ```
 
-Review coverage and failed imports before publishing. Only extracted public text is committed; raw Notion records, permissions, user identifiers, authentication data, and fetch logs are excluded. There is no scheduled refresh.
+The crawler starts with a fresh temporary cache outside the repository. `TOOLKIT_CACHE` optionally reuses a reviewed cache. All current public Notion pages and rows are refreshed. Image/file transcriptions are reused only while their public attachment reference is unchanged; new or replaced attachments become explicit gaps requiring extraction and review. Linked-document text has its own collection date in `data/toolkit-linked-text.json`; refresh and review those files separately before claiming current complete coverage. The two catalog pages required browser rendering. Raw caches and signed attachment URLs must remain outside GitHub. Review coverage and failed imports before publishing. Only extracted public text is committed; raw Notion records, permissions, user identifiers, authentication data, and fetch logs are excluded. There is no scheduled refresh.
 
 ## Privacy and hosting
 
@@ -49,15 +51,15 @@ GitHub Pages publishes `main` from the repository root with `.nojekyll`. GitHub 
 
 ## Conversational backend (version 0.2)
 
-`backend/chat.js` retrieves up to sixteen indexed passages, sends those passages and the last conversation turns to URI's OpenAI-compatible gateway, and validates the structured response. It asks clarifying questions, interprets follow-ups, and returns only links from the source registry. Citation validation does not establish factual correctness: staff review of real answers remains necessary. The snapshot's existing coverage limitations still apply.
+`backend/chat.js` retrieves up to sixteen indexed passages (twenty when including calendar records for conflict checks), sends those passages and the last conversation turns to URI's OpenAI-compatible gateway, and validates the structured response. It asks clarifying questions, interprets follow-ups, and returns only links from the source registry. Citation validation does not establish factual correctness: staff review of real answers remains necessary. The source coverage and image-transcription qualifications above still apply.
 
 `backend/worker.js` runs on Cloudflare Workers. An atomic D1 database transaction reserves requests before AI calls, with a default hard limit of 100 calls per UTC day across the whole pilot and eight calls per UTC minute per network address. Shared campus network addresses may share the minute limit. Failed API calls also consume a daily slot. Only daily usage counters and temporary hashed network-address counters are persisted; conversation messages are not stored by this app. Old counters are cleaned on the next request (network counters after two minute buckets, daily counters after the day changes); idle counters can remain until another request, and provider backups may retain prior data. Cloudflare and the URI gateway may process and retain data under their own service policies. CORS limits browser origins but is not authentication. This is a bounded public pilot, not an authenticated campus service.
 
-Default model: `its_direct/pt2-claude-haiku-4.5-us`. Maximum output: 1,800 tokens per call; maximum conversation request: 22,000 characters plus bounded retrieved evidence. Limits bound request volume, not an exact dollar amount.
+Default model: `its_direct/pt3-claude-sonnet-5.5-1m-us`. Maximum output: 2,200 tokens per call; maximum conversation request: 22,000 characters plus bounded retrieved evidence. Limits bound request volume, not an exact dollar amount.
 
 ### Deployment
 
-1. Deploy with `npx wrangler deploy` after signing in, or paste the bundled Worker into Cloudflare’s code editor. The GitHub app is installed for this repository, but Cloudflare’s Git account connection did not complete; automated backend builds are not configured. The included `wrangler.jsonc` declares the D1 database. Create tables with `backend/schema.sql` in the D1 console, then bind it as `PILOT_DB`.
+1. Deploy with `npx wrangler deploy` after signing in, or run `npm run bundle:backend` and paste the bundled Worker from the reported path into Cloudflare’s code editor. The bundled corpus is losslessly compressed and decoded once at Worker startup. The GitHub app is installed for this repository, but Cloudflare’s Git account connection did not complete; automated backend builds are not configured. The included `wrangler.jsonc` declares the D1 database. Create tables with `backend/schema.sql` in the D1 console, then bind it as `PILOT_DB`.
 2. Add `URI_API_KEY` as an encrypted Worker secret with `npx wrangler secret put URI_API_KEY`. Enter the credential directly in the secret prompt. Never put it in GitHub or `config.js`.
 3. Check `/health` and test a conversation from the GitHub website origin. URI gateway access from Cloudflare still needs verification; local API access does not prove remote access.
 4. Set `CHAT_API_URL` in `config.js` to the Worker URL, without a trailing slash. Push the frontend only once the backend is verified.
@@ -87,3 +89,9 @@ The conversational retriever uses broader ranking when an exact keyword search h
 Gateway and model-format failures return clearly labeled original source excerpts. Backend infrastructure failures also fall back to excerpts. Rate limits stay enforced; the browser can show related local excerpts while a request is blocked. Long conversations keep a bounded recent API context while preserving the full visible transcript and exact first question for the optional email draft. Clarifications no longer display a staff-email option after every turn.
 
 Twenty-four automated tests cover these behaviors, including simulated network/invalid-output failures and a long transcript. Real gateway tests also included broad course redesign, prerequisite changes combined with an approval-guarantee question, sent-back proposals, and syllabus-upload wording. This improves usefulness without establishing complete source coverage or guaranteeing AI accuracy.
+
+### Sonnet and full toolkit ingestion — October 6, 2026
+
+Sonnet 5.5 replaces Haiku. The gateway rejects nondefault temperature for this model, so that parameter is omitted. Source indexing expanded from 57 sources / 308 passages to 406 sources / 1,419 passages. Reviewed extraction snapshots (`toolkit-pages.json`, `toolkit-media-text.json`, `toolkit-linked-text.json`) make completeness auditable. The public crawler resolves collection pointers stored in views, queries all database rows, parses date annotations, follows synced blocks and external-object mentions, and paginates each public block. It never publishes Notion permissions or user metadata.
+
+Twenty-nine automated checks pass. Eight live Sonnet scenarios produced cited answers, and a hosted ABM/4+1 comparison confirmed the deployed backend uses the expanded evidence. Live evaluation covers course changes, ABM versus 4+1 definitions, engineering contacts and approval endpoints, sent-back proposals, assessment-plan contents, calendar conflicts, and tracking boundaries. Tests never send emails. The request-volume cap remains 100 per UTC day; Sonnet has different pricing from Haiku, and this cap does not guarantee a fixed dollar spend.

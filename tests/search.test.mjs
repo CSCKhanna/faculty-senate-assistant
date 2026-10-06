@@ -10,7 +10,7 @@ test('temporary-to-permanent retrieves the toolkit classification, not a fabrica
   assert.ok(r.every(x=>data.passages.some(p=>p.text===x.p.text&&p.source===x.p.source)));
 });
 test('proposal status retrieves tracking steps',()=>{
-  const r=search('How do I track my proposal?');assert.equal(r[0].source.title,'Track Your Proposal');assert.match(r[0].p.text,/workflow|status/i);
+  const r=search('How do I track my proposal?');assert.equal(r[0].source.title,'Track Your Proposal');assert.ok(r.some(x=>x.source.title==='Track Your Proposal'&&/workflow|status/i.test(x.p.text)));
 });
 test('unrelated questions fall back rather than presenting an answer',()=>{
   assert.deepEqual(search('What is the weather in Boston?'),[]);

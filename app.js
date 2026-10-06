@@ -1,4 +1,4 @@
-import {buildSearch,emailLink,conversationContext} from './search.js?v=5';
+import {buildSearch,emailLink,conversationContext} from './search.js?v=6';
 import {CHAT_API_URL} from './config.js';
 const $=s=>document.querySelector(s);
 const results=$('#results'),status=$('#load-status'),input=$('#question'),submit=$('#submit');
@@ -62,7 +62,7 @@ async function run(){
     if(answer.followUp)bubble.append(el('p',answer.followUp,'chat-followup'));
     if(answer.sources.length){const citations=el('div',undefined,'chat-citations');
       for(const source of answer.sources){
-        if(!/^https:\/\/(gilded-toucan-d8a\.notion\.site|web\.uri\.edu)\//.test(source.url))continue;
+        if(!/^https:\/\/(gilded-toucan-d8a\.notion\.site|web\.uri\.edu|docs\.google\.com|drive\.google\.com)\//.test(source.url))continue;
         citations.append(link('['+source.id+'] '+source.title,source.url));
         if(source.notice)citations.append(el('p',source.notice,'notice'));
       }bubble.append(citations);
@@ -83,12 +83,13 @@ $('#sources-button').addEventListener('click',()=>$('#source-dialog').showModal(
 $('#close-dialog').addEventListener('click',()=>$('#source-dialog').close());
 $('#source-dialog').addEventListener('click',e=>{if(e.target===$('#source-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}});
 try{
-  const [a,b]=await Promise.all([fetch('data/index.json'),fetch('data/coverage.json')]);
+  const [a,b]=await Promise.all([fetch('data/index.json?v=6'),fetch('data/coverage.json?v=6')]);
   if(!a.ok||!b.ok)throw new Error('Source files unavailable');data=await a.json();coverage=await b.json();search=buildSearch(data);submit.disabled=false;
   for(const b of document.querySelectorAll('[data-question]'))b.disabled=false;
   const toolkit=data.sources.filter(s=>s.kind==='Curriculum Toolkit').length;
+  const entries=coverage.toolkit?.databaseEntries||0;
   if(CHAT_API_URL){try{const h=await fetch(CHAT_API_URL+'/health',{signal:AbortSignal.timeout(10000)});connected=h.ok&&(await h.json()).ready;}catch{connected=false;}}
-  status.textContent=`${data.sources.length} sources indexed · ${toolkit} toolkit pages · Snapshot ${date(data.builtAt)} · ${connected?'Conversational pilot':'Source search — AI connection pending'}`;
+  status.textContent=`${data.sources.length} sources indexed · ${toolkit} toolkit pages + ${entries} database entries · Snapshot ${date(data.builtAt)} · ${connected?'Sonnet conversational pilot':'Source search — AI connection pending'}`;
   submit.textContent=connected?'Send question':'Find guidance';
   $('#mode-note').textContent=connected?'A conversation grounded in the toolkit.':'Source search available while the AI connection is being set up.';
   const c=$('#coverage');c.append(el('p',`${data.sources.length} sources and ${data.passages.length} passages. Snapshot collected ${date(data.builtAt)}.`));

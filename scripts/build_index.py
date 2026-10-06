@@ -49,7 +49,7 @@ def add_source(url, title, kind, lines, edited=None):
     def flush():
         if buffer:
             s = '\n'.join(buffer)
-            if len(s) > 35:
+            if s:
                 passages.append({'source':url, 'heading':heading, 'text':s})
             buffer.clear()
     for line in lines:
@@ -172,26 +172,38 @@ def web_page(url):
     return url,clean(' '.join(p.title)).replace(' – Faculty Senate',''),'Faculty Senate website',p.lines,[up.urljoin(url,x) for x in p.links]
 
 def main():
-    seen=set(); queue={TOOLKIT}; webq={SENATE}
+    import os, subprocess, sys, tempfile
+    cache=pathlib.Path(os.environ.get('TOOLKIT_CACHE') or tempfile.mkdtemp(prefix='senate-toolkit-'))
+    subprocess.run([sys.executable,str(ROOT/'scripts/crawl_toolkit.py')],env={**os.environ,'TOOLKIT_CACHE':str(cache)},check=True)
+    toolkit=json.loads((cache/'content.json').read_text())
+    webq={SENATE}
+    for page in toolkit['pages']:
+        add_source(page['url'],page['title'],page['kind'],[page['title']]+page['lines'],page['modified'])
+    for bid,reason in toolkit['issues'].items(): failures.append({'url':NOTION+'/'+bid.replace('-',''),'reason':reason})
+    assets={a['id']:a for a in toolkit['assets'] if a['type'] in ('file','image')}
+    reviewed=json.loads((ROOT/'data/toolkit-media-text.json').read_text())
+    imported=set()
+    for item in reviewed['items']:
+        current=assets.get(item['id'])
+        if not current: continue
+        if item.get('resourceSource')!=current['source']:
+            failures.append({'url':item['url'],'reason':'Image or attachment changed; new extraction/transcription must be reviewed.'}); continue
+        add_source(item['url'],item['title'],item['kind'],item['lines'])
+        sources[item['url']]['notice']='Image transcription: verify small text and diagram arrows in the original.' if item['method'].startswith('Sonnet') else ''
+        imported.add(item['id'])
+    for bid in set(assets)-imported:
+        failures.append({'url':NOTION+'/'+assets[bid]['page'].replace('-',''),'reason':'New or changed attachment is not yet transcribed: '+assets[bid]['title']})
+    # Linked resources have separate, auditable extraction dates. Keep the reviewed
+    # public snapshot until a full linked-file refresh is reviewed; never drop it.
+    linked=json.loads((ROOT/'data/toolkit-linked-text.json').read_text())
+    for item in linked['items']:
+        url=item['url'].split('?')[0] if 'google.com' in item['url'] else item['url']
+        add_source(url,item['title'],item['kind'],item['lines'])
+        sources[url]['fetchedAt']=linked['builtAt']
+    for entry in toolkit['links']:
+        link=canonical(entry['url'])
+        if link and is_senate(link): webq.add(link)
     with cf.ThreadPoolExecutor(max_workers=6) as pool:
-        while queue:
-            batch=sorted(queue-seen);queue=set()
-            if not batch: break
-            seen.update(batch)
-            jobs={pool.submit(notion_page,p):p for p in batch}
-            for f in cf.as_completed(jobs):
-                pid=jobs[f];url=NOTION+'/'+pid.replace('-','')
-                try:
-                    _,title,lines,children,links,edited=f.result()
-                    add_source(url,title,'Curriculum Toolkit',lines,edited);queue.update(children-seen)
-                    if any(f['url']==url and f['reason'].startswith('Partial import:') for f in failures):
-                        sources[url]['notice']='Some embedded content could not be indexed. Open the source for complete guidance. '+sources[url]['notice']
-                    for link in links:
-                        link=canonical(link)
-                        if link and is_senate(link): webq.add(link)
-                        elif link: external.add(link)
-                    print('Toolkit:',title,flush=True)
-                except Exception as e: failures.append({'url':url,'reason':str(e)[:180]})
         webseen=set(); pdfq=set()
         while webq:
             batch=sorted(webq-webseen);webq=set()
@@ -221,7 +233,7 @@ def main():
     (ROOT/'data').mkdir(exist_ok=True)
     data={'builtAt':STAMP,'sources':list(sources.values()),'passages':passages}
     (ROOT/'data/index.json').write_text(json.dumps(data,ensure_ascii=False))
-    coverage={'builtAt':STAMP,'sourceCount':len(sources),'passageCount':len(passages),'failures':failures,'externalLinksNotIndexed':sorted(external),'limitations':['Snapshot, not a live connection. Refresh by running scripts/build_index.py.','Public text from toolkit pages, reachable Senate website pages, and directly linked URI PDFs is indexed. This is not a complete inventory of all published Senate files.','Notion database views, embedded images, linked Google files, scanned PDFs, restricted files, and external sites may require a separate import.','Extractive search returns original passages; it does not generate AI answers.']}
+    coverage={'builtAt':STAMP,'sourceCount':len(sources),'passageCount':len(passages),'toolkit':{'pages':sum(p['kind']=='Curriculum Toolkit' for p in toolkit['pages']),'databaseEntries':sum(p['kind'].endswith('database item') for p in toolkit['pages']),'databases':{x['title']:len(x['rows']) for x in toolkit['catalog'].values()},'attachmentsAndImages':len(imported),'unresolvedBlocks':len(toolkit['issues'])},'failures':failures,'externalLinksNotIndexed':sorted(external),'limitations':['Snapshot, not a live connection. Toolkit pages and all public database rows were refreshed.','Image and file transcriptions are reused only when their attachment reference is unchanged. New or replaced files are reported as gaps. Verify small text and diagram arrows in the original.','Linked-document snapshot collected '+linked['builtAt']+'. Refresh and review linked files separately; the toolkit crawler does not silently replace that snapshot.','Kuali account contents and access-request forms are operational destinations. The external NCES classification search remains a reference link.','Historical, incomplete and conflicting source material may need staff clarification. The tracker is a dated snapshot, not live Kuali status.']}
     (ROOT/'data/coverage.json').write_text(json.dumps(coverage,ensure_ascii=False,indent=2))
     print(json.dumps({'sources':len(sources),'passages':len(passages),'failures':len(failures),'external':len(external)}),flush=True)
 
