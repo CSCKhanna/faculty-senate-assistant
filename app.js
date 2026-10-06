@@ -1,11 +1,14 @@
 import {loadCorpus,hydrateEvidence} from './corpus.js';
 import {buildSearch,emailLink,conversationContext} from './search.js?v=7';
+import {renderAnswer,sourceUrl,referenceLabel} from './presentation.js';
+import {isFollowUp} from './conversation.js';
 import {CHAT_API_URL} from './config.js';
 const $=s=>document.querySelector(s);
 const results=$('#results'),status=$('#load-status'),input=$('#question'),submit=$('#submit');
 let data,coverage,search,question='',messages=[],busy=false,connected=false;
 const scroller=$('#chat-scroll'),panel=$('#chat-panel');
 function scrollChat(){scroller.scrollTop=scroller.scrollHeight;}
+function showAnswer(bubble){scroller.scrollTop=Math.max(0,bubble.offsetTop-scroller.offsetTop-18);}
 function startConversation(){
   panel.classList.add('has-conversation');
   $('#question-label').textContent=connected?'Reply or ask a follow-up':'Your question';
@@ -43,7 +46,7 @@ async function runSourceSearch(){
 }
 function messageBubble(role,text){
   const bubble=el('article',undefined,'chat-message '+role);
-  bubble.append(el('span',role==='user'?'YOU':'FACULTY SENATE ASSISTANT','chat-role'),el('p',text,'chat-text'));
+  bubble.append(el('span',role==='user'?'You':'Faculty Senate Assistant','chat-role'),el('p',text,'chat-text'));
   results.append(bubble);scrollChat();return bubble;
 }
 async function run(){
@@ -52,6 +55,7 @@ async function run(){
   startConversation();
   const original=input.value;
   if(!messages.length){question=original;results.replaceChildren();}
+  else if(!isFollowUp(original))question=original;
   messages.push({role:'user',content:original});messageBubble('user',original);input.value='';
   busy=true;submit.disabled=true;results.setAttribute('aria-busy','true');
   const waiting=messageBubble('assistant','Looking through Senate resources…');
@@ -59,23 +63,32 @@ async function run(){
     const response=await fetch(CHAT_API_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:conversationContext(messages)}),signal:AbortSignal.timeout(55000)});
     const answer=await response.json();if(!response.ok)throw new Error(answer.error||'The assistant is unavailable.');
     if(typeof answer.answer!=='string'||!Array.isArray(answer.sources))throw new Error('The assistant returned an incomplete answer.');
-    waiting.remove();const bubble=messageBubble('assistant',answer.answer);
+    waiting.remove();const bubble=messageBubble('assistant','');
+    bubble.querySelector('.chat-text').replaceWith(renderAnswer(answer.answer,answer.sources));
     if(answer.followUp)bubble.append(el('p',answer.followUp,'chat-followup'));
-    if(answer.sources.length){const citations=el('div',undefined,'chat-citations');
+    if(answer.sources.some(sourceUrl)){
+      const references=el('details',undefined,'chat-references');
+      references.append(el('summary',`Sources (${answer.sources.filter(sourceUrl).length})`));
+      const citations=el('div',undefined,'chat-citations');
       for(const source of answer.sources){
-        const citationUrl=source.url.replace(/^http:\/\/web\.uri\.edu\//,'https://web.uri.edu/');
-        if(!/^https:\/\/(gilded-toucan-d8a\.notion\.site|web\.uri\.edu|digitalcommons\.uri\.edu|docs\.google\.com|drive\.google\.com)\//.test(citationUrl))continue;
-        citations.append(link('['+source.id+'] '+source.title,citationUrl));
-        if(source.notice)citations.append(el('p',source.notice,'notice'));
-      }bubble.append(citations);
+        const url=sourceUrl(source);if(!url)continue;
+        const row=el('div',undefined,'chat-reference');row.append(link('['+source.id+'] '+referenceLabel(source),url));
+        if(source.section&&source.section!==source.title)row.append(el('small',source.section,'reference-section'));
+        citations.append(row);
+      }
+      const notices=[...new Set(answer.sources.map(s=>s.notice).filter(Boolean))];
+      if(notices.length){const notes=el('div',undefined,'source-notes');notes.append(el('strong','Source notes'));for(const note of notices)notes.append(el('p',note));citations.append(notes);}
+      references.append(citations);bubble.append(references);
     }
-    bubble.append(el('small',answer.kind==='sources'?'Original source excerpts. Open the linked source for complete guidance.':'AI-generated guidance. Check the linked sources.','chat-note'));
-    if(answer.kind!=='clarification'){const email=link('Email Genviéve with my original question',emailLink(question),'chat-email');bubble.append(email);}
+    const actions=el('div',undefined,'answer-actions');
+    if(answer.kind!=='clarification')actions.append(link('Email Genviéve about this question',emailLink(question),'chat-email'));
+    if(answer.kind==='sources')actions.append(el('small','Source excerpts; open the references for complete guidance.','chat-note'));
+    bubble.append(actions);showAnswer(bubble);
     messages.push({role:'assistant',content:answer.answer+(answer.followUp?'\n'+answer.followUp:'')});
   }catch(error){waiting.remove();const bubble=messageBubble('assistant',error.message+' You can still consult the related guidance below.');
     for(const r of await hydrateEvidence(data,search(original,2,true)).catch(()=>[])){bubble.append(el('p',r.p.text.slice(0,900),'excerpt'),link('Read '+r.source.title,r.p.source));}
     messages.pop();input.value=original;}
-  finally{busy=false;submit.disabled=false;results.setAttribute('aria-busy','false');scrollChat();input.focus({preventScroll:true});}
+  finally{busy=false;submit.disabled=false;results.setAttribute('aria-busy','false');input.focus({preventScroll:true});}
 }
 $('#question-form').addEventListener('submit',e=>{e.preventDefault();run();});
 input.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();run();}});
@@ -91,7 +104,7 @@ try{
   const toolkit=data.sources.filter(s=>s.kind==='Curriculum Toolkit').length;
   const entries=coverage.toolkit?.databaseEntries||0;
   if(CHAT_API_URL){try{const h=await fetch(CHAT_API_URL+'/health',{signal:AbortSignal.timeout(10000)});connected=h.ok&&(await h.json()).ready;}catch{connected=false;}}
-  status.textContent=`${data.sources.length} sources indexed · ${toolkit} toolkit pages + ${entries} database entries · Snapshot ${date(data.builtAt)} · ${connected?'Sonnet conversational pilot':'Source search — AI connection pending'}`;
+  status.textContent=`${data.sources.length.toLocaleString()} sources · Updated ${date(data.builtAt)} · ${connected?'AI assistant connected':'Source search available'}`;
   submit.textContent=connected?'Send question':'Find guidance';
   $('#mode-note').textContent=connected?'Answers grounded in the toolkit, Senate website and proposal trackers.':'Source search available while the AI connection is being set up.';
   const c=$('#coverage');c.append(el('p',`${data.sources.length} sources and ${data.passages.length} passages. Snapshot collected ${date(data.builtAt)}.`));

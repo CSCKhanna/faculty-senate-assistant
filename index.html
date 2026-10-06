@@ -4,27 +4,27 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Explore Faculty Senate guidance with source-linked search and an email fallback.">
   <title>Faculty Senate Assistant · Prototype</title>
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
   <a class="skip" href="#question">Skip to question</a>
   <div class="shell">
     <aside class="sidebar">
       <div class="brand"><span class="brand-mark" aria-hidden="true">FS</span><div>FACULTY SENATE<span>University of Rhode Island</span></div></div>
-      <div class="sidebar-intro"><span class="eyebrow">CURRICULUM RESOURCES</span><h1>A clearer path<br>to your answer.</h1><p>Ask a question. Find the guidance.<br>Keep the source close.</p></div>
+      <div class="sidebar-intro"><span class="eyebrow">CURRICULUM RESOURCES</span><h1>Faculty Senate<br>information.</h1><p>Clear answers from the toolkit,<br>Senate website, and proposal trackers.</p></div>
       <nav aria-label="Source resources">
         <a href="https://gilded-toucan-d8a.notion.site/URI-Faculty-Senate-Curriculum-Toolkit-3a57535bf92c80c78bacd5b49e9c6c12" target="_blank" rel="noopener">Curriculum Toolkit <span aria-hidden="true">↗</span></a>
         <a href="https://web.uri.edu/facsen/" target="_blank" rel="noopener">Faculty Senate website <span aria-hidden="true">↗</span></a>
         <button id="sources-button" type="button">View indexed sources <span aria-hidden="true">＋</span></button>
       </nav>
-      <div class="sidebar-foot"><span class="prototype-tag">REVIEW PROTOTYPE</span><p>Answers grounded in Senate resources.<br>This is not an official URI service.</p></div>
+      <div class="sidebar-foot"><span class="prototype-tag">PILOT SERVICE</span><p>Answers grounded in Senate resources.<br>This is not an official URI service.</p></div>
     </aside>
     <main>
-      <header class="topbar"><div><strong>Faculty Senate Assistant</strong><span>Toolkit, Senate website & trackers</span></div><button id="new-question" type="button">New question</button></header>
+      <header class="topbar"><div><strong>Faculty Senate Assistant</strong><span>Toolkit, Senate website & trackers</span></div><button id="new-question" type="button">New conversation</button></header>
       <div class="workspace">
         <section class="chat-panel" id="chat-panel" aria-label="Faculty Senate conversation">
           <div class="chat-scroll" id="chat-scroll" tabindex="0" aria-label="Conversation history">
-            <section class="welcome" aria-labelledby="welcome-title"><span class="eyebrow blue">START WITH YOUR QUESTION</span><h2 id="welcome-title">How can I help?</h2><p>Ask about curriculum proposals, processes, or your next step.</p></section>
+            <section class="welcome" aria-labelledby="welcome-title"><span class="eyebrow blue">START WITH YOUR QUESTION</span><h2 id="welcome-title">How can I help?</h2><p>Ask about curriculum proposals, Senate procedures, program approvals, or Kuali.</p></section>
             <div class="suggestions" aria-label="Example questions"><span>Try asking</span><button type="button" data-question="How do I make a temporary course permanent?">Make a course permanent</button><button type="button" data-question="How do I get access to Kuali?">Get Kuali access</button><button type="button" data-question="How do I track my proposal?">Track a proposal</button></div>
             <section id="results" aria-label="Conversation messages" role="log" aria-live="polite" aria-busy="false"></section>
           </div>
@@ -37,11 +37,11 @@
           </section>
         </section>
         <div id="load-status" class="status" role="status">Loading source snapshot…</div>
-        <footer class="page-foot">Conversation history stays in memory for this visit. When connected, messages are sent through the backend to URI’s AI gateway. Email opens a draft for you to review and send.<br>Prototype uses a saved snapshot. Check original sources for current guidance and deadlines.</footer>
+        <footer class="page-foot">AI-generated answers with source references. Verify time-sensitive information in the original source.<br>Messages are processed through URI’s AI gateway; this chat is kept only for this visit. Email links open an unsent draft.</footer>
       </div>
     </main>
   </div>
   <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-top"><div><span class="eyebrow blue">SOURCE TRANSPARENCY</span><h2 id="source-title">What this prototype searches</h2></div><button id="close-dialog" type="button" aria-label="Close source list">✕</button></div><div id="coverage"></div><div id="source-list"></div></dialog>
-  <script type="module" src="app.js?v=8"></script>
+  <script type="module" src="app.js?v=9"></script>
 </body>
 </html>

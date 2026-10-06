@@ -21,9 +21,9 @@ This is a dated snapshot, not live Kuali access. Historical proposals, reports, 
 
 `prepare_corpus.mjs` builds an immutable corpus revision: compact lexical postings, passage metadata, and text shards. The Worker searches the compact index and fetches only the selected source text before calling Sonnet. The full corpus remains available without embedding tens of megabytes in the Worker or sending every document in each prompt. Both frontend and backend use the same pinned source revision.
 
-Answers include validated source citations and keep recent conversation context. Procedural retrieval includes course classifications, start instructions, and submission steps. Tracker coverage is supplied separately so the assistant can explicitly identify the unavailable 2019–2020 archive rather than substitute another year.
+Answers include validated source citations and retain context for short replies while keeping independent questions separate. Wrapped JSON is extracted before display; malformed transport fields cannot appear as an answer. The interface renders paragraphs, steps, emphasis, and clickable citation markers safely, with source notes grouped in expandable references. Procedural retrieval includes course classifications, start instructions, and submission steps. Named approval lookups prioritize matching tracker rows, including common AI wording. Year-wide program status questions inspect every recorded-status row in the primary B/C tracker tabs and distinguish pending or tabled proposals from denials. Tracker coverage is supplied separately so the assistant can explicitly identify the unavailable 2019–2020 archive rather than substitute another year.
 
-The app offers a reviewed email draft to Genviéve Spitale (`genvieve.spitale@uri.edu`) with the first question preserved exactly. **Nothing sends emails automatically.** A single conversation panel keeps the composer available for follow-ups.
+The app offers a reviewed email draft to Genviéve Spitale (`genvieve.spitale@uri.edu`) with the original question for the active topic preserved exactly. **Nothing sends emails automatically.** A single conversation panel keeps the composer available for follow-ups.
 
 ## Limits and hosting
 
@@ -46,4 +46,4 @@ Keep previously deployed immutable corpus revisions until no deployed Worker ref
 
 ## Validation
 
-Thirty-nine automated checks cover complete toolkit registration, published-page coverage, tracker tabs/rows and field labels, exact text hydration, historical program lookup, submission steps, follow-up context, per-answer citation numbering, citation validation, credential handling, and request caps. Real Sonnet evaluation includes a named program record, committee duties, meeting attendance/voting, unavailable tracker access, and prerequisite changes. Tests do not send emails.
+Forty-seven automated checks cover complete toolkit registration, published-page coverage, tracker tabs/rows and field labels, exact text hydration, historical program lookup, submission steps, follow-up context, per-answer citation numbering, citation validation, credential handling, and request caps. Real Sonnet evaluation includes a named program record, committee duties, meeting attendance/voting, unavailable tracker access, and prerequisite changes. Tests do not send emails.
