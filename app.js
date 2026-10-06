@@ -62,8 +62,9 @@ async function run(){
     if(answer.followUp)bubble.append(el('p',answer.followUp,'chat-followup'));
     if(answer.sources.length){const citations=el('div',undefined,'chat-citations');
       for(const source of answer.sources){
-        if(!/^https:\/\/(gilded-toucan-d8a\.notion\.site|web\.uri\.edu|docs\.google\.com|drive\.google\.com)\//.test(source.url))continue;
-        citations.append(link('['+source.id+'] '+source.title,source.url));
+        const citationUrl=source.url.replace(/^http:\/\/web\.uri\.edu\//,'https://web.uri.edu/');
+        if(!/^https:\/\/(gilded-toucan-d8a\.notion\.site|web\.uri\.edu|docs\.google\.com|drive\.google\.com)\//.test(citationUrl))continue;
+        citations.append(link('['+source.id+'] '+source.title,citationUrl));
         if(source.notice)citations.append(el('p',source.notice,'notice'));
       }bubble.append(citations);
     }
