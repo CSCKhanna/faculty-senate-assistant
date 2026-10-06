@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {validateMessages,retrieve,parseAnswer,converse} from '../backend/chat.js';
+import {validateMessages,retrieve,parseAnswer,converse,gatherEvidence} from '../backend/chat.js';
 const data=JSON.parse(fs.readFileSync(new URL('../data/index.json',import.meta.url)));
 test('follow-up retains the proposal subject for retrieval',()=>{
   const messages=[{role:'user',content:'How do I make a temporary course permanent?'},{role:'assistant',content:'Use a course modification.'},{role:'user',content:'What happens next?'}];
@@ -73,6 +73,32 @@ test('unknown wording asks a useful routing question without an email-first dead
   const a=await converse(data,[{role:'user',content:'Something is confusing and I need direction'}],{},()=>{throw new Error('No paid call needed');});assert.equal(a.kind,'clarification');assert.match(a.answer,/course.*program.*Kuali/);
 });
 test('prior citation numbers cannot be confused with the new evidence numbering',async()=>{
- let request;await converse(data,[{role:'user',content:'Who can attend Faculty Senate meetings?'},{role:'assistant',content:'The bylaws support participation by ex officio members [3].'},{role:'user',content:'How can I ask to speak?'}],{URI_API_KEY:'test'},async(u,o)=>{request=JSON.parse(o.body);return new Response(JSON.stringify({choices:[{message:{content:'{"kind":"answer","answer":"Consult the speaking rules [1].","sourceIds":[1]}'}}]}));});
+ let request;await converse(data,[{role:'user',content:'Who can attend Faculty Senate meetings?'},{role:'assistant',content:'The bylaws support participation by ex officio members [3].'},{role:'user',content:'How can I ask to speak at that meeting?'}],{URI_API_KEY:'test'},async(u,o)=>{request=JSON.parse(o.body);return new Response(JSON.stringify({choices:[{message:{content:'{"kind":"answer","answer":"Consult the speaking rules [1].","sourceIds":[1]}'}}]}));});
  const previous=request.messages.find(m=>m.role==='assistant');assert.ok(previous);assert.ok(!/\[3\]/.test(previous.content));assert.match(request.messages[0].content,/Never audit or correct an earlier citation using the current numbering/);
+});
+
+test('wrapped and repeated JSON is extracted without leaking its envelope',()=>{
+  const p=retrieve(data,[{role:'user',content:'What is Kuali?'}]);
+  const object={kind:'answer',answer:'Use **Kuali** for curriculum proposals [1].',sourceIds:[1],followUp:'Are you requesting access?'};
+  for(const raw of ['kind: answer\n\n'+JSON.stringify(object),'Draft answer [1].\n**followUp:** Duplicate\n```json\n'+JSON.stringify(object)+'\n```','```json\n'+JSON.stringify(object)+'\n```']){
+    const result=parseAnswer(raw,p);assert.equal(result.answer,object.answer);assert.equal(result.followUp,object.followUp);assert.ok(!result.answer.includes('sourceIds'));
+  }
+  const braces={...object,answer:'The label contains {braces} and an escaped "quote" [1].'};
+  assert.equal(parseAnswer('Result:\n'+JSON.stringify(braces),p).answer,braces.answer);
+  for(const raw of ['kind: answer\n{"answer":"broken [1]','Draft [1].\n```json\n{"kind":','{"kind":"answer","answer":"followUp: internal [1]","sourceIds":[1]}'])assert.throws(()=>parseAnswer(raw,p));
+});
+test('a new Kuali question ignores earlier unrelated approval questions',async()=>{
+  const messages=[{role:'user',content:'Was the interdisciplinary AI major approved?'},{role:'assistant',content:'It was presented to Senate [1].'},{role:'user',content:'How can I start using kuali?'}];
+  const p=retrieve(data,messages);for(const heading of ['Faculty Access','Logging In','Accessing the Curriculum App'])assert.ok(p.some(r=>r.p.heading===heading));
+  let request;await converse(data,messages,{URI_API_KEY:'test'},async(u,o)=>{request=JSON.parse(o.body);return Response.json({choices:[{message:{content:'{"kind":"answer","answer":"Faculty have access [1].","sourceIds":[1]}'}}]});});
+  assert.ok(!request.messages.some(m=>m.role==='assistant'));assert.ok(!request.messages[0].content.includes('Interdisciplinary Artificial Intelligence'));
+});
+test('AI approval lookup includes newest matching program tracker and earlier tabled record',()=>{
+  const p=retrieve(data,[{role:'user',content:'Was the interdisciplinary AI major approved?'}]);
+  assert.ok(p.some(r=>/2026.2027/.test(r.source.title)&&/To President/.test(r.p.text)));
+  assert.ok(p.some(r=>/2025 - 2026/.test(r.source.title)&&/Tabled at FS/.test(r.p.text)));
+});
+test('year-wide program status question inspects primary program rows, excludes headers, and never equates pending with denial',async()=>{
+  const p=await gatherEvidence(data,[{role:'user',content:'Were there any programs not approved last academic year?'}]);
+  assert.match(p[0].p.heading,/2025 - 2026.*complete status audit/);assert.match(p[0].p.text,/159 rows/);assert.match(p[0].p.text,/"Complete":158/);assert.match(p[0].p.text,/"To FS":1/);assert.match(p[0].p.text,/does not mean denied/);assert.match(p[0].p.text,/Tabled at FS/);assert.ok(!p[0].p.text.includes('"Status":2'));
 });
