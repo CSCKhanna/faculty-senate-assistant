@@ -1,6 +1,6 @@
 // Extractive retrieval only. Every returned character comes from an indexed source.
-const STOP = new Set('a an the of to for and or in on at is are be was were it this that i my me we our you your how do does did can could would should what when where who which with have has want need please about from as by into all get getting like know find tell more help question'.split(' '));
-export const normalize = text => text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/cross[ -]?list(?:ed|ing)?/g,' crosslist ').replace(/simultaneous/g,' simultaneous ').replace(/\b(?:approve|approved|approving|approvals)\b/g,' approval ').replace(/\b(?:modify|modifying|modifications|modification)\b/g,' modification ').replace(/\b(?:track|tracking)\b/g,' track ').replace(/\b(?:chairs)\b/g,' chair ').replace(/\b(?:courses)\b/g,' course ').replace(/\b(?:proposals)\b/g,' proposal ').replace(/\b(?:programs)\b/g,' program ').replace(/\b(?:committees)\b/g,' committee ');
+const STOP = new Set('a an the of to for and or in on at is are be was were it this that i my me we our you your how do does did can could would should what when where who which with have has want need please about from as by into all get getting like know find tell more help question teach teaching taught wondering trying someone anyone something use using information explain regarding'.split(' '));
+export const normalize = text => text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/cross[ -]?list(?:ed|ing)?/g,' crosslist ').replace(/simultaneous/g,' simultaneous ').replace(/\b(?:approve|approved|approving|approvals)\b/g,' approval ').replace(/\b(?:modify|modifying|modifications|modification)\b/g,' modification ').replace(/\b(?:track|tracking)\b/g,' track ').replace(/\b(?:chairs)\b/g,' chair ').replace(/\b(?:courses|classes|class)\b/g,' course ').replace(/\b(?:propose|proposing|proposed)\b/g,' proposal ').replace(/\b(?:proposals)\b/g,' proposal ').replace(/\b(?:programs)\b/g,' program ').replace(/\b(?:committees)\b/g,' committee ');
 export const tokens = text => normalize(text).match(/[a-z0-9]+/g)?.filter(x=>x.length>1&&!STOP.has(x)) || [];
 const SYNONYMS={deadline:['deadline','calendar','date','submission'],dates:['date','calendar','deadline'],calendar:['calendar','date','deadline'],access:['access','login','logging'],login:['login','logging','access'],status:['status','track','workflow'],track:['track','status'],permanent:['permanent'],temporary:['temporary'],change:['change','modification'],changing:['change','modification'],submit:['submit','submission','submitted'],submitting:['submit','submission','submitted'],denied:['denied','rejected'],rejected:['rejected','denied'],credits:['credit','credits'],crosslist:['crosslist'],syllabus:['syllabus','syllabi']};
 export function buildSearch(data){
@@ -13,7 +13,7 @@ export function buildSearch(data){
     return {p,counts,title:new Set(title),length:words.length,source:sourceMap.get(p.source)};
   });
   const avg=docs.reduce((s,d)=>s+d.length,0)/Math.max(docs.length,1);
-  return question=>{
+  return (question,limit=4)=>{
     const original=[...new Set(tokens(question))];
     if(!original.length)return [];
     const groups=original.map(w=>SYNONYMS[w]||[w]);
@@ -35,18 +35,18 @@ export function buildSearch(data){
         if(hit)bodyMatched++;
         score+=best;
       }
-      const coverage=matched/groups.length;
+      const coverage=matched/meaningful.length;
       score*=coverage*coverage;
       if(d.source.kind==='Curriculum Toolkit')score*=1.15;
       if(/archive|previous years|2017-2018|2023-2024/i.test(d.source.title)&&!/(?:19|20)\d{2}/.test(question))score*=.6;
       return {...d,score,coverage,bodyMatched};
-    }).filter(d=>d.score>1&&d.coverage>=.6&&d.bodyMatched>=Math.min(2,groups.length)).sort((a,b)=>b.score-a.score);
+    }).filter(d=>d.score>1&&d.coverage>=.5&&d.bodyMatched>=Math.min(2,groups.length)).sort((a,b)=>b.score-a.score);
     const results=[],perSource=new Map(),texts=new Set();
     for(const r of ranked){
       if(r.score<(ranked[0]?.score||0)*.4)continue;
-      if(results.length===4)break;
+      if(results.length===limit)break;
       const key=r.p.text.toLowerCase();
-      if(texts.has(key)||(perSource.get(r.p.source)||0)>=2)continue;
+      if(texts.has(key)||(perSource.get(r.p.source)||0)>=3)continue;
       texts.add(key);perSource.set(r.p.source,(perSource.get(r.p.source)||0)+1);results.push(r);
     }
     return results;

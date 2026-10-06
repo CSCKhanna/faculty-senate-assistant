@@ -1,4 +1,4 @@
-import {buildSearch,emailLink} from './search.js';
+import {buildSearch,emailLink} from './search.js?v=4';
 import {CHAT_API_URL} from './config.js';
 const $=s=>document.querySelector(s);
 const results=$('#results'),status=$('#load-status'),input=$('#question'),submit=$('#submit');

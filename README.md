@@ -49,11 +49,11 @@ GitHub Pages publishes `main` from the repository root with `.nojekyll`. GitHub 
 
 ## Conversational backend (version 0.2)
 
-`backend/chat.js` retrieves up to eight indexed passages, sends those passages and the last conversation turns to URI's OpenAI-compatible gateway, and validates the structured response. It asks clarifying questions, interprets follow-ups, and returns only links from the source registry. Citation validation does not establish factual correctness: staff review of real answers remains necessary. The snapshot's existing coverage limitations still apply.
+`backend/chat.js` retrieves up to sixteen indexed passages, sends those passages and the last conversation turns to URI's OpenAI-compatible gateway, and validates the structured response. It asks clarifying questions, interprets follow-ups, and returns only links from the source registry. Citation validation does not establish factual correctness: staff review of real answers remains necessary. The snapshot's existing coverage limitations still apply.
 
 `backend/worker.js` runs on Cloudflare Workers. An atomic D1 database transaction reserves requests before AI calls, with a default hard limit of 100 calls per UTC day across the whole pilot and eight calls per UTC minute per network address. Shared campus network addresses may share the minute limit. Failed API calls also consume a daily slot. Only daily usage counters and temporary hashed network-address counters are persisted; conversation messages are not stored by this app. Old counters are cleaned on the next request (network counters after two minute buckets, daily counters after the day changes); idle counters can remain until another request, and provider backups may retain prior data. Cloudflare and the URI gateway may process and retain data under their own service policies. CORS limits browser origins but is not authentication. This is a bounded public pilot, not an authenticated campus service.
 
-Default model: `its_direct/pt2-claude-haiku-4.5-us`. Maximum output: 1,100 tokens per call; maximum conversation request: 22,000 characters plus bounded retrieved evidence. Limits bound request volume, not an exact dollar amount.
+Default model: `its_direct/pt2-claude-haiku-4.5-us`. Maximum output: 1,800 tokens per call; maximum conversation request: 22,000 characters plus bounded retrieved evidence. Limits bound request volume, not an exact dollar amount.
 
 ### Deployment
 
@@ -70,4 +70,11 @@ The conversation logic is provider-independent JavaScript using standard HTTP re
 
 ### Verification
 
-Fourteen automated checks cover retrieval, follow-up context, message limits, citation rejection, email fidelity, and credential exclusion. A live two-turn test against the URI gateway on October 6, 2026 produced a clarification followed by a course-modification answer with toolkit citations. Cloudflare backend, D1 storage, and the encrypted production credential are deployed. A hosted two-turn test also passed on October 6, 2026.
+Twenty automated checks cover retrieval, follow-up context, message limits, citation rejection, email fidelity, and credential exclusion. A live two-turn test against the URI gateway on October 6, 2026 produced a clarification followed by a course-modification answer with toolkit citations. Cloudflare backend, D1 storage, and the encrypted production credential are deployed. A hosted two-turn test also passed on October 6, 2026.
+
+
+### Answer reliability fix — October 6, 2026
+
+Search now recognizes conversational wording such as “class that I teach” and retrieves procedure-start sections alongside matched fields. Follow-up retrieval uses both the original topic and the assistant’s last question without treating previous answers as factual sources. The gateway is explicitly asked for JSON; cited plain text and JSON with a missing citation list are accepted only after validating every citation against supplied evidence. Capability questions are handled without a paid request. Unknown citations, unsupported plain text, and invented URLs remain rejected.
+
+The regression suite includes the actual failed user questions, prerequisite follow-ups, temporary-to-permanent navigation, and both gateway response formats. Real gateway tests cover course changes, Kuali/login, capability questions, permanent-course conversion, tracking, cross-listing, date ambiguity, and an unrelated request. Some embedded source content still needs separate ingestion. No emails are sent by the app or its tests.
