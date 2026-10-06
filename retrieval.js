@@ -51,7 +51,7 @@ export function retrieve(data,messages){
     if(registry.get(source)?.title==='Course Modification Proposal Walkthrough')for(const heading of ['Submit to the Workflow','So, what happens now?']){const p=bySource.get(source)?.find(p=>p.heading===heading);if(p&&!found.some(r=>r.p===p)&&found.length<16)found.push({p,source:registry.get(source)});}
     if(found.length>=16)break;
   }
-  if(/course|class|prerequis/i.test(combined)&&/chang|modif/i.test(combined)){
+  if(/course|class|prerequis/i.test(combined)&&/chang|modif|permanent/i.test(combined)){
     const taxonomy=byHeading.get('Course change classifications (full source)')?.[0];
     if(taxonomy){const at=found.findIndex(r=>r.p===taxonomy);if(at>=0)found.splice(at,1);found.unshift({p:taxonomy,source:registry.get(taxonomy.source)});if(found.length>16)found.length=16;}
   }
@@ -64,6 +64,12 @@ export function retrieve(data,messages){
   }
   // Access instructions and named tracker rows should precede loosely related reports.
   const priority=[];
+  if(/course|class|prerequis/i.test(combined)&&/chang|modif|permanent/i.test(combined)){
+    const manual=bySource.get('https://web.uri.edu/manual/appendix-e-specific-procedures-for-processing-curricular-materials/')||[];
+    // These consecutive section chunks keep classification and its review path
+    // together even when the compact index has not hydrated their text yet.
+    for(const p of manual.filter(p=>p.heading==='Part 3. Approval Process').slice(0,5))priority.push({p,source:registry.get(p.source)});
+  }
   if(/kuali/i.test(combined)&&/start|access|log.?in|using|begin|use|staff|faculty/i.test(combined)){
     for(const heading of ['Faculty Access','Non-Faculty Access','Logging In','Accessing the Curriculum App','The Kuali Dashboard']){
       const p=byTitle.get('Kuali Basics')?.find(p=>p.heading===heading);
@@ -96,8 +102,11 @@ export function retrieve(data,messages){
     priority.push(...rows.filter(r=>r.hits===best).slice(0,6));
   }
   if(/\bbills?\b|legislation/i.test(latest)&&/what is|difference|different|how.*approv|process/i.test(latest)){
+    // An old transmittal form is not needed to explain current legislation.
+    for(let i=found.length-1;i>=0;i--)if(found[i].source.kind==='Faculty Senate PDF'||found[i].source.kind==='Faculty Senate proposal tracker')found.splice(i,1);
     priority.push(...(byTitle.get('Appendix C: By-Laws of the Faculty Senate – University Manual')||[]).filter(p=>/^Section (?:8|10)\./.test(p.heading)).slice(0,5).map(p=>({p,source:registry.get(p.source)})));
     const overview=byTitle.get('Legislation')?.[1];if(overview)priority.push({p:overview,source:registry.get(overview.source)});
+    priority.push(...(byTitle.get('When will my proposal be approved?')||[]).filter(p=>/after the Senate Meeting/i.test(p.heading)).map(p=>({p,source:registry.get(p.source)})));
   }
   const merged=[],keys=new Set();for(const r of [...priority,...found]){const k=r.p.id===undefined?r.p.source+'\n'+r.p.heading+'\n'+r.p.text:r.p.id;if(!keys.has(k)){keys.add(k);merged.push(r);}if(merged.length===16)break;}
   return merged;

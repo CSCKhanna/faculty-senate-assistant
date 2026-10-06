@@ -388,7 +388,7 @@ function retrieve(data2, messages2) {
     }
     if (found.length >= 16) break;
   }
-  if (/course|class|prerequis/i.test(combined) && /chang|modif/i.test(combined)) {
+  if (/course|class|prerequis/i.test(combined) && /chang|modif|permanent/i.test(combined)) {
     const taxonomy = byHeading.get("Course change classifications (full source)")?.[0];
     if (taxonomy) {
       const at = found.findIndex((r) => r.p === taxonomy);
@@ -403,6 +403,10 @@ function retrieve(data2, messages2) {
     return [...extras, ...found].slice(0, 20);
   }
   const priority = [];
+  if (/course|class|prerequis/i.test(combined) && /chang|modif|permanent/i.test(combined)) {
+    const manual = bySource.get("https://web.uri.edu/manual/appendix-e-specific-procedures-for-processing-curricular-materials/") || [];
+    for (const p of manual.filter((p2) => p2.heading === "Part 3. Approval Process").slice(0, 5)) priority.push({ p, source: registry.get(p.source) });
+  }
   if (/kuali/i.test(combined) && /start|access|log.?in|using|begin|use|staff|faculty/i.test(combined)) {
     for (const heading of ["Faculty Access", "Non-Faculty Access", "Logging In", "Accessing the Curriculum App", "The Kuali Dashboard"]) {
       const p = byTitle.get("Kuali Basics")?.find((p2) => p2.heading === heading);
@@ -440,9 +444,11 @@ function retrieve(data2, messages2) {
     priority.push(...rows.filter((r) => r.hits === best).slice(0, 6));
   }
   if (/\bbills?\b|legislation/i.test(latest) && /what is|difference|different|how.*approv|process/i.test(latest)) {
+    for (let i = found.length - 1; i >= 0; i--) if (found[i].source.kind === "Faculty Senate PDF" || found[i].source.kind === "Faculty Senate proposal tracker") found.splice(i, 1);
     priority.push(...(byTitle.get("Appendix C: By-Laws of the Faculty Senate \u2013 University Manual") || []).filter((p) => /^Section (?:8|10)\./.test(p.heading)).slice(0, 5).map((p) => ({ p, source: registry.get(p.source) })));
     const overview = byTitle.get("Legislation")?.[1];
     if (overview) priority.push({ p: overview, source: registry.get(overview.source) });
+    priority.push(...(byTitle.get("When will my proposal be approved?") || []).filter((p) => /after the Senate Meeting/i.test(p.heading)).map((p) => ({ p, source: registry.get(p.source) })));
   }
   const merged = [], keys = /* @__PURE__ */ new Set();
   for (const r of [...priority, ...found]) {
