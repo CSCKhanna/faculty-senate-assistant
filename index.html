@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore Faculty Senate guidance with source-linked search and an email fallback.">
+  <title>Faculty Senate Curriculum Assistant · Prototype</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#question">Skip to question</a>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">FS</span><div>FACULTY SENATE<span>University of Rhode Island</span></div></div>
+      <div class="sidebar-intro"><span class="eyebrow">CURRICULUM RESOURCES</span><h1>A clearer path<br>to your answer.</h1><p>Ask a question. Find the guidance.<br>Keep the source close.</p></div>
+      <nav aria-label="Source resources">
+        <a href="https://gilded-toucan-d8a.notion.site/URI-Faculty-Senate-Curriculum-Toolkit-3a57535bf92c80c78bacd5b49e9c6c12" target="_blank" rel="noopener">Curriculum Toolkit <span aria-hidden="true">↗</span></a>
+        <a href="https://web.uri.edu/facsen/" target="_blank" rel="noopener">Faculty Senate website <span aria-hidden="true">↗</span></a>
+        <button id="sources-button" type="button">View indexed sources <span aria-hidden="true">＋</span></button>
+      </nav>
+      <div class="sidebar-foot"><span class="prototype-tag">REVIEW PROTOTYPE</span><p>Source excerpts, not generated advice.<br>This is not an official URI service.</p></div>
+    </aside>
+    <main>
+      <header class="topbar"><div><strong>Curriculum Assistant</strong><span>Toolkit & Senate guidance</span></div><button id="new-question" type="button">New question</button></header>
+      <div class="workspace">
+        <section class="welcome" aria-labelledby="welcome-title"><span class="eyebrow blue">START WITH YOUR QUESTION</span><h2 id="welcome-title">What would you like to know?</h2><p>Search the toolkit and Faculty Senate resources in your own words.</p></section>
+        <section class="question-panel" aria-label="Ask a question">
+          <form id="question-form">
+            <label for="question">Your question</label>
+            <textarea id="question" name="question" rows="3" maxlength="5000" placeholder="For example: How do I make a temporary course permanent?" required aria-describedby="question-help"></textarea>
+            <div class="form-bottom"><span id="question-help">Original passages with links to their sources.</span><button class="primary" id="submit" type="submit" disabled>Find guidance <span aria-hidden="true">⌕</span></button></div>
+          </form>
+        </section>
+        <div class="suggestions" aria-label="Example questions"><span>Try asking</span><button type="button" data-question="How do I make a temporary course permanent?">Make a course permanent</button><button type="button" data-question="How do I get access to Kuali?">Get Kuali access</button><button type="button" data-question="How do I track my proposal?">Track a proposal</button></div>
+        <div id="load-status" class="status" role="status">Loading source snapshot…</div>
+        <section id="results" aria-label="Search results" aria-live="polite" aria-busy="false"></section>
+        <footer class="page-foot">Questions stay in this browser. Email opens a draft for you to review and send.<br>Prototype uses a saved snapshot. Check original sources for current guidance and deadlines.</footer>
+      </div>
+    </main>
+  </div>
+  <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-top"><div><span class="eyebrow blue">SOURCE TRANSPARENCY</span><h2 id="source-title">What this prototype searches</h2></div><button id="close-dialog" type="button" aria-label="Close source list">✕</button></div><div id="coverage"></div><div id="source-list"></div></dialog>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
