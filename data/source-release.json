@@ -1,1 +1,29 @@
-{"version":1,"corpus":{"builtAt":"2026-10-06T20:35:35.933901+00:00","sourceCount":1321,"passageCount":28573,"corpusBase":"data/corpus-14e032937a2a"},"bills":{"builtAt":"2026-10-06T20:35:35.933901+00:00","path":"data/bills-455371660268.json","recordCount":7144,"corpusBase":"data/corpus-14e032937a2a"},"checkedAt":"2026-10-06T20:35:35.933901+00:00","refresh":{"mode":"bootstrap","schedule":"daily","issues":[]}}
+{
+  "version": 1,
+  "corpus": {
+    "builtAt": "2026-10-07T17:03:16.872764+00:00",
+    "sourceCount": 1326,
+    "passageCount": 30939,
+    "corpusBase": "data/corpus-c5570c09556d"
+  },
+  "bills": {
+    "builtAt": "2026-10-07T17:03:16.872764+00:00",
+    "corpusBase": "data/corpus-c5570c09556d",
+    "path": "data/bills-d2659a98ab31.json",
+    "recordCount": 7220
+  },
+  "checkedAt": "2026-10-07T17:03:16.872764+00:00",
+  "refresh": {
+    "status": "complete",
+    "cadence": "daily",
+    "scheduleUtc": "10:17",
+    "freshSources": 1249,
+    "retainedSources": 77,
+    "gapCount": 582,
+    "toolkitChecked": true,
+    "websiteChecked": true,
+    "websiteRootChecked": true,
+    "websiteDiscoveryComplete": true,
+    "trackerCount": 10
+  }
+}
