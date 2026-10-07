@@ -23,7 +23,7 @@
   ],
   "limitations": [
     "Public toolkit, Faculty Senate website and readable public trackers are checked daily. Meeting questions also receive a live website check.",
-    "Each source retains its own fetchedAt extraction date. Failed refreshes retain last readable content with a stale notice.",
+    "Each source shows its own text collection date. If a refresh fails, the last readable content is retained and labeled as an earlier snapshot.",
     "Reviewed toolkit image transcriptions retain their original dates. New or replaced attachments are recorded as gaps until reviewed.",
     "Restricted, broken and unreadable sources are listed as gaps. Their contents are unavailable.",
     "OCR can omit or misread graphical content, dates, numbers, tables and signatures. Verify them in the original.",
