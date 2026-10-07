@@ -1,5 +1,6 @@
 import {loadCorpus,hydrateEvidence} from './corpus.js?v=3';
 import {loadSourceRelease} from './source-release.js?v=1';
+import {loadSourceInventory} from './source-inventory.js?v=1';
 import {buildSearch,emailLink,conversationContext} from './search.js?v=9';
 import {renderAnswer,sourceUrl,referenceLabel} from './presentation.js?v=3';
 import {isFollowUp} from './conversation.js?v=4';
@@ -165,7 +166,10 @@ async function loadInventory(){
   if(inventoryPromise)return inventoryPromise;
   inventoryPromise=(async()=>{
     const c=$('#coverage'),list=$('#source-list');c.replaceChildren(el('p','Loading the source inventory…'));list.replaceChildren();
-    const [index,r]=await Promise.all([ensureIndex(),fetch('data/coverage.json?v=7',{cache:'no-store'})]);if(!r.ok)throw new Error('Coverage unavailable');const coverage=await r.json();
+    const snapshot=await loadSourceInventory(ensureIndex(),fetch,BASE),{index,coverage}=snapshot;
+    // Adopt only a fully aligned inventory. Conversation records and the draft
+    // remain independent of source publication and are left intact.
+    manifest=snapshot.manifest;data=index;search=buildSearch(index);indexPromise=Promise.resolve(index);syncMode();
     c.replaceChildren(el('p',`${index.sources.length.toLocaleString()} sources and ${index.passages.length.toLocaleString()} passages. Snapshot collected ${date(index.builtAt)}.`));
     const ul=el('ul');for(const text of new Set(coverage.limitations||[]))ul.append(el('li',text));c.append(ul);
     if(coverage.website){const w=coverage.website;c.append(el('p',`${w.publishedPagesIndexed} of ${w.publishedPages} published Senate pages/posts indexed, plus linked public documents and ${w.trackers.length} readable proposal trackers with every downloadable tab.`));if(w.gaps.length)c.append(lazyDetails(`${w.gaps.length} website links unavailable or unreadable`,w.gaps,g=>{const p=el('p',undefined,'coverage-fail');p.append(link(g.url,g.url),document.createTextNode(' — '+g.reason));return p;}));}
@@ -174,9 +178,9 @@ async function loadInventory(){
     const label=el('label','Filter the source inventory');label.htmlFor='source-filter';const filter=el('input');filter.type='search';filter.id='source-filter';filter.placeholder='Title or resource type';
     const count=el('p',undefined,'inventory-count'),rows=el('div'),more=button('Show more sources',()=>{limit+=100;draw();},'inventory-more');let limit=100;
     const sorted=[...index.sources].sort((a,b)=>a.kind.localeCompare(b.kind)||a.title.localeCompare(b.title));
-    function draw(){const q=filter.value.trim().toLowerCase(),matches=sorted.filter(s=>(s.title+' '+s.kind).toLowerCase().includes(q));rows.replaceChildren();count.textContent=`Showing ${Math.min(limit,matches.length).toLocaleString()} of ${matches.length.toLocaleString()} matching sources`;more.hidden=matches.length<=limit;for(const s of matches.slice(0,limit)){const row=el('div',undefined,'listed-source');row.append(link(s.title,s.url),el('span',s.kind+(s.notice?' · Source qualification':'')));rows.append(row);}}
+    function draw(){const q=filter.value.trim().toLowerCase(),matches=sorted.filter(s=>(s.title+' '+s.kind).toLowerCase().includes(q));rows.replaceChildren();count.textContent=`Showing ${Math.min(limit,matches.length).toLocaleString()} of ${matches.length.toLocaleString()} matching sources`;more.hidden=matches.length<=limit;for(const s of matches.slice(0,limit)){const row=el('div',undefined,'listed-source');row.append(link(s.title,s.url),el('span',s.kind));if(s.fetchedAt&&Number.isFinite(Date.parse(s.fetchedAt)))row.append(el('span','Source text collected '+date(s.fetchedAt)+'.'));if(s.notice)row.append(el('span','Source qualification: '+s.notice));rows.append(row);}}
     filter.addEventListener('input',()=>{limit=100;draw();});list.append(label,filter,count,rows,more);draw();
-  })().catch(()=>{$('#coverage').replaceChildren(el('p','The source inventory could not load. The direct toolkit and Senate links above remain available.'),button('Retry loading sources',()=>loadInventory(),'inventory-more'));inventoryPromise=undefined;});
+  })().catch(()=>{$('#coverage').replaceChildren(el('p','The source inventory could not load. The direct toolkit and Senate links above remain available.'),button('Retry loading sources',()=>loadInventory(),'inventory-more'));}).finally(()=>{inventoryPromise=undefined;});
   return inventoryPromise;
 }
 function openSources(){$('#source-dialog').showModal();loadInventory();}

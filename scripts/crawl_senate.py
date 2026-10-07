@@ -85,8 +85,8 @@ def image_text_needed(page):
 _ocr_lock=threading.Lock();_ocr_engine=None
 
 def seed_ocr_bootstrap(pack_path=None):
- # This small public pack contains only OCR text already in the published
- # corpus. The freshly downloaded PDF's hash still determines every cache hit.
+ # This small public pack contains OCR results from public Senate PDFs.
+ # The freshly downloaded PDF's hash still determines every cache hit.
  pack_path=pathlib.Path(pack_path) if pack_path is not None else ROOT/'data/ocr-bootstrap.json'
  if not pack_path.exists():return 0
  if pack_path.stat().st_size>5000000:raise ValueError('OCR bootstrap exceeds the size limit')
@@ -100,8 +100,10 @@ def seed_ocr_bootstrap(pack_path=None):
  for key,rows in pages.items():
   match=re.fullmatch(r'[a-f0-9]{64}-([1-9][0-9]{0,4})',key)
   if not match or int(match[1])>10000:raise ValueError('Invalid OCR bootstrap page key')
-  if not isinstance(rows,list) or not 0<len(rows)<=2000 or any(not isinstance(row,str) or len(row)>10000 for row in rows):raise ValueError('Invalid OCR bootstrap text rows')
-  if sum(map(len,rows))>100000 or not any(row.strip() for row in rows):raise ValueError('Invalid OCR bootstrap page text')
+  if not isinstance(rows,list) or len(rows)>2000 or any(not isinstance(row,str) or len(row)>10000 for row in rows):raise ValueError('Invalid OCR bootstrap text rows')
+  # An empty array is a completed OCR pass with no detected text. Reusing it
+  # avoids repeating inference for unchanged pages; whitespace-only rows are invalid.
+  if sum(map(len,rows))>100000 or rows and not any(row.strip() for row in rows):raise ValueError('Invalid OCR bootstrap page text')
   validated.append((key,rows))
  # Finish validating the whole pack before creating anything in the cache.
  seeded=0

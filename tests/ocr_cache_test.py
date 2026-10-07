@@ -47,8 +47,8 @@ class OCRCacheTests(unittest.TestCase):
 
     def test_verified_public_bootstrap_seeds_all_pages_without_pdf_inputs(self):
         path = ROOT / 'data/ocr-bootstrap.json'
-        self.assertEqual(crawler.seed_ocr_bootstrap(path), 770)
-        self.assertEqual(len(list(self.cache.glob('*-ocr.json'))), 770)
+        self.assertEqual(crawler.seed_ocr_bootstrap(path), 2186)
+        self.assertEqual(len(list(self.cache.glob('*-ocr.json'))), 2186)
         self.assertEqual(list(self.cache.glob('*.pdf')), [])
         self.assertEqual(list(self.cache.glob('*.png')), [])
         self.assertEqual(list(self.cache.glob('*.tmp')), [])
@@ -84,11 +84,21 @@ class OCRCacheTests(unittest.TestCase):
         self.assertEqual(json.loads((self.cache / (key + '-ocr.json')).read_text()), ['Concurrent fresh extraction'])
         self.assertEqual(list(self.cache.glob('*.tmp')), [])
 
+    def test_page_with_no_detected_text_is_reused_without_rendering_or_inference(self):
+        key = self.digest + '-1'
+        path = self.pack({key: []})
+        self.assertEqual(crawler.seed_ocr_bootstrap(path), 1)
+        with patch.object(crawler.subprocess, 'run') as render, patch.object(crawler, '_ocr_engine') as engine:
+            self.assertEqual(crawler.ocr_page(self.raw, 0), [])
+            render.assert_not_called()
+            engine.assert_not_called()
+        self.assertEqual(json.loads((self.cache / (key + '-ocr.json')).read_text()), [])
+
     def test_invalid_pack_is_fully_rejected_before_any_cache_write(self):
         good = self.digest + '-1'
         for key, rows in [('../outside', ['Text']), (self.digest + '-0', ['Text']),
                           (self.digest + '-10001', ['Text']), (self.digest + '-2', ['Text', 5]),
-                          (self.digest + '-2', []), (self.digest + '-2', ['x'] * 2001),
+                          (self.digest + '-2', ['   ']), (self.digest + '-2', ['x'] * 2001),
                           (self.digest + '-2', ['x' * 10001])]:
             path = self.pack({good: ['Valid first page'], key: rows})
             before = {p.name for p in self.cache.iterdir()}

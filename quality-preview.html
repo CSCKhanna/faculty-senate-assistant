@@ -522,6 +522,58 @@ async function loadSourceRelease(fetcher = qualityFetch, base = SOURCE_BASE) {
   return validateRelease(await response.json());
 }
 
+// source-inventory.js?v=1
+init_quality_fixtures();
+
+// corpus.js
+init_quality_fixtures();
+var BASE2 = "https://csckhanna.github.io/faculty-senate-assistant/";
+async function loadCorpus2(manifest2, fetcher = qualityFetch, base = BASE2) {
+  if (!/^data\/corpus-[a-f0-9]{12}$/.test(manifest2.corpusBase)) throw new Error("Invalid corpus revision");
+  const [a, b] = await Promise.all([fetcher(base + manifest2.corpusBase + "/routing.json", { signal: AbortSignal.timeout(15e3) }), fetcher(base + manifest2.corpusBase + "/postings.bin", { signal: AbortSignal.timeout(15e3) })]);
+  if (!a.ok || !b.ok) throw new Error("Corpus unavailable");
+  const [routing, buffer] = await Promise.all([a.json(), b.arrayBuffer()]);
+  if (routing.builtAt !== manifest2.builtAt || routing.corpusBase !== manifest2.corpusBase || routing.sources?.length !== manifest2.sourceCount || routing.docs?.length !== manifest2.passageCount) throw new Error("Corpus mismatch");
+  const sources2 = routing.sources;
+  return { ...routing, base, postings: new Uint32Array(buffer), passages: routing.docs.map((d, id) => ({ id, source: sources2[d[0]].url, heading: d[1], text: d[3] })) };
+}
+
+// source-release.js
+init_quality_fixtures();
+var SOURCE_BASE2 = "https://csckhanna.github.io/faculty-senate-assistant/";
+var validDate2 = (value) => typeof value === "string" && Number.isFinite(Date.parse(value));
+function validateRelease2(value) {
+  const c = value?.corpus, b = value?.bills;
+  if (value?.version !== 1 || !validDate2(value.checkedAt) || !c || !b || !validDate2(c.builtAt) || b.builtAt !== c.builtAt || b.corpusBase !== c.corpusBase || !/^data\/corpus-[a-f0-9]{12}$/.test(c.corpusBase) || !/^data\/bills-[a-f0-9]{12}\.json$/.test(b.path)) throw new Error("Invalid source release");
+  if (!Number.isInteger(c.sourceCount) || c.sourceCount < 1 || c.sourceCount > 2e4 || !Number.isInteger(c.passageCount) || c.passageCount < 1 || c.passageCount >= 65536 || !Number.isInteger(b.recordCount) || b.recordCount < 0 || b.recordCount > c.passageCount) throw new Error("Invalid source counts");
+  return value;
+}
+async function loadSourceRelease2(fetcher = qualityFetch, base = SOURCE_BASE2) {
+  const response = await fetcher(base + "data/source-release.json", { cache: "no-store", signal: AbortSignal.timeout(1e4) });
+  if (!response.ok) throw new Error("Source release unavailable");
+  return validateRelease2(await response.json());
+}
+
+// source-inventory.js?v=1
+async function loadSourceInventory(currentIndex, fetcher = qualityFetch, base = SOURCE_BASE2) {
+  async function coverage() {
+    const response = await fetcher(base + "data/coverage.json", { cache: "no-store", signal: AbortSignal.timeout(1e4) });
+    if (!response.ok) throw new Error("Coverage unavailable");
+    return response.json();
+  }
+  const descriptor = (index2) => ({ builtAt: index2.builtAt, corpusBase: index2.corpusBase, sourceCount: index2.sources.length, passageCount: index2.passages.length });
+  const matches = (index2, report2) => report2?.builtAt === index2.builtAt && report2.sourceCount === index2.sources.length && report2.passageCount === index2.passages.length;
+  const [initialIndex, initialReport] = await Promise.allSettled([currentIndex, coverage()]);
+  if (initialIndex.status === "fulfilled" && initialReport.status === "fulfilled" && matches(initialIndex.value, initialReport.value)) return { index: initialIndex.value, coverage: initialReport.value, manifest: descriptor(initialIndex.value) };
+  let index, report;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const manifest2 = (await loadSourceRelease2(fetcher, base)).corpus;
+    [index, report] = await Promise.all([loadCorpus2(manifest2, fetcher, base), coverage()]);
+    if (matches(index, report)) return { index, coverage: report, manifest: manifest2 };
+  }
+  throw new Error("Source inventory publication is incomplete");
+}
+
 // app.js
 init_search();
 
@@ -626,7 +678,7 @@ var submit = $("#submit");
 var scroller = $("#chat-scroll");
 var panel = $("#chat-panel");
 var VISIT_KEY = "senate-assistant-visit-v1:" + location.pathname;
-var BASE2 = new URL("./", location.href).href;
+var BASE3 = new URL("./", location.href).href;
 var manifest;
 var data;
 var search;
@@ -727,11 +779,12 @@ function emailAction(original = question) {
 }
 function renderResponse(bubble, answer2) {
   bubble.querySelector(".chat-text")?.remove();
-  bubble.append(renderAnswer(answer2.answer, answer2.sources));
+  const body = renderAnswer(answer2.answer, answer2.sources);
+  bubble.append(body);
   if (answer2.liveMeeting) {
     const note = answer2.checkedAt && Number.isFinite(Date.parse(answer2.checkedAt)) ? "Meeting sources checked " + checkedTime(answer2.checkedAt) + "." : "Live meeting information could not be checked. Please retry or open the Senate meeting page.";
-    bubble.append(el("small", note, "chat-note"));
-  } else if (answer2.sourceStatus === "last-good") bubble.append(el("small", "The latest source update could not be loaded. This answer uses the last available source snapshot.", "chat-note"));
+    bubble.insertBefore(el("small", note, "chat-note"), body);
+  } else if (answer2.sourceStatus === "last-good") bubble.insertBefore(el("small", "The latest source update could not be loaded. This answer uses the last available source snapshot.", "chat-note"), body);
   if (answer2.followUp) bubble.append(el("p", answer2.followUp, "chat-followup"));
   const sources2 = answer2.sources.filter(sourceUrl);
   if (sources2.length) {
@@ -786,8 +839,8 @@ function renderResponse(bubble, answer2) {
 }
 async function ensureIndex() {
   if (!indexPromise) indexPromise = (async () => {
-    if (!manifest?.corpusBase) manifest = (await loadSourceRelease(qualityFetch, BASE2)).corpus;
-    data = await loadCorpus(manifest, qualityFetch, BASE2);
+    if (!manifest?.corpusBase) manifest = (await loadSourceRelease(qualityFetch, BASE3)).corpus;
+    data = await loadCorpus(manifest, qualityFetch, BASE3);
     search = buildSearch(data);
     return data;
   })().catch((e) => {
@@ -992,9 +1045,12 @@ async function loadInventory() {
     const c = $("#coverage"), list = $("#source-list");
     c.replaceChildren(el("p", "Loading the source inventory\u2026"));
     list.replaceChildren();
-    const [index, r] = await Promise.all([ensureIndex(), qualityFetch("data/coverage.json?v=7", { cache: "no-store" })]);
-    if (!r.ok) throw new Error("Coverage unavailable");
-    const coverage = await r.json();
+    const snapshot = await loadSourceInventory(ensureIndex(), qualityFetch, BASE3), { index, coverage } = snapshot;
+    manifest = snapshot.manifest;
+    data = index;
+    search = buildSearch(index);
+    indexPromise = Promise.resolve(index);
+    syncMode();
     c.replaceChildren(el("p", `${index.sources.length.toLocaleString()} sources and ${index.passages.length.toLocaleString()} passages. Snapshot collected ${date(index.builtAt)}.`));
     const ul = el("ul");
     for (const text of new Set(coverage.limitations || [])) ul.append(el("li", text));
@@ -1033,7 +1089,9 @@ async function loadInventory() {
       more.hidden = matches.length <= limit;
       for (const s of matches.slice(0, limit)) {
         const row = el("div", void 0, "listed-source");
-        row.append(link(s.title, s.url), el("span", s.kind + (s.notice ? " \xB7 Source qualification" : "")));
+        row.append(link(s.title, s.url), el("span", s.kind));
+        if (s.fetchedAt && Number.isFinite(Date.parse(s.fetchedAt))) row.append(el("span", "Source text collected " + date(s.fetchedAt) + "."));
+        if (s.notice) row.append(el("span", "Source qualification: " + s.notice));
         rows.append(row);
       }
     }
@@ -1045,6 +1103,7 @@ async function loadInventory() {
     draw();
   })().catch(() => {
     $("#coverage").replaceChildren(el("p", "The source inventory could not load. The direct toolkit and Senate links above remain available."), button("Retry loading sources", () => loadInventory(), "inventory-more"));
+  }).finally(() => {
     inventoryPromise = void 0;
   });
   return inventoryPromise;
@@ -1067,7 +1126,7 @@ if (window.visualViewport) {
   viewport();
 }
 restore();
-await Promise.allSettled([loadSourceRelease(qualityFetch, BASE2).then((release) => {
+await Promise.allSettled([loadSourceRelease(qualityFetch, BASE3).then((release) => {
   manifest = release.corpus;
 }), checkConnection()]);
 ready = true;
