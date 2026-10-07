@@ -30,7 +30,7 @@ export default {
     const url=new URL(request.url);
     if(url.pathname==='/health'){
       const state=env.URI_API_KEY&&env.PILOT_DB?await sourceStore.get():{release:fallbackRelease,releaseStatus:'bundled'},release=state.release;
-      return reply({ready:Boolean(env.URI_API_KEY&&env.PILOT_DB),snapshot:release.corpus.builtAt,sourceCount:release.corpus.sourceCount,sourceCheckedAt:release.checkedAt,sourceStatus:state.releaseStatus,refreshSchedule:'daily',liveMeetings:true,model:env.AI_MODEL||'its_direct/pt3-claude-sonnet-5.5-1m-us'});
+      return reply({ready:Boolean(env.URI_API_KEY&&env.PILOT_DB),snapshot:release.corpus.builtAt,sourceCount:release.corpus.sourceCount,sourceCheckedAt:release.checkedAt,sourceStatus:state.releaseStatus,refreshSchedule:'daily',liveMeetings:true,model:env.AI_MODEL||'its_direct/pt3-claude-opus-5.5-1m-us'});
     }
     if(!permitted)return reply({error:'This origin is not allowed.'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers});

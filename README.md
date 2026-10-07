@@ -1,6 +1,6 @@
 # URI Faculty Senate Assistant — prototype
 
-A conversational assistant grounded in public URI Faculty Senate resources. GitHub Pages hosts the frontend and immutable source files. Cloudflare Workers retrieves relevant passages and calls Sonnet 5.5 through the URI AI gateway. The gateway credential stays encrypted on Cloudflare and never appears in browser code or GitHub.
+A conversational assistant grounded in public URI Faculty Senate resources. GitHub Pages hosts the frontend and immutable source files. Cloudflare Workers retrieves relevant passages and calls Claude Opus 5.5 through the URI AI gateway. The gateway credential stays encrypted on Cloudflare and never appears in browser code or GitHub.
 
 [Live assistant](https://csckhanna.github.io/faculty-senate-assistant/)
 
@@ -19,7 +19,7 @@ Public source snapshots refresh daily; meeting and agenda questions also check t
 
 ## Retrieval and chat
 
-`prepare_corpus.mjs` builds an immutable corpus revision: compact lexical postings, passage metadata, and text shards. The Worker searches the compact index and fetches only the selected source text before calling Sonnet. The full corpus remains available without embedding tens of megabytes in the Worker or sending every document in each prompt. A single public release pointer selects matching immutable corpus and bill indexes. The backend checks the release on requests, with a five-minute cache, and retains the last readable generation when a publication or download fails. A new source refresh does not need a Worker redeployment.
+`prepare_corpus.mjs` builds an immutable corpus revision: compact lexical postings, passage metadata, and text shards. The Worker searches the compact index and fetches only the selected source text before calling Claude Opus. The full corpus remains available without embedding tens of megabytes in the Worker or sending every document in each prompt. A single public release pointer selects matching immutable corpus and bill indexes. The backend checks the release on requests, with a five-minute cache, and retains the last readable generation when a publication or download fails. A new source refresh does not need a Worker redeployment.
 
 Answers include validated source citations and retain context for short replies while keeping independent questions separate. Wrapped JSON is extracted before display; malformed transport fields cannot appear as an answer. The interface renders paragraphs, steps, emphasis, and clickable citation markers safely, with source notes grouped in expandable references. Procedural retrieval includes course classifications, start instructions, and submission steps. Named approval lookups prioritize matching tracker rows, including common AI wording. Year-wide program status questions inspect every recorded-status row in the primary B/C tracker tabs and distinguish pending or tabled proposals from denials. Tracker coverage is supplied separately so the assistant can explicitly identify the unavailable 2019–2020 archive rather than substitute another year.
 
@@ -27,7 +27,7 @@ The app offers a reviewed email draft to Genviéve Spitale (`genvieve.spitale@ur
 
 ## Limits and hosting
 
-The Worker uses the existing D1 usage database, `faculty-senate-pilot-usage`. The pilot allows 100 requests per UTC day across all users and eight requests per minute per network. These limits remain in place; they do not guarantee a fixed dollar spend. Sonnet model: `its_direct/pt3-claude-sonnet-5.5-1m-us`. The gateway does not support nondefault temperature for this model, so that parameter is omitted.
+The Worker uses the existing D1 usage database, `faculty-senate-pilot-usage`. The pilot allows 100 requests per UTC day across all users and eight requests per minute per network. These limits remain in place; they do not guarantee a fixed dollar spend. Claude Opus model: `its_direct/pt3-claude-opus-5.5-1m-us`. Requests use the model’s default temperature and the existing structured JSON response format.
 
 The Worker permits the configured GitHub origin. Credentials are used only in the gateway Authorization header. Indexed source downloads come from the public GitHub corpus; live meeting and agenda downloads go directly to public URI and Google Docs/Drive pages. These public source requests contain no credentials or conversation text. Generated links and source IDs are checked against retrieved evidence.
 
@@ -54,4 +54,4 @@ The automated regression suite covers complete toolkit registration, published-p
 
 See [QUALITY.md](QUALITY.md) for the experience and verification contract. Chat starts with the small manifest and health check; source inventory and local search load on demand. Refresh preserves the transcript and draft in tab-scoped session storage, including a retry for interrupted requests. New conversation clears them. Failed requests retry in place without discarding a draft. The AI daily limit remains 100; after the limit, the same interface provides source search. Citation numbers are consolidated per document, and copied answers include the references.
 
-Run `npm test` for factual retrieval, corpus integrity, transport, context, and real SQLite budget tests. `node scripts/build_quality_preview.mjs` creates `quality-preview.html` with simulated replies, no credentials, and no paid AI calls. Browser scenarios use `?scenario=slow`, `error-once`, `invalid`, `daily-limit`, `offline`, `inventory-error`, `long`, or `unsafe`. Publish the generated preview alongside the source data to test the exact interface in Chrome. Its tab storage is separate from the live assistant. Use bounded real Sonnet evaluations to check answer quality; deterministic fixtures verify interface behavior only.
+Run `npm test` for factual retrieval, corpus integrity, transport, context, and real SQLite budget tests. `node scripts/build_quality_preview.mjs` creates `quality-preview.html` with simulated replies, no credentials, and no paid AI calls. Browser scenarios use `?scenario=slow`, `error-once`, `invalid`, `daily-limit`, `offline`, `inventory-error`, `long`, or `unsafe`. Publish the generated preview alongside the source data to test the exact interface in Chrome. Its tab storage is separate from the live assistant. Use bounded real Claude Opus evaluations to check answer quality; deterministic fixtures verify interface behavior only.

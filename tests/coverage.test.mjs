@@ -29,9 +29,9 @@ test('ABM comparison supplies both definitions rather than only a form field',()
 test('historical calendar extraction preserves its human-readable and ISO date',()=>{
  assert.ok(bootstrapData.passages.some(x=>/November 02, 2026 \(2026-11-02\)/.test(x.text)));
 });
-test('Sonnet request omits unsupported temperature and remains grounded',async()=>{
+test('Claude Opus request uses default temperature and remains grounded',async()=>{
  let request;await converse(bootstrapData,[{role:'user',content:'How can I change my course?'}],{URI_API_KEY:'test'},async(url,options)=>{request=JSON.parse(options.body);return new Response(JSON.stringify({choices:[{message:{content:'{"kind":"answer","answer":"See the course modification guidance [1].","sourceIds":[1]}'}}]}),{status:200});});
- assert.equal(request.model,'its_direct/pt3-claude-sonnet-5.5-1m-us');assert.equal(request.temperature,undefined);assert.ok(request.messages[0].content.includes('EVIDENCE'));
+ assert.equal(request.model,'its_direct/pt3-claude-opus-5.5-1m-us');assert.equal(request.temperature,undefined);assert.ok(request.messages[0].content.includes('EVIDENCE'));
 });
 
 test('prerequisite follow-up retains the full major/minor classification context',()=>{

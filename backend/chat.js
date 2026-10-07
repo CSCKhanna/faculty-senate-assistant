@@ -130,7 +130,7 @@ export async function answerEvidence(data,messages,env,passages,fetcher=fetch){
   }).flatMap((caption,i)=>[caption,{type:'file',file:{file_data:attachments[i].fileData,filename:attachments[i].filename}}])]:question;
   const res=await fetcher('https://llmgw.its.uri.edu/v1/chat/completions',{
     method:'POST',headers:{'Authorization':'Bearer '+env.URI_API_KEY,'Content-Type':'application/json'},
-    body:JSON.stringify({model:env.AI_MODEL||'its_direct/pt3-claude-sonnet-5.5-1m-us',max_tokens:2200,response_format:{type:"json_object"},messages:[{role:'system',content:systemPrompt(data,passages)},...activeMessages(messages).slice(0,-1).map(m=>m.role==='assistant'?{...m,content:m.content.replace(/\[\d+\]/g,'')}:m),{role:'user',content}]}),
+    body:JSON.stringify({model:env.AI_MODEL||'its_direct/pt3-claude-opus-5.5-1m-us',max_tokens:2200,response_format:{type:"json_object"},messages:[{role:'system',content:systemPrompt(data,passages)},...activeMessages(messages).slice(0,-1).map(m=>m.role==='assistant'?{...m,content:m.content.replace(/\[\d+\]/g,'')}:m),{role:'user',content}]}),
     signal:AbortSignal.timeout(45000)
   });
   if(!res.ok)throw new Error('AI gateway unavailable ('+res.status+').');

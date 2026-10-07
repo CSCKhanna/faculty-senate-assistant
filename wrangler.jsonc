@@ -4,7 +4,7 @@
   "compatibility_date": "2026-10-06",
   "workers_dev": true,
   "vars": {
-    "AI_MODEL": "its_direct/pt3-claude-sonnet-5.5-1m-us",
+    "AI_MODEL": "its_direct/pt3-claude-opus-5.5-1m-us",
     "ALLOWED_ORIGINS": "https://csckhanna.github.io",
     "DAILY_REQUEST_LIMIT": "100"
   },
