@@ -46,11 +46,14 @@ def merge_sources(old, fresh, checked_at, gaps=()):
     """Replace successful sources atomically; never relabel retained text as fresh."""
     registry = {s['url']: dict(s) for s in old['sources']}
     updated = {s['url']: dict(s) for s in fresh['sources']}
-    missing = set(registry) - set(updated)
     gap_urls = {g['url'] for g in gaps}
-    for url in missing:
-        source = registry[url]
-        if url in gap_urls:
+    checked = dt.datetime.fromisoformat(checked_at.replace('Z', '+00:00'))
+    for url in gap_urls:
+        # Reused image/OCR records can be present in the newly assembled registry
+        # even though their extraction is older. A successful unchanged-content
+        # recheck has a fresh extraction date and must not acquire a stale notice.
+        source = updated.get(url, registry.get(url))
+        if source and dt.datetime.fromisoformat(source['fetchedAt'].replace('Z', '+00:00')) < checked:
             original_notice = source.get('notice', '').split(STALE)[0].rstrip()
             source['notice'] = (original_notice + ' ' + STALE + ' from ' + source.get('fetchedAt', 'an earlier date') + '.').strip()
             source['lastRefreshAttemptAt'] = checked_at
@@ -175,7 +178,18 @@ def assemble(stage, toolkit, senate, checked_at, initial_coverage):
         raise ValueError('Neither authoritative source could be refreshed; published generation was retained')
     previous = normalize_legacy_uri_urls(read_json(stage / 'data/index.json'))
     fresh = {'sources': list(core.sources.values()), 'passages': list(core.passages)}
-    gaps = failures + (senate.get('gaps', []) if senate else [])
+    gaps = failures + list(website.get('gaps', [])) + (senate.get('gaps', []) if senate else [])
+    media_pass_incomplete = any(g.get('reason', '').startswith('Website image refresh incomplete') for g in gaps)
+    if media_pass_incomplete:
+        # A failed image pass may leave the staged prior media file intact. Those
+        # records are still readable, but none can be relabeled as newly checked.
+        retained_images = [{'url': s['url'], 'reason': 'Website image refresh incomplete; retaining the earlier image extraction.'}
+                           for s in previous['sources']
+                           if s.get('kind') == 'Faculty Senate website image'
+                           and not any(n['url'] == s['url'] and n['fetchedAt'] >= checked_at for n in fresh['sources'])]
+        known_gap_urls = {g['url'] for g in website.get('gaps', [])}
+        website = {**website, 'gaps': list(website.get('gaps', [])) + [g for g in retained_images if g['url'] not in known_gap_urls]}
+        gaps.extend(retained_images)
     # A whole-source outage marks each retained source in that scope, not just its home page.
     if not toolkit_ready:
         gaps.extend({'url': s['url']} for s in previous['sources'] if 'Curriculum Toolkit' in s.get('kind', ''))
@@ -189,7 +203,7 @@ def assemble(stage, toolkit, senate, checked_at, initial_coverage):
     validate_index(merged, previous)
     refreshed = sum(s['fetchedAt'] >= checked_at for s in fresh['sources'])
     retained = len(merged['sources']) - refreshed
-    refresh = {'status': 'complete' if toolkit_ready and senate_ready and not failures else 'partial',
+    refresh = {'status': 'complete' if toolkit_ready and senate_ready and not failures and not media_pass_incomplete else 'partial',
                'cadence': 'daily', 'scheduleUtc': '10:17', 'freshSources': refreshed,
                'retainedSources': retained, 'gapCount': len(failures) + len(website.get('gaps', [])),
                'toolkitChecked': toolkit_ready, 'websiteChecked': senate_ready,
@@ -286,7 +300,9 @@ def main():
         try:
             # Delete the staged old result so a failed process cannot masquerade as a fresh crawl.
             (stage / 'data/senate-text.json').unlink(missing_ok=True)
-            run('crawl_senate.py', stage, env)
+            # Leave time for image extraction, validation and publication within
+            # the workflow's four-hour limit, even when both earlier crawls time out.
+            run('crawl_senate.py', stage, env, 7800)
             senate = read_json(stage / 'data/senate-text.json')
             if any(item['url'] == 'https://web.uri.edu/facsen/' for item in senate['items']):
                 # If image extraction fails, keep dated previous image text rather than erase it.

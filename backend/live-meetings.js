@@ -9,6 +9,17 @@ const LIVE=/\b(?:next|upcoming|current|latest|today|tomorrow|this (?:week|month)
 const MEETING=/\b(?:meetings?|agenda)\b/i;
 function removeBillDates(text){return text.replace(/\b(?:bill\s*#?\s*)?(?:20\d{2}|\d{2})\s*[-–]\s*(?:20\d{2}|\d{2})\s*[-–]\s*(?:[A-Z]+\s*[-–]\s*)?\d{1,3}[A-Z]?\b/gi,'');}
 function historicQuestion(text){return HISTORIC.test(removeBillDates(text));}
+const MONTH_YEAR_PATTERN=/\b(January|February|March|April|May|June|July|August|September|Sept\.?|October|November|December|Jan\.?|Feb\.?|Mar\.?|Apr\.?|Jun\.?|Jul\.?|Aug\.?|Sep\.?|Oct\.?|Nov\.?|Dec\.?)\s+(20\d{2})\b/i;
+function requestedPeriod(text){
+  const clean=removeBillDates(text),writtenDate=clean.match(DATE_PATTERN);
+  if(writtenDate){const date=parseMeetingDate(writtenDate[0]);return date?{type:'date',...date}:{type:'invalid-date',label:writtenDate[0]};}
+  const month=clean.match(MONTH_YEAR_PATTERN);
+  if(month){const index=MONTHS.findIndex(s=>s.startsWith(month[1].toLowerCase().slice(0,3))),year=month[2];return {type:'month',month:`${year}-${String(index+1).padStart(2,'0')}`,label:`${MONTHS[index][0].toUpperCase()+MONTHS[index].slice(1)} ${year}`};}
+  const year=clean.match(/\b(20\d{2})\b/);
+  return year?{type:'year',year:year[1],label:year[1]}:null;
+}
+function requestedScope(messages){return requestedPeriod(latestQuestion(messages))||requestedPeriod(topicQuestion(messages));}
+function matchesScope(row,scope){return !scope||scope.type==='date'&&row.date===scope.date||scope.type==='month'&&row.date.startsWith(scope.month+'-')||scope.type==='year'&&row.date.startsWith(scope.year+'-');}
 
 function latestQuestion(messages){return messages.filter(m=>m.role==='user').at(-1)?.content||'';}
 function topicQuestion(messages){
@@ -24,12 +35,13 @@ function topicQuestion(messages){
 }
 export function isLiveMeetingQuestion(messages,now=new Date()){
   const latest=latestQuestion(messages),topic=topicQuestion(messages);
-  const year=removeBillDates(latest).match(/\b(20\d{2})\b/),upcomingCurrent=/\b(?:next|upcoming|current)\b/i.test(latest)&&(!year||Number(year[1])>=Number(easternDate(now).date.slice(0,4)));
-  if(!latest||historicQuestion(latest)&&!upcomingCurrent||historicQuestion(topic)&&!LIVE.test(latest))return false;
+  const today=easternDate(now).date,scope=requestedScope(messages),currentPeriod=scope&&(scope.type==='date'?scope.date>=today:scope.type==='month'?scope.month>=today.slice(0,7):scope.type==='year'?scope.year>=today.slice(0,4):false);
+  const currentQuery=Boolean(currentPeriod)||/\b(?:next|upcoming|current)\b/i.test(latest)&&!scope;
+  if(!latest||historicQuestion(latest)&&!currentQuery||historicQuestion(topic)&&!currentQuery&&!LIVE.test(latest))return false;
   if(OTHER_COMMITTEE.test(latest)&&!/\bfaculty senate\b/i.test(latest)||(!/\bfaculty senate\b/i.test(latest)&&OTHER_COMMITTEE.test(topic)))return false;
   if(!MEETING.test(topic))return false;
   if(/\b(?:policy|procedure|parliamentary|quorum|rules|how often|how (?:are|is).*(?:prepared|distributed|posted)|how (?:much|many) (?:notice|days)|notice (?:requirement|required))\b/i.test(latest)&&!LIVE.test(latest))return false;
-  if(LIVE.test(topic))return true;
+  if(LIVE.test(topic)||currentPeriod)return true;
   return /\b(?:when|where|what time|what(?:'s| is) on|what will|what is the agenda|agenda (?:available|posted)|has .*agenda|is .*agenda)\b/i.test(latest);
 }
 function modeFor(messages){
@@ -121,13 +133,13 @@ export function parseMeetingRows(html){
   }
   return rows.sort((a,b)=>a.date.localeCompare(b.date));
 }
-function pageEvidence(html,meeting,now,mode,rows){
+function pageEvidence(html,meeting,now,mode,rows,scope){
   const paragraphs=[...mainContent(html).matchAll(/<p\b[^>]*>([\s\S]*?)<\/p\s*>/gi)].map(m=>htmlToText(m[1]));
   const general=paragraphs.filter(s=>/Faculty Senate meetings are scheduled|Meetings are hybrid|invitation with agenda|Senate meetings are open|General Faculty.*precedes/i.test(s)).join('\n\n').slice(0,5000);
   const specific=meeting?`Dated meeting row on the current Faculty Senate meetings page:\n${meeting.rowText}\nMeeting date: ${meeting.label}. Location: ${meeting.location}.\n${meeting.agendaURL?'The Agenda cell has a public link.':'The Agenda cell has no readable public agenda link at the time of this check.'}`:
-    `The page currently lists these dated Faculty Senate meetings:\n${rows.filter(r=>!r.orientation).slice(-16).map(r=>r.rowText).join('\n')}\nNo ${mode==='upcoming'?'upcoming dated meeting':'published meeting agenda'} could be identified from this current schedule.`;
+    `The page currently lists these dated Faculty Senate meetings:\n${rows.filter(r=>!r.orientation).slice(-16).map(r=>r.rowText).join('\n')}\n${scope?`No ${mode==='upcoming'?'upcoming dated meeting':'published meeting agenda'} matching the requested period ${scope.label} could be identified. Other dated rows do not answer the requested period.`:`No ${mode==='upcoming'?'upcoming dated meeting':'published meeting agenda'} could be identified from this current schedule.`}`;
   return {source:{title:'Faculty Senate — current meeting schedule',url:MEETINGS_URL,fetchedAt:now.toISOString(),notice:'Read from the live Faculty Senate website for this question.'},
-    p:{source:MEETINGS_URL,heading:meeting?`Faculty Senate meeting — ${meeting.label}`:'Current meeting schedule',text:specific+'\n\n'+general}};
+    p:{source:MEETINGS_URL,heading:meeting?`Faculty Senate meeting — ${meeting.label}`:'Current meeting schedule',text:(scope?`Requested meeting period: ${scope.label}.\n`:'')+specific+'\n\n'+general}};
 }
 export async function getLiveMeetingEvidence(messages,{fetcher=fetch,now=new Date(),timeoutMs=12000}={}){
   const mode=modeFor(messages),deadline=Date.now()+Math.min(15000,Math.max(1000,timeoutMs)),result={evidence:[],attachments:[],checkedAt:null,attemptedAt:now.toISOString(),status:'source-unavailable',issues:[],nextMeeting:null,mode};
@@ -143,12 +155,13 @@ export async function getLiveMeetingEvidence(messages,{fetcher=fetch,now=new Dat
   const hasFivePM=/3:00\s*[–—-]\s*5:00\s*(?:p\.?m\.?|PM)/i.test(htmlToText(mainContent(html)));
   const upcoming=candidateRows.filter(r=>r.date>today.date||r.date===today.date&&(!hasFivePM||today.minutes<17*60));
   const past=candidateRows.filter(r=>r.date<=today.date);
-  const question=latestQuestion(messages),explicitDate=parseMeetingDate(question),explicitYear=removeBillDates(question).match(/\b(20\d{2})\b/);
-  const applicable=explicitDate?upcoming.filter(r=>r.date===explicitDate.date):explicitYear?upcoming.filter(r=>r.date.startsWith(explicitYear[1]+'-')):upcoming;
+  const question=latestQuestion(messages),scope=requestedScope(messages);
+  result.requestedPeriod=scope;
+  const applicable=(scope?.type==='date'&&scope.date===today.date?candidateRows:upcoming).filter(r=>matchesScope(r,scope));
   const latestPublishedAgenda=/\b(?:latest|most recent)\b/i.test(question)&&/\bagenda\b/i.test(question)&&! /\blast meeting\b/i.test(question);
-  const meeting=mode==='upcoming'?applicable[0]:latestPublishedAgenda?candidateRows.filter(r=>r.agendaURL).at(-1):past.at(-1);
+  const meeting=mode==='upcoming'?applicable[0]:latestPublishedAgenda?candidateRows.filter(r=>r.agendaURL&&matchesScope(r,scope)).at(-1):past.filter(r=>matchesScope(r,scope)).at(-1);
   result.nextMeeting=meeting||null;
-  result.evidence.push(pageEvidence(html,meeting,now,mode,rows));
+  result.evidence.push(pageEvidence(html,meeting,now,mode,rows,scope));
   if(!meeting){result.status=mode==='upcoming'?'no-upcoming-meeting':'no-published-agenda';return result;}
   if(!meeting.agendaURL){result.status=meeting.unsafeAgenda?'agenda-unavailable':'agenda-not-posted';if(meeting.unsafeAgenda)result.issues.push({source:MEETINGS_URL,message:'Agenda link is outside the approved public-source hosts.'});return result;}
   try{
@@ -183,10 +196,13 @@ export async function getLiveMeetingEvidence(messages,{fetcher=fetch,now=new Dat
 export function liveMeetingFallback(result){
   if(result.status==='source-unavailable')return {kind:'unanswered',answer:'I couldn’t read the current Faculty Senate meeting schedule, so I can’t verify the next meeting or agenda. Please try again shortly, or use the email option below to ask Genviéve. Your original question will be included in the draft.',followUp:'',sources:[],retryable:true,checkedAt:null,attemptedAt:result.attemptedAt,liveStatus:result.status};
   const meeting=result.nextMeeting,source={id:1,url:MEETINGS_URL,title:'Faculty Senate — current meeting schedule',section:meeting?`Faculty Senate meeting — ${meeting.label}`:'Current meeting schedule',sections:[]};
-  let answer=meeting?`The ${result.mode==='upcoming'?'next':'most recent'} Faculty Senate meeting listed is ${meeting.label}${meeting.location?`, at ${meeting.location}`:''}. [1]`:'The current Faculty Senate schedule does not provide a dated upcoming meeting that I can verify. [1]';
+  let answer=meeting?(result.requestedPeriod?.type==='date'?`The schedule lists a Faculty Senate meeting on ${meeting.label}${meeting.location?`, at ${meeting.location}`:''}. [1]`:
+    `The ${result.mode==='upcoming'?'next':'most recent'} Faculty Senate meeting${result.requestedPeriod?` listed for ${result.requestedPeriod.label}`:' listed'} is ${meeting.label}${meeting.location?`, at ${meeting.location}`:''}. [1]`):
+    result.requestedPeriod?`The current Faculty Senate schedule does not list a ${result.mode==='upcoming'?'dated upcoming meeting':'published meeting agenda'} for ${result.requestedPeriod.label} that I can verify. [1]`:
+    result.status==='no-published-agenda'?'The current Faculty Senate meeting schedule does not provide a public agenda link that I can verify. [1]':'The current Faculty Senate schedule does not provide a dated upcoming meeting that I can verify. [1]';
   if(result.status==='agenda-not-posted')answer+='\n\nThe meeting’s Agenda cell does not yet contain a public link. I can verify the date and location, but the agenda items are not available from that row. [1]';
   if(result.status==='agenda-unavailable')answer+='\n\nI couldn’t read the linked agenda, so I can’t verify its items. You can try its link from the meeting schedule or ask Genviéve using the email option below.';
   if(result.status==='agenda-attached')answer+='\n\nThe schedule provides an agenda link, but I couldn’t complete a verified reading of its contents. Open the Agenda link from the meeting schedule to review it, or ask Genviéve using the email option below. [1]';
   if(result.status==='agenda-date-mismatch')answer+='\n\nThe agenda link opens a document with a different meeting date. I can’t verify this meeting’s agenda from that document; Genviéve can help resolve the mismatch.';
-  return {kind:'answer',answer,followUp:'',sources:[source],snapshotDate:result.checkedAt,checkedAt:result.checkedAt,liveStatus:result.status,escalatable:['agenda-unavailable','agenda-attached','agenda-date-mismatch','no-upcoming-meeting'].includes(result.status)};
+  return {kind:'answer',answer,followUp:'',sources:[source],snapshotDate:result.checkedAt,checkedAt:result.checkedAt,liveStatus:result.status,escalatable:['agenda-unavailable','agenda-attached','agenda-date-mismatch','no-upcoming-meeting','no-published-agenda'].includes(result.status)};
 }

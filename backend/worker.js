@@ -50,7 +50,11 @@ export default {
       if(!limit.allowed)return reply({error:limit.reason},429);
       if(isLiveMeetingQuestion(messages)){
         const live=await getLiveMeetingEvidence(messages),{attachments,...facts}=live,context={builtAt:live.checkedAt||fallbackRelease.corpus.builtAt,currentDate:new Date().toISOString(),live:facts,attachments};
-        let answer=live.evidence?.length?await answerEvidence(context,messages,env,live.evidence):liveMeetingFallback(live);
+        // A readable schedule without a meeting/agenda for the requested
+        // period has a complete, bounded answer. Do not let the model replace
+        // it with a different dated row or speculate about missing agenda text.
+        const directFallback=['source-unavailable','no-upcoming-meeting','no-published-agenda'].includes(live.status)||!live.evidence?.length;
+        let answer=directFallback?liveMeetingFallback(live):await answerEvidence(context,messages,env,live.evidence);
         if(attachments?.length&&answer.kind==='sources')answer=liveMeetingFallback({...live,status:'agenda-unavailable'});
         const liveStatus=attachments?.length?(answer.sources.some(s=>attachments.some(a=>a.sourceUrl===s.url))?'agenda-read':'agenda-unavailable'):live.status;
         return reply({...answer,checkedAt:live.checkedAt||null,liveStatus,liveMeeting:true});

@@ -42,11 +42,11 @@ function messageBubble(role,text){
 }
 function emailAction(original=question){return link('Email Genviéve with the original question',emailLink(original),'chat-email');}
 function renderResponse(bubble,answer){
-  bubble.querySelector('.chat-text')?.remove();bubble.append(renderAnswer(answer.answer,answer.sources));
+  bubble.querySelector('.chat-text')?.remove();const body=renderAnswer(answer.answer,answer.sources);bubble.append(body);
   if(answer.liveMeeting){
     const note=answer.checkedAt&&Number.isFinite(Date.parse(answer.checkedAt))?'Meeting sources checked '+checkedTime(answer.checkedAt)+'.':'Live meeting information could not be checked. Please retry or open the Senate meeting page.';
-    bubble.append(el('small',note,'chat-note'));
-  }else if(answer.sourceStatus==='last-good')bubble.append(el('small','The latest source update could not be loaded. This answer uses the last available source snapshot.','chat-note'));
+    bubble.insertBefore(el('small',note,'chat-note'),body);
+  }else if(answer.sourceStatus==='last-good')bubble.insertBefore(el('small','The latest source update could not be loaded. This answer uses the last available source snapshot.','chat-note'),body);
   if(answer.followUp)bubble.append(el('p',answer.followUp,'chat-followup'));
   const sources=answer.sources.filter(sourceUrl);
   if(sources.length){

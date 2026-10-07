@@ -84,20 +84,41 @@ def image_text_needed(page):
 
 _ocr_lock=threading.Lock();_ocr_engine=None
 
+def cleanup_legacy_ocr_inputs():
+ # Older runs copied the complete document for every OCR page. Only remove
+ # this crawler's known transient names after a completed OCR JSON proves the
+ # page result is cached. Shared document inputs and unrelated files stay intact.
+ removed=0
+ for file in CACHE.iterdir():
+  match=re.fullmatch(r'([a-f0-9]{64}-[1-9][0-9]*)(?:\.pdf|-render\.png)',file.name)
+  if match and file.is_file() and (CACHE/(match[1]+'-ocr.json')).is_file():
+   file.unlink();removed+=1
+ return removed
+
 def ocr_page(raw,n):
  global _ocr_engine
- key=hashlib.sha256(raw).hexdigest()+'-'+str(n+1);out=CACHE/(key+'-ocr.json')
+ digest=hashlib.sha256(raw).hexdigest();key=digest+'-'+str(n+1);out=CACHE/(key+'-ocr.json')
  if out.exists():return json.loads(out.read_text())
  with _ocr_lock:
+  # Another fetch worker may have cached this page while we waited for OCR.
+  if out.exists():return json.loads(out.read_text())
   if _ocr_engine is None:
    from rapidocr_onnxruntime import RapidOCR
    _ocr_engine=RapidOCR(intra_op_num_threads=4,inter_op_num_threads=1)
-  pdf=CACHE/(key+'.pdf');pdf.write_bytes(raw);prefix=CACHE/(key+'-render')
+  # One immutable input serves every page of this document. Per-page copies
+  # previously consumed gigabytes for long scanned curriculum reports.
+  pdf=CACHE/(digest+'.pdf');prefix=CACHE/(key+'-render');image=prefix.with_suffix('.png')
+  if not pdf.exists():pdf.write_bytes(raw)
   binary=os.environ.get('PDFTOPPM') or shutil.which('pdftoppm')
   if not binary:raise RuntimeError('Poppler pdftoppm is required for scanned PDF extraction')
-  subprocess.run([binary,'-f',str(n+1),'-l',str(n+1),'-singlefile','-r','160','-png',str(pdf),str(prefix)],check=True,timeout=90,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-  result,_=_ocr_engine(str(prefix)+'.png')
-  rows=[r[1] for r in result or []];out.write_text(json.dumps(rows));return rows
+  try:
+   subprocess.run([binary,'-f',str(n+1),'-l',str(n+1),'-singlefile','-r','160','-png',str(pdf),str(prefix)],check=True,timeout=90,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+   result,_=_ocr_engine(str(image))
+   rows=[r[1] for r in result or []]
+   temporary=out.with_suffix('.tmp');temporary.write_text(json.dumps(rows));temporary.replace(out)
+   return rows
+  finally:
+   image.unlink(missing_ok=True)
 
 def read(url,label):
  target=url;match=re.search(r'/(document|spreadsheets|presentation|file)/d/([^/?#]+)',url)
@@ -147,6 +168,8 @@ def read(url,label):
 
 def main():
  os.environ.setdefault('SENATE_REFRESH','1')
+ cleaned=cleanup_legacy_ocr_inputs()
+ if cleaned:print('Removed',cleaned,'completed legacy OCR render inputs from cache',flush=True)
  pending={core.SENATE:'Faculty Senate'};published=[];issues=[];seen=set();items={};labels={};tracker_ids=set()
  if os.environ.get('SOURCE_SEEDS'):
   for seed in json.loads(pathlib.Path(os.environ['SOURCE_SEEDS']).read_text()):

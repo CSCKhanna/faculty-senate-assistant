@@ -4,6 +4,7 @@ import pathlib
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))
 from refresh_sources import merge_sources, validate_index, build_release, promote, write_json, normalize_legacy_uri_urls, assemble
@@ -60,6 +61,59 @@ class RefreshTests(unittest.TestCase):
             self.assertNotIn(retired, [s['url'] for s in updated['sources']])
             current_coverage = json.loads((root / 'data/coverage.json').read_text())
             self.assertTrue(any(g['url'] == retired and 'Removed toolkit page' in g['reason'] for g in current_coverage['failures']))
+
+    def stage_image(self, root, previous, url, stamp=OLD):
+        prior = source(url, OLD)
+        prior['kind'] = 'Faculty Senate website image'
+        previous['sources'].append(prior)
+        previous['passages'].append({'source': url, 'heading': 'FAQ image', 'text': 'Previously readable image text.'})
+        write_json(root / 'data/index.json', previous)
+        return {'url': url, 'parent': 'https://web.uri.edu/facsen/', 'title': 'FAQ image',
+                'kind': 'Faculty Senate website image', 'lines': ['Previously readable image text.'], 'fetchedAt': stamp}
+
+    def test_failed_image_recheck_keeps_date_and_stale_notice_from_media_gaps(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = pathlib.Path(directory)
+            previous, coverage, toolkit, senate = self.staged_inputs(root)
+            toolkit['pages'] = json.loads((root / 'data/toolkit-pages.json').read_text())['pages']
+            url = 'https://web.uri.edu/facsen/files/faq.png'
+            image = self.stage_image(root, previous, url)
+            write_json(root / 'data/senate-media-text.json', {'items': [image], 'gaps': [{'url': url, 'reason': 'Image OCR unavailable'}], 'videos': []})
+            with patch('merge_senate.ocr_spacing', side_effect=lambda line: line):
+                assemble(root, toolkit, senate, NEW, coverage)
+            result = json.loads((root / 'data/index.json').read_text())
+            retained = next(s for s in result['sources'] if s['url'] == url)
+            self.assertEqual(retained['fetchedAt'], OLD)
+            self.assertEqual(retained['refreshStatus'], 'unavailable')
+            self.assertIn('last readable snapshot', retained['notice'])
+            self.assertEqual(retained['lastRefreshAttemptAt'], NEW)
+
+    def test_whole_image_pass_failure_qualifies_prior_extraction_but_not_fresh_images(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = pathlib.Path(directory)
+            previous, coverage, toolkit, senate = self.staged_inputs(root)
+            toolkit['pages'] = json.loads((root / 'data/toolkit-pages.json').read_text())['pages']
+            old_url = 'https://web.uri.edu/facsen/files/faq.png'
+            fresh_url = 'https://web.uri.edu/facsen/files/workflow.png'
+            old_image = self.stage_image(root, previous, old_url)
+            fresh_image = self.stage_image(root, previous, fresh_url, NEW)
+            write_json(root / 'data/senate-media-text.json', {'items': [old_image, fresh_image], 'gaps': [], 'videos': []})
+            senate['gaps'].append({'url': 'https://web.uri.edu/facsen/', 'reason': 'Website image refresh incomplete; previous image extraction dates were retained.'})
+            with patch('merge_senate.ocr_spacing', side_effect=lambda line: line):
+                assemble(root, toolkit, senate, NEW, coverage)
+            result = json.loads((root / 'data/index.json').read_text())
+            retained = next(s for s in result['sources'] if s['url'] == old_url)
+            fresh = next(s for s in result['sources'] if s['url'] == fresh_url)
+            self.assertEqual(retained['fetchedAt'], OLD)
+            self.assertEqual(retained['refreshStatus'], 'unavailable')
+            self.assertIn('last readable snapshot', retained['notice'])
+            self.assertEqual(fresh['fetchedAt'], NEW)
+            self.assertNotIn('refreshStatus', fresh)
+            self.assertNotIn('last readable snapshot', fresh['notice'])
+            current_coverage = json.loads((root / 'data/coverage.json').read_text())
+            self.assertEqual(current_coverage['refresh']['status'], 'partial')
+            self.assertTrue(any(g['url'] == old_url for g in current_coverage['website']['gaps']))
+            self.assertFalse(any(g['url'] == fresh_url for g in current_coverage['website']['gaps']))
 
     def test_legacy_public_uri_http_reference_is_upgraded_without_redating(self):
         original = index('http://web.uri.edu/honors')

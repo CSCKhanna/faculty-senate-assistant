@@ -33,6 +33,47 @@ test('Eastern local day determines the next meeting across a UTC date boundary',
   const after=await getLiveMeetingEvidence(ask('Next meeting?'),{fetcher,now:new Date('2026-10-16T00:15:00Z')});
   assert.equal(after.nextMeeting.date,'2026-11-19');
 });
+const futureSchedule=()=>schedule().replace('</table>','<tr><td>January 28, 2027</td><td>Hope Room</td><td>Agenda</td><td>Minutes</td></tr><tr><td>February 18, 2027</td><td>Hope Room</td><td>Agenda</td><td>Minutes</td></tr><tr><td>March 18, 2027</td><td>Hope Room</td><td>Agenda</td><td>Minutes</td></tr></table>');
+test('explicit future year selects a meeting in that year for in, for, and during queries',async()=>{
+  for(const preposition of ['in','for','during']){
+    const question=`When is the next Faculty Senate meeting ${preposition} 2027?`;
+    assert.equal(isLiveMeetingQuestion(ask(question),now),true);
+    const result=await getLiveMeetingEvidence(ask(question),{fetcher:makeFetcher(futureSchedule()),now});
+    assert.equal(result.nextMeeting.date,'2027-01-28',question);assert.equal(result.requestedPeriod.year,'2027');
+    assert.match(result.evidence[0].p.text,/Requested meeting period: 2027/);
+  }
+});
+test('upcoming exact date and month queries are live and preserve the requested period',async()=>{
+  for(const [question,date] of [['What is on the October 15, 2026 Faculty Senate agenda?','2026-10-15'],['When is the Faculty Senate meeting in February 2027?','2027-02-18'],['What is on the February 18, 2027 Faculty Senate agenda?','2027-02-18']]){
+    assert.equal(isLiveMeetingQuestion(ask(question),now),true,question);
+    const result=await getLiveMeetingEvidence(ask(question),{fetcher:makeFetcher(futureSchedule()),now});assert.equal(result.nextMeeting.date,date,question);
+  }
+  assert.equal(isLiveMeetingQuestion(ask('What was on the October 15, 2025 Faculty Senate agenda?'),now),false);
+});
+test('an unlisted requested date, month, or year never substitutes an unrelated meeting',async()=>{
+  for(const period of ['February 25, 2027','April 2027','2028']){
+    const question=`What is on the next Faculty Senate meeting agenda for ${period}?`;
+    assert.equal(isLiveMeetingQuestion(ask(question),now),true,question);
+    const result=await getLiveMeetingEvidence(ask(question),{fetcher:makeFetcher(futureSchedule()),now});
+    assert.equal(result.status,'no-upcoming-meeting');assert.equal(result.nextMeeting,null);assert.equal(result.requestedPeriod.label,period);
+    assert.match(result.evidence[0].p.text,new RegExp(`matching the requested period ${period}`));
+    const fallback=liveMeetingFallback(result);assert.match(fallback.answer,new RegExp(`for ${period}`));assert.doesNotMatch(fallback.answer,/October 15|January 28|February 18/);
+  }
+});
+test('meeting period remains available to a short agenda follow-up',async()=>{
+  const messages=[...ask('When is the next Faculty Senate meeting in 2027?'),{role:'assistant',content:'The schedule lists January 28, 2027.'},{role:'user',content:'What is on its agenda?'}];
+  assert.equal(isLiveMeetingQuestion(messages,now),true);
+  const result=await getLiveMeetingEvidence(messages,{fetcher:makeFetcher(futureSchedule()),now});
+  assert.equal(result.nextMeeting.date,'2027-01-28');assert.equal(result.requestedPeriod.year,'2027');
+});
+test('bill academic years do not constrain the next meeting year',async()=>{
+  for(const bill of ['2025-2026-FSEC-09','2025–2026–FSEC–09','2025-2026-09C','25-26-09C']){
+    const question=`Will bill ${bill} be on the next Faculty Senate agenda?`;
+    assert.equal(isLiveMeetingQuestion(ask(question),now),true,question);
+    const result=await getLiveMeetingEvidence(ask(question),{fetcher:makeFetcher(futureSchedule()),now});
+    assert.equal(result.nextMeeting.date,'2026-10-15');assert.equal(result.requestedPeriod,null);
+  }
+});
 test('future row without agenda does not reuse the old agenda or Zoom link',async()=>{
   const calls=[],result=await getLiveMeetingEvidence(ask('What is on the next meeting agenda?'),{fetcher:makeFetcher(schedule(),{},calls),now});
   assert.equal(result.status,'agenda-not-posted');assert.equal(result.nextMeeting.date,'2026-10-15');assert.equal(result.checkedAt,now.toISOString());assert.equal(calls.length,1);

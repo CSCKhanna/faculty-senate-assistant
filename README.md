@@ -4,9 +4,9 @@ A conversational assistant grounded in public URI Faculty Senate resources. GitH
 
 [Live assistant](https://csckhanna.github.io/faculty-senate-assistant/)
 
-## Current coverage
+## Source coverage
 
-The October 6, 2026 snapshot has **1,321 sources and 28,573 passages**:
+The initial October 6, 2026 snapshot has **1,321 sources and 28,573 passages**:
 
 - The full reachable public Notion toolkit: 24 pages, 272 database entries, and all 59 embedded images/files. Synced content, collapsed sections, and database rows are included.
 - All 48 publicly published Faculty Senate pages/posts were audited, including pages missing from menus. The website crawl indexed 921 pages and linked documents, including University Manual sections, reports, minutes, legislation, and spreadsheets.
