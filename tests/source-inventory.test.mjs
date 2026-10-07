@@ -88,7 +88,7 @@ class Element {
   focus(){}
 }
 async function until(check){for(let i=0;i<40;i++){if(check())return;await new Promise(resolve=>setImmediate(resolve));}assert.fail('Frontend fixture did not finish loading');}
-test('reopening source coverage updates one generation while preserving the transcript and draft',async()=>{
+test('reopening source coverage updates its generation and discovery qualifications while preserving the transcript and draft',async()=>{
   const f=fixture(),nodes=new Map(),saved={question:'How do I modify a course?',draft:'My unfinished follow-up',records:[{role:'user',content:'How do I modify a course?'},{role:'assistant',kind:'answer',answer:'Use the published course guidance.',sources:[],followUp:''}]};
   const visitKey='senate-assistant-visit-v1:/faculty-senate-assistant/',storage=new Map([[visitKey,JSON.stringify(saved)]]);
   const node=selector=>{if(!nodes.has(selector))nodes.set(selector,new Element());return nodes.get(selector);};
@@ -99,12 +99,18 @@ test('reopening source coverage updates one generation while preserving the tran
   try{
     await import('../app.js?source-inventory-fixture');
     node('#sources-button').dispatch('click');await until(()=>node('#source-list').textContent.includes('Generation 1 source 1'));
+    assert.doesNotMatch(node('#coverage').textContent,/complete list of published Senate pages could not be verified/);
     node('#close-dialog').dispatch('click');
     const transcript=node('#results').textContent,stored=storage.get(visitKey);
+    f.values[1].coverage.website.discoveryComplete=false;
     f.publish(2);node('#sources-button').dispatch('click');
     await until(()=>node('#source-list').textContent.includes('Generation 2 source 2'));
     assert.match(node('#coverage').textContent,/2 sources and 2 passages/);
     assert.match(node('#coverage').textContent,/Coverage for generation 2/);
+    assert.match(node('#coverage').textContent,/The complete list of published Senate pages could not be verified/);
+    assert.match(node('#coverage').textContent,/Known pages and followed public links were checked, but some newly published pages may be missing/);
+    const discoveryNote=node('#coverage').children.find(child=>child.className==='coverage-discovery-note');
+    assert.equal(discoveryNote.children[0].tagName,'strong');
     assert.doesNotMatch(node('#source-list').textContent,/Generation 1 source/);
     assert.match(node('#source-list').textContent,/Source text collected Sep 3, 2026/);
     assert.match(node('#source-list').textContent,/Source qualification: The latest refresh could not verify this source/);
@@ -112,5 +118,9 @@ test('reopening source coverage updates one generation while preserving the tran
     assert.equal(node('#question').value,saved.draft);
     assert.equal(storage.get(visitKey),stored);
     assert.match(node('#load-status').textContent,/2 sources/);
+    node('#close-dialog').dispatch('click');f.values[1].coverage.website.discoveryComplete=true;node('#sources-button').dispatch('click');
+    await until(()=>node('#source-list').textContent.includes('Generation 2 source 2'));
+    assert.doesNotMatch(node('#coverage').textContent,/complete list of published Senate pages could not be verified/);
+    assert.equal(node('#results').textContent,transcript);assert.equal(node('#question').value,saved.draft);assert.equal(storage.get(visitKey),stored);
   }finally{for(const [key,descriptor]of originals){if(descriptor)Object.defineProperty(globalThis,key,descriptor);else delete globalThis[key];}}
 });

@@ -171,6 +171,7 @@ async function loadInventory(){
     // remain independent of source publication and are left intact.
     manifest=snapshot.manifest;data=index;search=buildSearch(index);indexPromise=Promise.resolve(index);syncMode();
     c.replaceChildren(el('p',`${index.sources.length.toLocaleString()} sources and ${index.passages.length.toLocaleString()} passages. Snapshot collected ${date(index.builtAt)}.`));
+    if(coverage.website?.discoveryComplete===false){const note=el('p',undefined,'coverage-discovery-note');note.append(el('strong','The complete list of published Senate pages could not be verified. '),document.createTextNode('Known pages and followed public links were checked, but some newly published pages may be missing.'));c.append(note);}
     const ul=el('ul');for(const text of new Set(coverage.limitations||[]))ul.append(el('li',text));c.append(ul);
     if(coverage.website){const w=coverage.website;c.append(el('p',`${w.publishedPagesIndexed} of ${w.publishedPages} published Senate pages/posts indexed, plus linked public documents and ${w.trackers.length} readable proposal trackers with every downloadable tab.`));if(w.gaps.length)c.append(lazyDetails(`${w.gaps.length} website links unavailable or unreadable`,w.gaps,g=>{const p=el('p',undefined,'coverage-fail');p.append(link(g.url,g.url),document.createTextNode(' — '+g.reason));return p;}));}
     if(coverage.failures?.length)c.append(lazyDetails(`${coverage.failures.length} import issues or partial sources`,coverage.failures,f=>el('p',`${f.url} — ${f.reason}`,'coverage-fail')));

@@ -169,9 +169,16 @@ def assemble(stage, toolkit, senate, checked_at, initial_coverage):
         failures.append({'url': core.NOTION + '/' + core.TOOLKIT.replace('-', ''),
                          'reason': 'Public toolkit refresh was incomplete; retaining the previous readable toolkit snapshot.'})
     senate_ready = bool(senate and any(item['url'] == core.SENATE for item in senate['items']))
+    discovery_complete = bool(senate_ready and senate.get('discovery', {}).get('complete'))
+    if senate_ready and not senate.get('publishedPages'):
+        raise ValueError('Published Senate page inventory is empty; retaining the published generation')
     website = initial_coverage.get('website', {})
     if senate_ready:
         website = merge_senate.apply_snapshot(senate, core)
+        website['discovery'] = senate.get('discovery', {'complete': False, 'method': 'unverified'})
+        website['discoveryComplete'] = discovery_complete
+        if not discovery_complete and not any(g.get('reason', '').startswith('Published page discovery incomplete') for g in website.get('gaps', [])):
+            website['gaps'].append({'url': core.SENATE, 'reason': 'Published page discovery incomplete; the published-page inventory could not be verified.'})
     else:
         failures.append({'url': core.SENATE, 'reason': 'Faculty Senate refresh was unavailable; retaining the previous readable snapshot.'})
     if not toolkit_ready and not senate_ready:
@@ -203,10 +210,11 @@ def assemble(stage, toolkit, senate, checked_at, initial_coverage):
     validate_index(merged, previous)
     refreshed = sum(s['fetchedAt'] >= checked_at for s in fresh['sources'])
     retained = len(merged['sources']) - refreshed
-    refresh = {'status': 'complete' if toolkit_ready and senate_ready and not failures and not media_pass_incomplete else 'partial',
+    refresh = {'status': 'complete' if toolkit_ready and senate_ready and discovery_complete and not failures and not media_pass_incomplete else 'partial',
                'cadence': 'daily', 'scheduleUtc': '10:17', 'freshSources': refreshed,
                'retainedSources': retained, 'gapCount': len(failures) + len(website.get('gaps', [])),
-               'toolkitChecked': toolkit_ready, 'websiteChecked': senate_ready,
+               'toolkitChecked': toolkit_ready, 'websiteChecked': senate_ready and discovery_complete,
+               'websiteRootChecked': senate_ready, 'websiteDiscoveryComplete': discovery_complete,
                'trackerCount': len(website.get('trackers', []))}
     coverage = {**initial_coverage, 'builtAt': checked_at, 'sourceCount': len(merged['sources']),
                 'passageCount': len(merged['passages']), 'toolkit': toolkit_meta,
@@ -298,6 +306,12 @@ def main():
         env['SOURCE_SEEDS'] = str(seed_file)
         senate = None
         try:
+            # Keep only the earlier inventory outside publishable data. A discovery
+            # outage must not silently replace it with an empty collection.
+            previous_snapshot = read_json(stage / 'data/senate-text.json')
+            inventory_file = stage / 'previous-senate-inventory.json'
+            write_json(inventory_file, {k: previous_snapshot[k] for k in ('builtAt', 'publishedPages', 'discovery') if k in previous_snapshot})
+            env['SENATE_PREVIOUS_SNAPSHOT'] = str(inventory_file)
             # Delete the staged old result so a failed process cannot masquerade as a fresh crawl.
             (stage / 'data/senate-text.json').unlink(missing_ok=True)
             # Leave time for image extraction, validation and publication within

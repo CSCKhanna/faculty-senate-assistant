@@ -1,4 +1,5 @@
 import copy
+import hashlib
 import json
 import pathlib
 import sys
@@ -8,6 +9,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / 'scripts'))
 from refresh_sources import merge_sources, validate_index, build_release, promote, write_json, normalize_legacy_uri_urls, assemble
+from senate_discovery import discover, rest_inventory, SENATE
 
 OLD = '2026-10-06T12:00:00+00:00'
 NEW = '2026-10-07T12:00:00+00:00'
@@ -40,6 +42,7 @@ class RefreshTests(unittest.TestCase):
                     'website': {'gaps': [], 'trackers': []}}
         toolkit = {'pages': pages[:-1], 'assets': [], 'links': [], 'catalog': {}, 'issues': {}}
         senate = {'builtAt': NEW, 'publishedPages': [home], 'attemptedSources': 1, 'gaps': [], 'trackers': [],
+                  'discovery': {'complete': True, 'method': 'wordpress-rest', 'checkedAt': NEW, 'lastCompleteAt': NEW},
                   'items': [{**source(home, NEW), 'lines': ['The next meeting agenda.'], 'ocrPages': []}]}
         return previous, coverage, toolkit, senate
 
@@ -61,6 +64,33 @@ class RefreshTests(unittest.TestCase):
             self.assertNotIn(retired, [s['url'] for s in updated['sources']])
             current_coverage = json.loads((root / 'data/coverage.json').read_text())
             self.assertTrue(any(g['url'] == retired and 'Removed toolkit page' in g['reason'] for g in current_coverage['failures']))
+
+    def test_incomplete_discovery_is_qualified_without_redating_successful_reads(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = pathlib.Path(directory)
+            previous, coverage, toolkit, senate = self.staged_inputs(root)
+            toolkit['pages'] = json.loads((root / 'data/toolkit-pages.json').read_text())['pages']
+            senate['discovery'] = {'complete': False, 'method': 'navigation-and-previous-inventory', 'lastCompleteAt': OLD}
+            refresh = assemble(root, toolkit, senate, NEW, coverage)
+            self.assertEqual(refresh['status'], 'partial')
+            self.assertFalse(refresh['websiteChecked'])
+            self.assertFalse(refresh['websiteDiscoveryComplete'])
+            self.assertTrue(refresh['websiteRootChecked'])
+            current = json.loads((root / 'data/coverage.json').read_text())
+            self.assertEqual(current['website']['discovery']['lastCompleteAt'], OLD)
+            self.assertTrue(any(g['reason'].startswith('Published page discovery incomplete') for g in current['website']['gaps']))
+            home = next(s for s in json.loads((root / 'data/index.json').read_text())['sources'] if s['url'] == SENATE)
+            self.assertEqual(home['fetchedAt'], NEW)
+            self.assertNotIn('refreshStatus', home)
+
+    def test_empty_published_inventory_is_rejected_before_any_promotion(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = pathlib.Path(directory)
+            previous, coverage, toolkit, senate = self.staged_inputs(root)
+            senate['publishedPages'] = []
+            with self.assertRaisesRegex(ValueError, 'page inventory is empty'):
+                assemble(root, toolkit, senate, NEW, coverage)
+            self.assertEqual(json.loads((root / 'data/index.json').read_text()), previous)
 
     def stage_image(self, root, previous, url, stamp=OLD):
         prior = source(url, OLD)
@@ -218,6 +248,119 @@ class RefreshTests(unittest.TestCase):
             write_json(root / bills['path'], bill_data)
             with self.assertRaisesRegex(ValueError, 'outside corpus'):
                 build_release(root, NEW, {})
+
+
+class DiscoveryTests(unittest.TestCase):
+    def entry(self, url):
+        return {'link': url, 'title': {'rendered': 'Senate page'}}
+
+    def xml(self, root, urls, child):
+        return ('<%s xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">%s</%s>' %
+                (root, ''.join('<%s><loc>%s</loc></%s>' % (child, url, child) for url in urls), root)).encode()
+
+    def fetcher(self, responses):
+        def fetch(url):
+            value = responses[url]
+            if isinstance(value, Exception):
+                raise value
+            return value, 'application/xml' if value.lstrip().startswith(b'<') else 'application/json'
+        return fetch
+
+    def rest(self, entries):
+        return {SENATE + 'wp-json/wp/v2/pages?per_page=100&page=1': json.dumps(entries).encode(),
+                SENATE + 'wp-json/wp/v2/posts?per_page=100&page=1': b'[]'}
+
+    def test_valid_rest_pages_and_empty_posts_are_complete(self):
+        pages, discovery, gaps = discover(self.fetcher(self.rest([self.entry(SENATE)])), NEW)
+        self.assertEqual(set(pages), {SENATE})
+        self.assertTrue(discovery['complete'])
+        self.assertEqual(discovery['method'], 'wordpress-rest')
+        self.assertEqual(gaps, [])
+
+    def test_empty_api_uses_every_page_and_post_map_from_authoritative_sitemap(self):
+        maps = [SENATE + 'wp-sitemap-posts-page-1.xml', SENATE + 'wp-sitemap-posts-page-2.xml',
+                SENATE + 'wp-sitemap-posts-post-1.xml']
+        responses = self.rest([])
+        responses[SENATE + 'wp-sitemap.xml'] = self.xml('sitemapindex', maps + [SENATE + 'wp-sitemap-taxonomies-category-1.xml'], 'sitemap')
+        responses[maps[0]] = self.xml('urlset', [SENATE, SENATE + 'meetings/'], 'url')
+        responses[maps[1]] = self.xml('urlset', [SENATE + 'new-agenda/', SENATE + 'meetings/'], 'url')
+        responses[maps[2]] = self.xml('urlset', [SENATE + 'new-announcement/'], 'url')
+        pages, discovery, gaps = discover(self.fetcher(responses), NEW)
+        self.assertEqual(set(pages), {SENATE, SENATE + 'meetings/', SENATE + 'new-agenda/', SENATE + 'new-announcement/'})
+        self.assertTrue(discovery['complete'])
+        self.assertEqual(discovery['method'], 'wordpress-sitemap')
+        self.assertTrue(discovery['errors'])
+        self.assertEqual(gaps, [])
+
+    def test_outage_retains_previous_inventory_and_original_complete_date(self):
+        previous = {'builtAt': OLD, 'publishedPages': [SENATE, SENATE + 'archive/']}
+        pages, discovery, gaps = discover(self.fetcher({}), NEW, previous)
+        self.assertEqual(set(pages), set(previous['publishedPages']))
+        self.assertFalse(discovery['complete'])
+        self.assertEqual(discovery['lastCompleteAt'], OLD)
+        self.assertEqual(discovery['checkedAt'], NEW)
+        self.assertIn('previous published-page inventory', gaps[0]['reason'])
+
+    def test_invalid_api_shapes_or_foreign_urls_cannot_claim_complete_discovery(self):
+        for entries in ({'error': 'temporarily unavailable'}, [self.entry('https://other.example/facsen/')], [self.entry(SENATE + 'wp-json/')]):
+            with self.subTest(entries=entries):
+                pages, discovery, gaps = discover(self.fetcher(self.rest(entries)), NEW)
+                self.assertEqual(set(pages), {SENATE})
+                self.assertFalse(discovery['complete'])
+                self.assertTrue(gaps)
+
+    def test_partial_or_empty_sitemap_is_never_a_complete_inventory(self):
+        page_map, post_map = SENATE + 'wp-sitemap-posts-page-1.xml', SENATE + 'wp-sitemap-posts-post-1.xml'
+        for page_urls in ([], [SENATE + 'meetings/'], [SENATE]):
+            responses = self.rest([])
+            responses[SENATE + 'wp-sitemap.xml'] = self.xml('sitemapindex', [page_map, post_map], 'sitemap')
+            responses[page_map] = self.xml('urlset', page_urls, 'url')
+            responses[post_map] = OSError('Second content sitemap is unavailable')
+            pages, discovery, gaps = discover(self.fetcher(responses), NEW, {'builtAt': OLD, 'publishedPages': [SENATE, SENATE + 'known/']})
+            self.assertFalse(discovery['complete'])
+            self.assertIn(SENATE + 'known/', pages)
+            self.assertTrue(gaps)
+
+    def test_repeated_rest_pagination_is_rejected(self):
+        first = [self.entry(SENATE)] + [self.entry(SENATE + 'page-' + str(n) + '/') for n in range(99)]
+        responses = self.rest(first)
+        responses[SENATE + 'wp-json/wp/v2/pages?per_page=100&page=2'] = json.dumps([self.entry(SENATE)]).encode()
+        with self.assertRaisesRegex(ValueError, 'pagination repeated'):
+            rest_inventory(self.fetcher(responses))
+
+    def test_media_uses_current_html_without_rest_and_retains_unavailable_parent_images(self):
+        import crawl_senate_media as media
+        with tempfile.TemporaryDirectory() as directory:
+            root = pathlib.Path(directory)
+            cache = root / 'cache'; cache.mkdir(); (root / 'data').mkdir()
+            parent, unavailable = SENATE + 'help/', SENATE + 'unavailable/'
+            image_url, old_url = SENATE + 'uploads/workflow.png', SENATE + 'uploads/old.png'
+            snapshot = {'publishedPages': [SENATE, parent, unavailable], 'discovery': {'complete': False},
+                        'items': [{**source(SENATE, NEW), 'title': 'Home'}, {**source(parent, NEW), 'title': 'Help'}]}
+            write_json(root / 'data/senate-text.json', snapshot)
+            previous_image = {'url': old_url, 'parent': unavailable, 'title': 'Old guidance', 'kind': 'Faculty Senate website image', 'lines': ['Original text'], 'fetchedAt': OLD}
+            write_json(root / 'data/senate-media-text.json', {'items': [previous_image]})
+            for url, html in ((SENATE, '<main>Home</main>'), (parent, '<header><img src="/logo.png"/></header><main><img src="'+image_url.replace('https:', 'http:')+'"/><img src="'+image_url+'"/></main><footer><img src="/footer.png"/></footer>')):
+                key = hashlib.sha256(url.encode()).hexdigest()
+                (cache / (key + '.bin')).write_bytes(html.encode())
+                write_json(cache / (key + '.json'), {'fetchedAt': NEW, 'type': 'text/html'})
+            raw = b'Fresh instructional image bytes'
+            write_json(cache / (hashlib.sha256(raw).hexdigest() + '-image-ocr.json'), ['Fresh guidance'])
+            def fetch(url):
+                self.assertEqual(url, image_url)
+                key = hashlib.sha256(url.encode()).hexdigest()
+                (cache / (key + '.bin')).write_bytes(raw)
+                write_json(cache / (key + '.json'), {'fetchedAt': NEW})
+                return raw, 'image/png'
+            with patch.object(media.c, 'ROOT', root), patch.object(media.c, 'CACHE', cache), patch.object(media.c, 'STAMP', NEW), patch.object(media.c, 'cached', side_effect=fetch) as fetched:
+                media.main()
+                self.assertEqual(fetched.call_count, 1)
+            result = json.loads((root / 'data/senate-media-text.json').read_text())
+            self.assertEqual({i['url'] for i in result['items']}, {image_url, old_url})
+            self.assertEqual(next(i for i in result['items'] if i['url'] == old_url)['fetchedAt'], OLD)
+            self.assertEqual(next(i for i in result['items'] if i['url'] == image_url)['fetchedAt'], NEW)
+            self.assertTrue(any(g['url'] == old_url for g in result['gaps']))
+            self.assertTrue(any(g['reason'].startswith('Website image refresh incomplete') for g in result['gaps']))
 
 
 if __name__ == '__main__':

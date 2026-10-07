@@ -4,6 +4,7 @@ Raw download caches stay outside the repository. No authenticated downloads.
 import concurrent.futures as cf, datetime as dt, hashlib, io, json, os, pathlib, re, urllib.parse as up, subprocess, threading, shutil, tempfile
 from html.parser import HTMLParser
 import build_index as core
+from senate_discovery import discover, page_url
 ROOT=core.ROOT
 CACHE=pathlib.Path(os.environ.get('SENATE_CACHE',ROOT/'../../work/senate-audit')).resolve(); CACHE.mkdir(parents=True,exist_ok=True)
 STAMP=dt.datetime.now(dt.timezone.utc).isoformat()
@@ -207,26 +208,20 @@ def read(url,label):
 def main():
  os.environ.setdefault('SENATE_REFRESH','1')
  seeded=seed_ocr_bootstrap()
- if seeded:print('Seeded',seeded,'previously published OCR pages into the content-hash cache',flush=True)
+ if seeded:print('Seeded',seeded,'public PDF OCR page results into the content-hash cache',flush=True)
  cleaned=cleanup_legacy_ocr_inputs()
  if cleaned:print('Removed',cleaned,'completed legacy OCR render inputs from cache',flush=True)
- pending={core.SENATE:'Faculty Senate'};published=[];issues=[];seen=set();items={};labels={};tracker_ids=set()
+ previous_path=pathlib.Path(os.environ.get('SENATE_PREVIOUS_SNAPSHOT',ROOT/'data/senate-text.json'))
+ previous=json.loads(previous_path.read_text()) if previous_path.exists() else {}
+ discovered,discovery,issues=discover(cached,STAMP,previous)
+ pending=dict(discovered);published=set(discovered);seen=set();items={};labels={};tracker_ids=set()
+ print('Published page discovery:',discovery['method'],'complete='+str(discovery['complete']),len(published),'pages',flush=True)
  if os.environ.get('SOURCE_SEEDS'):
   for seed in json.loads(pathlib.Path(os.environ['SOURCE_SEEDS']).read_text()):
    url=normalize(seed['url'])
    if url and (eligible(url) or up.urlsplit(url).netloc=='web.uri.edu'):
     pending.setdefault(url,seed.get('title','Linked toolkit document'))
     if 'spreadsheets/d/' in url and re.search(r'track|20\d\d\s*[-–]',seed.get('title',''),re.I):tracker_ids.add(url);labels[url]=seed.get('title','Curriculum Proposal Tracker')
- # Enumerate every publicly published page/post, including pages missing from menus.
- for endpoint in ('pages','posts'):
-  page=1
-  while True:
-   try:raw,_=cached(core.SENATE+'wp-json/wp/v2/'+endpoint+'?per_page=100&page='+str(page));data=json.loads(raw)
-   except Exception as e:issues.append({'url':core.SENATE+'wp-json/wp/v2/'+endpoint,'reason':str(e)[:180]});break
-   if not data:break
-   for entry in data:pending[normalize(entry['link'])]=core.clean(re.sub('<[^>]+>','',entry['title']['rendered']));published.append(normalize(entry['link']))
-   if len(data)<100:break
-   page+=1
  with cf.ThreadPoolExecutor(max_workers=8) as pool:
   while pending:
    batch={u:t for u,t in pending.items() if u not in seen};pending={}
@@ -236,6 +231,9 @@ def main():
     url=jobs[job]
     try:
      item,links=job.result();items[url]=item
+     if not discovery['complete'] and item['kind']=='Faculty Senate website':
+      try:published.add(page_url(url))
+      except ValueError:pass
      for link,label in links:
       link=normalize(link,url)
       if link and eligible(link):
@@ -249,7 +247,7 @@ def main():
   if url in items:
    items[url]['kind']='Faculty Senate proposal tracker'
    label=labels.get(url,items[url]['title']);items[url]['title']=label if 'curriculum proposal tracker' in label.lower() else label+' Curriculum Proposal Tracker'
- snapshot={'builtAt':STAMP,'publishedPages':sorted(set(published)),'items':list(items.values()),'trackers':[{'url':u,'title':items[u]['title'],'tabs':items[u]['tabs'],'rows':items[u]['rowCount']} for u in sorted(tracker_ids) if u in items],'gaps':issues,'attemptedSources':len(seen)}
+ snapshot={'builtAt':STAMP,'publishedPages':sorted(published),'discovery':discovery,'items':list(items.values()),'trackers':[{'url':u,'title':items[u]['title'],'tabs':items[u]['tabs'],'rows':items[u]['rowCount']} for u in sorted(tracker_ids) if u in items],'gaps':issues,'attemptedSources':len(seen)}
  (ROOT/'data/senate-text.json').write_text(json.dumps(snapshot,ensure_ascii=False))
  print(json.dumps({'indexed':len(items),'publishedPages':len(set(published)),'trackers':len(snapshot['trackers']),'gaps':len(issues)}))
 if __name__=='__main__':main()

@@ -1052,6 +1052,11 @@ async function loadInventory() {
     indexPromise = Promise.resolve(index);
     syncMode();
     c.replaceChildren(el("p", `${index.sources.length.toLocaleString()} sources and ${index.passages.length.toLocaleString()} passages. Snapshot collected ${date(index.builtAt)}.`));
+    if (coverage.website?.discoveryComplete === false) {
+      const note = el("p", void 0, "coverage-discovery-note");
+      note.append(el("strong", "The complete list of published Senate pages could not be verified. "), document.createTextNode("Known pages and followed public links were checked, but some newly published pages may be missing."));
+      c.append(note);
+    }
     const ul = el("ul");
     for (const text of new Set(coverage.limitations || [])) ul.append(el("li", text));
     c.append(ul);
