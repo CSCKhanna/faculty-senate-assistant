@@ -10,7 +10,11 @@ const MEETING=/\b(?:meetings?|agenda)\b/i;
 function removeBillDates(text){return text.replace(/\b(?:bill\s*#?\s*)?(?:20\d{2}|\d{2})\s*[-–]\s*(?:20\d{2}|\d{2})\s*[-–]\s*(?:[A-Z]+\s*[-–]\s*)?\d{1,3}[A-Z]?\b/gi,'');}
 function historicQuestion(text){return HISTORIC.test(removeBillDates(text));}
 const MONTH_YEAR_PATTERN=/\b(January|February|March|April|May|June|July|August|September|Sept\.?|October|November|December|Jan\.?|Feb\.?|Mar\.?|Apr\.?|Jun\.?|Jul\.?|Aug\.?|Sep\.?|Oct\.?|Nov\.?|Dec\.?)\s+(20\d{2})\b/i;
-function requestedPeriod(text){
+function shiftCalendarDay(date,days){
+  const day=new Date(date+'T00:00:00Z');day.setUTCDate(day.getUTCDate()+days);return day.toISOString().slice(0,10);
+}
+function calendarLabel(date){const [year,month,day]=date.split('-').map(Number);return `${MONTHS[month-1][0].toUpperCase()+MONTHS[month-1].slice(1)} ${day}, ${year}`;}
+function requestedPeriod(text,now){
   const clean=removeBillDates(text),writtenDate=clean.match(DATE_PATTERN);
   if(writtenDate){const date=parseMeetingDate(writtenDate[0]);return date?{type:'date',...date}:{type:'invalid-date',label:writtenDate[0]};}
   const academic=clean.match(/\b(20\d{2})\s*[-–—]\s*(20\d{2}|\d{2})\s+(?:academic|school)\s+year\b/i)
@@ -23,11 +27,26 @@ function requestedPeriod(text){
   }
   const month=clean.match(MONTH_YEAR_PATTERN);
   if(month){const index=MONTHS.findIndex(s=>s.startsWith(month[1].toLowerCase().slice(0,3))),year=month[2];return {type:'month',month:`${year}-${String(index+1).padStart(2,'0')}`,label:`${MONTHS[index][0].toUpperCase()+MONTHS[index].slice(1)} ${year}`};}
+  if(/\b(?:today|tomorrow|this week|this month)\b/i.test(clean)){
+    const today=easternDate(now).date;
+    if(/\b(?:today|tomorrow)\b/i.test(clean)){
+      const relative=/\btomorrow\b/i.test(clean)?'tomorrow':'today',date=shiftCalendarDay(today,relative==='tomorrow'?1:0);
+      return {type:'date',date,label:calendarLabel(date),relative};
+    }
+    if(/\bthis week\b/i.test(clean)){
+      // US calendar week, Sunday–Saturday, derived from the Eastern local day.
+      // UTC arithmetic on that day avoids daylight-saving hour changes.
+      const weekday=new Date(today+'T00:00:00Z').getUTCDay(),startDate=shiftCalendarDay(today,-weekday),endDate=shiftCalendarDay(startDate,6);
+      return {type:'week',startDate,endDate,label:`${calendarLabel(startDate)} through ${calendarLabel(endDate)}`,relative:'this-week'};
+    }
+    const month=today.slice(0,7),index=Number(month.slice(5))-1;
+    return {type:'month',month,label:`${MONTHS[index][0].toUpperCase()+MONTHS[index].slice(1)} ${month.slice(0,4)}`,relative:'this-month'};
+  }
   const year=clean.match(/\b(20\d{2})\b/);
   return year?{type:'year',year:year[1],label:year[1]}:null;
 }
-function requestedScope(messages){return requestedPeriod(latestQuestion(messages))||requestedPeriod(topicQuestion(messages));}
-function matchesScope(row,scope){return !scope||scope.type==='date'&&row.date===scope.date||scope.type==='month'&&row.date.startsWith(scope.month+'-')||scope.type==='year'&&row.date.startsWith(scope.year+'-')||scope.type==='academic-year'&&row.date>=scope.startDate&&row.date<=scope.endDate;}
+function requestedScope(messages,now){return requestedPeriod(latestQuestion(messages),now)||requestedPeriod(topicQuestion(messages),now);}
+function matchesScope(row,scope){return !scope||scope.type==='date'&&row.date===scope.date||scope.type==='month'&&row.date.startsWith(scope.month+'-')||scope.type==='year'&&row.date.startsWith(scope.year+'-')||['academic-year','week'].includes(scope.type)&&row.date>=scope.startDate&&row.date<=scope.endDate;}
 
 function latestQuestion(messages){return messages.filter(m=>m.role==='user').at(-1)?.content||'';}
 function topicQuestion(messages){
@@ -43,7 +62,7 @@ function topicQuestion(messages){
 }
 export function isLiveMeetingQuestion(messages,now=new Date()){
   const latest=latestQuestion(messages),topic=topicQuestion(messages);
-  const today=easternDate(now).date,scope=requestedScope(messages),currentPeriod=scope&&(scope.type==='date'?scope.date>=today:scope.type==='month'?scope.month>=today.slice(0,7):scope.type==='year'?scope.year>=today.slice(0,4):scope.type==='academic-year'?scope.endDate>=today:false);
+  const today=easternDate(now).date,scope=requestedScope(messages,now),currentPeriod=scope&&(scope.type==='date'?scope.date>=today:scope.type==='month'?scope.month>=today.slice(0,7):scope.type==='year'?scope.year>=today.slice(0,4):['academic-year','week'].includes(scope.type)?scope.endDate>=today:false);
   const currentQuery=Boolean(currentPeriod)||/\b(?:next|upcoming|current)\b/i.test(latest)&&!scope;
   if(!latest||historicQuestion(latest)&&!currentQuery||historicQuestion(topic)&&!currentQuery&&!LIVE.test(latest))return false;
   if(OTHER_COMMITTEE.test(latest)&&!/\bfaculty senate\b/i.test(latest)||(!/\bfaculty senate\b/i.test(latest)&&OTHER_COMMITTEE.test(topic)))return false;
@@ -163,13 +182,17 @@ export async function getLiveMeetingEvidence(messages,{fetcher=fetch,now=new Dat
   const hasFivePM=/3:00\s*[–—-]\s*5:00\s*(?:p\.?m\.?|PM)/i.test(htmlToText(mainContent(html)));
   const upcoming=candidateRows.filter(r=>r.date>today.date||r.date===today.date&&(!hasFivePM||today.minutes<17*60));
   const past=candidateRows.filter(r=>r.date<=today.date);
-  const question=latestQuestion(messages),scope=requestedScope(messages);
+  const question=latestQuestion(messages),scope=requestedScope(messages,now);
   result.requestedPeriod=scope;
-  const applicable=(scope?.type==='date'&&scope.date===today.date?candidateRows:upcoming).filter(r=>matchesScope(r,scope));
+  const asksNext=/\b(?:next|upcoming)\b/i.test(question)||!requestedPeriod(question,now)&&/\b(?:next|upcoming)\b/i.test(topicQuestion(messages)),upcomingMatches=upcoming.filter(r=>matchesScope(r,scope));
+  const pastRelativePeriod=scope?.relative&&!asksNext&&!upcomingMatches.length&&scope.type!=='date';
+  const applicable=scope?.type==='date'&&!asksNext?candidateRows.filter(r=>matchesScope(r,scope)):
+    scope?.relative&&!asksNext&&!upcomingMatches.length?candidateRows.filter(r=>matchesScope(r,scope)):upcomingMatches;
   const latestPublishedAgenda=/\b(?:latest|most recent)\b/i.test(question)&&/\bagenda\b/i.test(question)&&! /\blast meeting\b/i.test(question);
-  const meeting=mode==='upcoming'?applicable[0]:latestPublishedAgenda?candidateRows.filter(r=>r.agendaURL&&matchesScope(r,scope)).at(-1):past.filter(r=>matchesScope(r,scope)).at(-1);
+  const meeting=mode==='upcoming'?(pastRelativePeriod?applicable.at(-1):applicable[0]):latestPublishedAgenda?candidateRows.filter(r=>r.agendaURL&&matchesScope(r,scope)).at(-1):past.filter(r=>matchesScope(r,scope)).at(-1);
+  if(pastRelativePeriod&&meeting)result.mode='latest';
   result.nextMeeting=meeting||null;
-  result.evidence.push(pageEvidence(html,meeting,now,mode,rows,scope));
+  result.evidence.push(pageEvidence(html,meeting,now,result.mode,rows,scope));
   if(!meeting){result.status=mode==='upcoming'?'no-upcoming-meeting':'no-published-agenda';return result;}
   if(!meeting.agendaURL){result.status=meeting.unsafeAgenda?'agenda-unavailable':'agenda-not-posted';if(meeting.unsafeAgenda)result.issues.push({source:MEETINGS_URL,message:'Agenda link is outside the approved public-source hosts.'});return result;}
   try{

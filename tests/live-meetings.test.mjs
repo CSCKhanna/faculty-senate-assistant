@@ -33,6 +33,63 @@ test('Eastern local day determines the next meeting across a UTC date boundary',
   const after=await getLiveMeetingEvidence(ask('Next meeting?'),{fetcher,now:new Date('2026-10-16T00:15:00Z')});
   assert.equal(after.nextMeeting.date,'2026-11-19');
 });
+test('today and tomorrow request their Eastern dates and never an unrelated later meeting',async()=>{
+  const localEvening=new Date('2026-10-08T00:30:00Z'); // Still October 7 in Rhode Island.
+  const yes=await getLiveMeetingEvidence(ask('Is there a Faculty Senate meeting tomorrow?'),{fetcher:makeFetcher(schedule({date:'October 8, 2026'})),now:localEvening});
+  assert.equal(yes.nextMeeting.date,'2026-10-08');assert.equal(yes.requestedPeriod.relative,'tomorrow');assert.equal(yes.requestedPeriod.label,'October 8, 2026');
+  for(const relative of ['today','tomorrow']){
+    const messages=ask(`Is there a Faculty Senate meeting ${relative}?`);
+    assert.equal(isLiveMeetingQuestion(messages,localEvening),true);
+    const no=await getLiveMeetingEvidence(messages,{fetcher:makeFetcher(schedule()),now:localEvening});
+    assert.equal(no.status,'no-upcoming-meeting');assert.equal(no.nextMeeting,null);assert.equal(no.requestedPeriod.date,relative==='today'?'2026-10-07':'2026-10-08');assert.doesNotMatch(liveMeetingFallback(no).answer,/October 15/);
+  }
+});
+test('tomorrow uses calendar-day arithmetic across month and daylight-saving boundaries',async()=>{
+  for(const [instant,date,label] of [['2026-11-01T00:30:00Z','2026-11-01','November 1, 2026'],['2027-03-14T01:30:00Z','2027-03-14','March 14, 2027']]){
+    const result=await getLiveMeetingEvidence(ask('When is the Faculty Senate meeting tomorrow?'),{fetcher:makeFetcher(schedule({date:label,old:false})),now:new Date(instant)});
+    assert.equal(result.nextMeeting.date,date);assert.equal(result.requestedPeriod.date,date);
+  }
+});
+test('exact today can read an ended time window but next or upcoming today cannot select it',async()=>{
+  const after=new Date('2026-10-07T22:00:00Z'),fetcher=makeFetcher(schedule({date:'October 7, 2026'}));
+  const dated=await getLiveMeetingEvidence(ask('Is there a Faculty Senate meeting today?'),{fetcher,now:after});
+  assert.equal(dated.nextMeeting.date,'2026-10-07');assert.doesNotMatch(liveMeetingFallback(dated).answer,/next Faculty Senate meeting/);
+  for(const qualifier of ['next','upcoming']){
+    const result=await getLiveMeetingEvidence(ask(`When is the ${qualifier} Faculty Senate meeting today?`),{fetcher,now:after});
+    assert.equal(result.nextMeeting,null);assert.equal(result.status,'no-upcoming-meeting');
+  }
+  const before=await getLiveMeetingEvidence(ask('When is the next Faculty Senate meeting today?'),{fetcher,now:new Date('2026-10-07T20:00:00Z')});
+  assert.equal(before.nextMeeting.date,'2026-10-07');
+});
+test('this week and this month keep their calendar ranges instead of choosing the next period',async()=>{
+  const fetcher=makeFetcher(schedule({date:'October 8, 2026'}));
+  for(const relative of ['this week','this month']){
+    const messages=ask(`Is there a Faculty Senate meeting ${relative}?`);
+    assert.equal(isLiveMeetingQuestion(messages,now),true);
+    const result=await getLiveMeetingEvidence(messages,{fetcher,now});assert.equal(result.nextMeeting.date,'2026-10-08');
+    if(relative==='this week'){assert.equal(result.requestedPeriod.startDate,'2026-10-04');assert.equal(result.requestedPeriod.endDate,'2026-10-10');}
+    else assert.equal(result.requestedPeriod.month,'2026-10');
+  }
+  const week=await getLiveMeetingEvidence(ask('When is the next Faculty Senate meeting this week?'),{fetcher:makeFetcher(schedule()),now});
+  assert.equal(week.nextMeeting,null);assert.equal(week.status,'no-upcoming-meeting');
+  const nextMonth=await getLiveMeetingEvidence(ask('When is the next Faculty Senate meeting this month?'),{fetcher:makeFetcher(schedule({date:'November 1, 2026',old:false})),now});
+  assert.equal(nextMonth.nextMeeting,null);assert.equal(nextMonth.requestedPeriod.month,'2026-10');
+  const sunday=await getLiveMeetingEvidence(ask('When is the next Faculty Senate meeting this week?'),{fetcher:makeFetcher(schedule({date:'October 10, 2026',old:false})),now:new Date('2026-10-11T12:00:00Z')});
+  assert.equal(sunday.nextMeeting,null);assert.equal(sunday.requestedPeriod.startDate,'2026-10-11');
+});
+test('relative periods remain in short agenda follow-ups and ended next-today stays unresolved',async()=>{
+  for(const relative of ['tomorrow','this week','this month']){
+    const messages=[...ask(`When is the next Faculty Senate meeting ${relative}?`),{role:'assistant',content:'The schedule lists a meeting on October 8.'},{role:'user',content:'Is its agenda available?'}];
+    const result=await getLiveMeetingEvidence(messages,{fetcher:makeFetcher(schedule({date:'October 8, 2026'})),now});assert.equal(result.nextMeeting.date,'2026-10-08');assert.equal(result.requestedPeriod.relative,relative.replace(' ','-'));
+  }
+  const messages=[...ask('When is the next Faculty Senate meeting today?'),{role:'assistant',content:'The listed time window has ended.'},{role:'user',content:'What is on its agenda?'}];
+  const result=await getLiveMeetingEvidence(messages,{fetcher:makeFetcher(schedule({date:'October 7, 2026'})),now:new Date('2026-10-07T22:00:00Z')});assert.equal(result.nextMeeting,null);
+});
+test('a general this-month query can report an earlier listed meeting without calling it next',async()=>{
+  const result=await getLiveMeetingEvidence(ask('Is there a Faculty Senate meeting this month?'),{fetcher:makeFetcher(schedule()),now:new Date('2026-10-20T12:00:00Z')});
+  assert.equal(result.nextMeeting.date,'2026-10-15');assert.equal(result.mode,'latest');assert.doesNotMatch(liveMeetingFallback(result).answer,/next Faculty Senate meeting/);
+  assert.doesNotMatch(result.evidence[0].p.text,/\b(?:next|upcoming)\b/i);assert.match(result.evidence[0].p.text,/Dated meeting row/);
+});
 const futureSchedule=()=>schedule().replace('</table>','<tr><td>January 28, 2027</td><td>Hope Room</td><td>Agenda</td><td>Minutes</td></tr><tr><td>February 18, 2027</td><td>Hope Room</td><td>Agenda</td><td>Minutes</td></tr><tr><td>March 18, 2027</td><td>Hope Room</td><td>Agenda</td><td>Minutes</td></tr></table>');
 test('explicit future year selects a meeting in that year for in, for, and during queries',async()=>{
   for(const preposition of ['in','for','during']){
