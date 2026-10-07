@@ -65,6 +65,31 @@ export function billEvidence(index,messages){
   }
   return selected;
 }
+export function requestedBillPage(messages){
+  const match=messages.at(-1)?.content.match(/\bpage\s*#?\s*([1-9]\d{0,3})\b/i);
+  return match?Number(match[1]):null;
+}
+export function billPageEvidence(index,corpus,messages,selected=billEvidence(index,messages)){
+  if(index.corpusBase!==corpus.corpusBase||index.builtAt!==corpus.builtAt)throw new Error('Bill and corpus generation mismatch');
+  const page=requestedBillPage(messages),explicit=identifiers(messages.at(-1)?.content||'');
+  const selectedDocuments=selected.filter(r=>r.source.kind==='Faculty Senate PDF'&&(!explicit.length||identifiers(r.source.title).some(a=>explicit.some(b=>a.year===b.year&&a.number===b.number&&(!b.committee||a.committee===b.committee)))));
+  const urls=new Set(selectedDocuments.map(r=>r.p.source)),registry=new Map(corpus.sources.filter(s=>urls.has(s.url)).map(s=>[s.url,s]));
+  const pages=[];
+  if(page!==null)for(const p of corpus.passages){
+    if(!registry.has(p.source)||Number(p.heading.match(/\| Page ([1-9]\d*)$/)?.[1])!==page)continue;
+    pages.push({source:registry.get(p.source),p});
+    if(pages.length===8)break;
+  }
+  const seen=new Set(),evidence=[];
+  // The specifically requested page must precede cover anchors and tracker
+  // rows, while preserving the bill route's existing eight-passage ceiling.
+  for(const r of [...pages,...selected]){if(seen.has(r.p.id))continue;seen.add(r.p.id);evidence.push(r);if(evidence.length===8)break;}
+  return {page,found:pages.length>0,pageIds:pages.map(r=>r.p.id),evidence,sources:[...registry.values()]};
+}
+export function missingBillPageAnswer(index,result){
+  const sources=result.sources.map((source,i)=>({id:i+1,url:source.url,title:source.title,notice:source.notice}));
+  return {kind:'unanswered',answer:`I couldn’t locate readable text for page ${result.page} of the requested bill or report in this source snapshot. Please open the original document to check that page, or use the email option to ask Genviéve.`,sources,followUp:'',snapshotDate:index.builtAt};
+}
 export function missingBillAnswer(index,messages){
   const ids=identifiers(messages.at(-1).content);
   const named=tokens(activeMessages(messages).filter(m=>m.role==='user').map(m=>m.content).join(' ')).filter(w=>!OMIT.has(w)&&!/^\d+$/.test(w)).length>=2;

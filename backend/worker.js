@@ -2,7 +2,7 @@ import fallbackRelease from '../data/source-release.json' with {type:'json'};
 import {hydrateEvidence} from '../corpus.js';
 import {createSourceStore} from './source-store.js';
 import {isLiveMeetingQuestion,getLiveMeetingEvidence,liveMeetingFallback} from './live-meetings.js';
-import {isBillQuestion,billEvidence,missingBillAnswer} from '../bills.js';
+import {isBillQuestion,billEvidence,requestedBillPage,billPageEvidence,missingBillPageAnswer,missingBillAnswer} from '../bills.js';
 const sourceStore=createSourceStore({fallback:fallbackRelease});
 import {validateMessages,converse,answerEvidence} from './chat.js';
 
@@ -61,7 +61,15 @@ export default {
       }
       return reply(await sourceStore.run(async release=>{
         if(isBillQuestion(messages)){
-          const index={...await sourceStore.billIndex(release),currentDate:new Date().toISOString()},selected=billEvidence(index,messages),passages=await hydrateEvidence(index,selected);
+          const index={...await sourceStore.billIndex(release),currentDate:new Date().toISOString()};let selected=billEvidence(index,messages),hydration=index,page=null;
+          if(requestedBillPage(messages)!==null&&selected.length){
+            hydration=await sourceStore.corpus(release);
+            page=billPageEvidence(index,hydration,messages,selected);
+            if(!page.found)return missingBillPageAnswer(index,page);
+            selected=page.evidence;
+          }
+          const passages=await hydrateEvidence(hydration,selected);
+          if(page&&!passages.some(r=>page.pageIds.includes(r.p.id)&&r.p.text.trim()))return missingBillPageAnswer(index,page);
           return passages.length?await answerEvidence(index,messages,env,passages):missingBillAnswer(index,messages);
         }
         return converse({...await sourceStore.corpus(release),currentDate:new Date().toISOString()},messages,env);
