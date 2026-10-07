@@ -187,6 +187,23 @@ test('last meeting agenda uses a past meeting even when a future agenda is poste
   const future=await getLiveMeetingEvidence(ask('What is on the latest Faculty Senate agenda?'),{fetcher,now});
   assert.equal(future.nextMeeting.date,'2026-10-15');
 });
+test('last meeting excludes today until its stated window ends while posted agendas remain independent',async()=>{
+  const fetcher=makeFetcher(schedule({agenda:docURL}),{[exportURL]:agendaText});
+  for(const instant of ['2026-10-15T13:00:00Z','2026-10-15T20:00:00Z']){
+    const check=new Date(instant),last=await getLiveMeetingEvidence(ask('When was the last Faculty Senate meeting?'),{fetcher,now:check});
+    assert.equal(last.nextMeeting.date,'2026-09-17',instant);
+    const messages=[...ask('When was the last Faculty Senate meeting?'),{role:'assistant',content:'The schedule lists September 17.'},{role:'user',content:'What was on its agenda?'}];
+    assert.equal((await getLiveMeetingEvidence(messages,{fetcher,now:check})).nextMeeting.date,'2026-09-17');
+  }
+  const end=await getLiveMeetingEvidence(ask('When was the last Faculty Senate meeting?'),{fetcher,now:new Date('2026-10-15T21:00:00Z')});
+  assert.equal(end.nextMeeting.date,'2026-10-15');
+  const unknownWindow=await getLiveMeetingEvidence(ask('When was the last Faculty Senate meeting?'),{fetcher:makeFetcher(schedule().replace('3:00 – 5:00PM','during the afternoon')),now:new Date('2026-10-15T23:00:00Z')});
+  assert.equal(unknownWindow.nextMeeting.date,'2026-09-17');
+  const latest=await getLiveMeetingEvidence(ask('What is the latest posted Faculty Senate agenda?'),{fetcher,now:new Date('2026-10-15T13:00:00Z')});
+  assert.equal(latest.nextMeeting.date,'2026-10-15');assert.equal(latest.status,'agenda-read');
+  const dated=await getLiveMeetingEvidence(ask('What is on the October 15, 2026 Faculty Senate agenda?'),{fetcher,now:new Date('2026-10-15T13:00:00Z')});
+  assert.equal(dated.nextMeeting.date,'2026-10-15');
+});
 test('an unavailable linked agenda retains verified date but never claims its contents',async()=>{
   const result=await getLiveMeetingEvidence(ask('What is on the next agenda?'),{fetcher:makeFetcher(schedule({agenda:docURL})),now});
   assert.equal(result.status,'agenda-unavailable');assert.equal(result.evidence.length,1);assert.equal(result.nextMeeting.date,'2026-10-15');assert.match(liveMeetingFallback(result).answer,/couldn’t read the linked agenda/);

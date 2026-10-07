@@ -181,7 +181,9 @@ export async function getLiveMeetingEvidence(messages,{fetcher=fetch,now=new Dat
   const today=easternDate(now),orientation=/\borientation\b/i.test(latestQuestion(messages)),candidateRows=rows.filter(r=>!r.cancelled&&(orientation||!r.orientation));
   const hasFivePM=/3:00\s*[–—-]\s*5:00\s*(?:p\.?m\.?|PM)/i.test(htmlToText(mainContent(html)));
   const upcoming=candidateRows.filter(r=>r.date>today.date||r.date===today.date&&(!hasFivePM||today.minutes<17*60));
-  const past=candidateRows.filter(r=>r.date<=today.date);
+  // "Last meeting" means the most recent listed meeting whose scheduled
+  // window has ended. Without a stated end time, a same-day row stays current.
+  const past=candidateRows.filter(r=>r.date<today.date||r.date===today.date&&hasFivePM&&today.minutes>=17*60);
   const question=latestQuestion(messages),scope=requestedScope(messages,now);
   result.requestedPeriod=scope;
   const asksNext=/\b(?:next|upcoming)\b/i.test(question)||!requestedPeriod(question,now)&&/\b(?:next|upcoming)\b/i.test(topicQuestion(messages)),upcomingMatches=upcoming.filter(r=>matchesScope(r,scope));
