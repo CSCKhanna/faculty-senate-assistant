@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
-test('OCR cache shares document inputs, coalesces parallel page work, and safely removes transient renders',()=>{
+test('OCR cache seeds verified public text safely, shares document inputs, and removes transient renders',()=>{
   const result=spawnSync(process.env.REFRESH_PYTHON||'python3',['tests/ocr_cache_test.py'],{
     cwd:new URL('..',import.meta.url),encoding:'utf8',env:{...process.env,PYTHONDONTWRITEBYTECODE:'1'}
   });

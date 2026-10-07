@@ -1,7 +1,7 @@
 """Audit all published Senate pages/posts and their public linked documents/trackers.
 Raw download caches stay outside the repository. No authenticated downloads.
 """
-import concurrent.futures as cf, datetime as dt, hashlib, io, json, os, pathlib, re, urllib.parse as up, subprocess, threading, shutil
+import concurrent.futures as cf, datetime as dt, hashlib, io, json, os, pathlib, re, urllib.parse as up, subprocess, threading, shutil, tempfile
 from html.parser import HTMLParser
 import build_index as core
 ROOT=core.ROOT
@@ -83,6 +83,42 @@ def image_text_needed(page):
  return substantial
 
 _ocr_lock=threading.Lock();_ocr_engine=None
+
+def seed_ocr_bootstrap(pack_path=None):
+ # This small public pack contains only OCR text already in the published
+ # corpus. The freshly downloaded PDF's hash still determines every cache hit.
+ pack_path=pathlib.Path(pack_path) if pack_path is not None else ROOT/'data/ocr-bootstrap.json'
+ if not pack_path.exists():return 0
+ if pack_path.stat().st_size>5000000:raise ValueError('OCR bootstrap exceeds the size limit')
+ pack=json.loads(pack_path.read_text(encoding='utf-8'))
+ if not isinstance(pack,dict) or pack.get('version')!=1 or not isinstance(pack.get('sourceSnapshot'),str):raise ValueError('Invalid OCR bootstrap metadata')
+ try:dt.datetime.fromisoformat(pack['sourceSnapshot'].replace('Z','+00:00'))
+ except ValueError:raise ValueError('Invalid OCR bootstrap snapshot date')
+ pages=pack.get('pages')
+ if not isinstance(pages,dict) or len(pages)>5000:raise ValueError('Invalid OCR bootstrap page count')
+ validated=[]
+ for key,rows in pages.items():
+  match=re.fullmatch(r'[a-f0-9]{64}-([1-9][0-9]{0,4})',key)
+  if not match or int(match[1])>10000:raise ValueError('Invalid OCR bootstrap page key')
+  if not isinstance(rows,list) or not 0<len(rows)<=2000 or any(not isinstance(row,str) or len(row)>10000 for row in rows):raise ValueError('Invalid OCR bootstrap text rows')
+  if sum(map(len,rows))>100000 or not any(row.strip() for row in rows):raise ValueError('Invalid OCR bootstrap page text')
+  validated.append((key,rows))
+ # Finish validating the whole pack before creating anything in the cache.
+ seeded=0
+ for key,rows in validated:
+  out=CACHE/(key+'-ocr.json')
+  if out.exists():continue
+  temporary=None
+  try:
+   with tempfile.NamedTemporaryFile(mode='w',encoding='utf-8',dir=CACHE,prefix='ocr-seed-',suffix='.tmp',delete=False) as file:
+    temporary=pathlib.Path(file.name);json.dump(rows,file,ensure_ascii=False,separators=(',',':'))
+   # Linking an already completed temporary file is atomic and cannot replace
+   # a result another process created after the existence check.
+   try:os.link(temporary,out);seeded+=1
+   except FileExistsError:pass
+  finally:
+   if temporary is not None:temporary.unlink(missing_ok=True)
+ return seeded
 
 def cleanup_legacy_ocr_inputs():
  # Older runs copied the complete document for every OCR page. Only remove
@@ -168,6 +204,8 @@ def read(url,label):
 
 def main():
  os.environ.setdefault('SENATE_REFRESH','1')
+ seeded=seed_ocr_bootstrap()
+ if seeded:print('Seeded',seeded,'previously published OCR pages into the content-hash cache',flush=True)
  cleaned=cleanup_legacy_ocr_inputs()
  if cleaned:print('Removed',cleaned,'completed legacy OCR render inputs from cache',flush=True)
  pending={core.SENATE:'Faculty Senate'};published=[];issues=[];seen=set();items={};labels={};tracker_ids=set()
