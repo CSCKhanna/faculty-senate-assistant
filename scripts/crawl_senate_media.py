@@ -23,7 +23,7 @@ def main():
  if not snapshot.get('publishedPages') or not any(x['url']==c.core.SENATE for x in snapshot['items']):raise ValueError('No freshly crawled public Senate page inventory for image extraction')
  previous_path=c.ROOT/'data/senate-media-text.json'
  previous=json.loads(previous_path.read_text()) if previous_path.exists() else {'items':[]}
- items=[];gaps=[];videos=[];engine=None;failed_parents=set();seen_images=set()
+ items=[];gaps=[];videos=[];engine=None;failed_parents=set();seen_images=set();references={};image_failures={}
  pages=[x for x in snapshot['items'] if x['kind']=='Faculty Senate website' and up.urlsplit(x['url']).netloc=='web.uri.edu' and up.urlsplit(x['url']).path.startswith('/facsen/')]
  if not snapshot.get('discovery',{}).get('complete'):
   gaps.append({'url':c.core.SENATE,'reason':'Website image refresh incomplete; published page discovery was incomplete.'})
@@ -41,6 +41,11 @@ def main():
    p.feed(raw.decode('utf-8','replace'))
   except Exception as e:
    failed_parents.add(parent);gaps.append({'url':parent,'reason':'Website image refresh incomplete; page HTML unavailable: '+str(e)[:120]});continue
+  references[parent]=set()
+  for u in p.images:
+   u=c.normalize(u,parent)
+   if u and up.urlsplit(u).netloc=='web.uri.edu' and '/wp-content/themes/' not in u and '/wp-content/plugins/' not in u:
+    references[parent].add(up.quote(u,safe=':/?#&%='))
   videos.extend({'url':u,'page':parent,'reason':'Instructional video: no transcript imported; use the original video.'} for u in p.videos)
   if parent==c.core.SENATE or any(x in parent for x in ('/people/','/committees/')):continue
   for u in p.images:
@@ -57,11 +62,22 @@ def main():
       from rapidocr_onnxruntime import RapidOCR
       engine=RapidOCR(intra_op_num_threads=4,inter_op_num_threads=1)
      result,_=engine(str(file));lines=[row[1] for row in result or []];out.write_text(json.dumps(lines))
+    lines=[line for line in lines if isinstance(line,str) and line.strip()]
     if lines:
      items.append({'url':u,'parent':parent,'title':page['title']+' — '+up.unquote(up.urlsplit(u).path.rsplit('/',1)[-1]),'kind':'Faculty Senate website image','lines':lines,'fetchedAt':json.loads((c.CACHE/(key+'.json')).read_text())['fetchedAt']});print('Image indexed',u,flush=True)
-   except Exception as e:gaps.append({'url':u,'reason':str(e)[:180]})
+    else:image_failures[u]='Website image refresh incomplete; the current image has no detected readable text. Earlier extracted text is retained for review.'
+   except Exception as e:
+    image_failures[u]='Website image refresh incomplete; '+str(e)[:140]
+    gaps.append({'url':u,'reason':image_failures[u]})
  for image in previous['items']:
-  if image['parent'] in failed_parents and not any(x['url']==image['url'] for x in items):
-   items.append(image);gaps.append({'url':image['url'],'reason':'Website image refresh incomplete; retaining the earlier extraction because its parent page was unavailable.'})
+  if any(x['url']==image['url'] for x in items):continue
+  reason=image_failures.get(image['url'])
+  if image['parent'] in failed_parents:
+   reason='Website image refresh incomplete; its parent page is missing from the freshly readable snapshot. Earlier extracted text is retained for review.'
+  elif image['parent'] in references and image['url'] not in references[image['parent']]:
+   reason='Website image refresh incomplete; the current parent page no longer references this image. Earlier extracted text is retained for review.'
+  if reason:
+   items.append(image)
+   if not any(g['url']==image['url'] for g in gaps):gaps.append({'url':image['url'],'reason':reason})
  result={'builtAt':c.STAMP,'items':items,'gaps':gaps,'videos':videos};(c.ROOT/'data/senate-media-text.json').write_text(json.dumps(result,ensure_ascii=False));print(json.dumps({'images':len(items),'gaps':len(gaps),'videos':len(videos)}))
 if __name__=='__main__':main()

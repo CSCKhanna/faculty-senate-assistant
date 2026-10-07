@@ -145,6 +145,57 @@ class RefreshTests(unittest.TestCase):
             self.assertTrue(any(g['url'] == old_url for g in current_coverage['website']['gaps']))
             self.assertFalse(any(g['url'] == fresh_url for g in current_coverage['website']['gaps']))
 
+    def test_empty_ocr_or_removed_image_retains_qualified_old_text_only(self):
+        import crawl_senate_media as media
+        for case in ('empty-ocr', 'removed-reference', 'missing-parent'):
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = pathlib.Path(directory)
+                previous, coverage, toolkit, senate = self.staged_inputs(root)
+                toolkit['pages'] = json.loads((root / 'data/toolkit-pages.json').read_text())['pages']
+                parent = SENATE + 'curriculum/help/'
+                old_url, good_url = SENATE + 'uploads/old-guidance.png', SENATE + 'uploads/current-guidance.png'
+                old_image = self.stage_image(root, previous, old_url); old_image['parent'] = parent
+                if case == 'missing-parent': old_image['parent'] = SENATE + 'retired-page/'
+                good_image = self.stage_image(root, previous, good_url); good_image['parent'] = SENATE + 'retired-page/'
+                write_json(root / 'data/senate-media-text.json', {'items': [old_image, good_image], 'gaps': [], 'videos': []})
+                senate['publishedPages'].append(parent)
+                senate['items'].append({**source(parent, NEW), 'title': 'Curriculum help', 'lines': ['Current guidance'], 'ocrPages': []})
+                write_json(root / 'data/senate-text.json', senate)
+                cache = root / 'cache'; cache.mkdir()
+                html = '<main><img src="'+good_url+'">' + ('<img src="'+old_url+'">' if case == 'empty-ocr' else '') + '</main>'
+                for url, text in ((SENATE, '<main>Home</main>'), (parent, html)):
+                    key = hashlib.sha256(url.encode()).hexdigest()
+                    (cache / (key + '.bin')).write_text(text)
+                    write_json(cache / (key + '.json'), {'fetchedAt': NEW, 'type': 'text/html'})
+                image_bytes = {old_url: b'Current image without detected text', good_url: b'Current readable image'}
+                for url, raw in image_bytes.items():
+                    write_json(cache / (hashlib.sha256(raw).hexdigest() + '-image-ocr.json'), [] if url == old_url else ['Current readable guidance'])
+                def fetch(url):
+                    raw = image_bytes[url]; key = hashlib.sha256(url.encode()).hexdigest()
+                    (cache / (key + '.bin')).write_bytes(raw)
+                    write_json(cache / (key + '.json'), {'fetchedAt': NEW})
+                    return raw, 'image/png'
+                with patch.object(media.c, 'ROOT', root), patch.object(media.c, 'CACHE', cache), patch.object(media.c, 'STAMP', NEW), patch.object(media.c, 'cached', side_effect=fetch):
+                    media.main()
+                extracted = json.loads((root / 'data/senate-media-text.json').read_text())
+                self.assertEqual(next(i for i in extracted['items'] if i['url'] == old_url)['fetchedAt'], OLD)
+                self.assertTrue(any(g['url'] == old_url and g['reason'].startswith('Website image refresh incomplete') for g in extracted['gaps']))
+                self.assertFalse(any(g['url'] == good_url for g in extracted['gaps']))
+                with patch('merge_senate.ocr_spacing', side_effect=lambda line: line):
+                    refresh = assemble(root, toolkit, senate, NEW, coverage)
+                self.assertEqual(refresh['status'], 'partial')
+                self.assertTrue(refresh['websiteChecked'])
+                result = json.loads((root / 'data/index.json').read_text())
+                retained = next(s for s in result['sources'] if s['url'] == old_url)
+                fresh = next(s for s in result['sources'] if s['url'] == good_url)
+                self.assertEqual(retained['fetchedAt'], OLD)
+                self.assertEqual(retained['refreshStatus'], 'unavailable')
+                self.assertEqual(retained['lastRefreshAttemptAt'], NEW)
+                self.assertIn('last readable snapshot', retained['notice'])
+                self.assertEqual(fresh['fetchedAt'], NEW)
+                self.assertNotIn('refreshStatus', fresh)
+                self.assertNotIn('last readable snapshot', fresh['notice'])
+
     def test_legacy_public_uri_http_reference_is_upgraded_without_redating(self):
         original = index('http://web.uri.edu/honors')
         upgraded = normalize_legacy_uri_urls(original)
