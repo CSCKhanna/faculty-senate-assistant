@@ -27,7 +27,7 @@ The app offers a reviewed email draft to Genviéve Spitale (`genvieve.spitale@ur
 
 ## Limits and hosting
 
-The Worker uses the existing D1 usage database, `faculty-senate-pilot-usage`. The pilot allows 100 requests per UTC day across all users and eight requests per minute per network. These limits remain in place; they do not guarantee a fixed dollar spend. Claude Opus model: `its_direct/pt3-claude-opus-5.5-1m-us`. Requests use the model’s default temperature and the existing structured JSON response format.
+The Worker uses the existing D1 usage database, `faculty-senate-pilot-usage`. The pilot allows 100 requests per UTC day across all users and eight requests per minute per network. These limits remain in place; they do not guarantee a fixed dollar spend. Claude Opus model: `its_direct/pt3-claude-opus-5.5-1m-us`. Requests use the model’s default temperature and the existing structured JSON response format. PDF answers have a 55-second gateway limit; other answers retain 45 seconds. Live source checks plus the PDF limit fit inside the browser’s 75-second request limit. Failure diagnostics record only the processing stage and a bounded error category or HTTP status, never questions, credentials, or response content.
 
 The Worker permits the configured GitHub origin. Credentials are used only in the gateway Authorization header. Indexed source downloads come from the public GitHub corpus; live meeting and agenda downloads go directly to public URI and Google Docs/Drive pages. These public source requests contain no credentials or conversation text. Generated links and source IDs are checked against retrieved evidence.
 
