@@ -74,6 +74,25 @@ test('bill academic years do not constrain the next meeting year',async()=>{
     assert.equal(result.nextMeeting.date,'2026-10-15');assert.equal(result.requestedPeriod,null);
   }
 });
+test('an explicit academic year uses the existing July through June period',async()=>{
+  const html=futureSchedule().replace('</table>','<tr><td>June 30, 2027</td><td>Hope Room</td><td>Agenda</td></tr><tr><td>July 1, 2027</td><td>Hope Room</td><td>Agenda</td></tr><tr><td>June 30, 2028</td><td>Hope Room</td><td>Agenda</td></tr><tr><td>July 1, 2028</td><td>Hope Room</td><td>Agenda</td></tr></table>');
+  for(const period of ['the 2027-2028 academic year','academic year 2027–2028','AY 2027–28']){
+    const question=`When is the next Faculty Senate meeting in ${period}?`;
+    assert.equal(isLiveMeetingQuestion(ask(question),now),true,question);
+    const result=await getLiveMeetingEvidence(ask(question),{fetcher:makeFetcher(html),now});
+    assert.equal(result.nextMeeting.date,'2027-07-01');assert.equal(result.requestedPeriod.type,'academic-year');assert.equal(result.requestedPeriod.startDate,'2027-07-01');assert.equal(result.requestedPeriod.endDate,'2028-06-30');
+  }
+  const lastDay=await getLiveMeetingEvidence(ask('When is the next Faculty Senate meeting in the 2027-2028 academic year?'),{fetcher:makeFetcher(html),now:new Date('2028-06-30T12:00:00Z')});
+  assert.equal(lastDay.nextMeeting.date,'2028-06-30');
+  assert.equal(isLiveMeetingQuestion(ask('What was on the Faculty Senate agenda in the 2025-2026 academic year?'),now),false);
+});
+test('an unlisted future academic year does not borrow earlier calendar-year meetings',async()=>{
+  const question='When is the next Faculty Senate meeting in the 2027-2028 academic year?',result=await getLiveMeetingEvidence(ask(question),{fetcher:makeFetcher(futureSchedule()),now});
+  assert.equal(result.status,'no-upcoming-meeting');assert.equal(result.nextMeeting,null);assert.equal(result.requestedPeriod.label,'2027–2028 academic year');
+  assert.match(result.evidence[0].p.text,/matching the requested period 2027–2028 academic year/);assert.match(liveMeetingFallback(result).answer,/for 2027–2028 academic year/);assert.doesNotMatch(liveMeetingFallback(result).answer,/January 28|February 18|March 18/);
+  const followUp=[...ask(question),{role:'assistant',content:'The current schedule does not list a meeting in that academic year.'},{role:'user',content:'Is an agenda available?'}];
+  assert.equal((await getLiveMeetingEvidence(followUp,{fetcher:makeFetcher(futureSchedule()),now})).nextMeeting,null);
+});
 test('future row without agenda does not reuse the old agenda or Zoom link',async()=>{
   const calls=[],result=await getLiveMeetingEvidence(ask('What is on the next meeting agenda?'),{fetcher:makeFetcher(schedule(),{},calls),now});
   assert.equal(result.status,'agenda-not-posted');assert.equal(result.nextMeeting.date,'2026-10-15');assert.equal(result.checkedAt,now.toISOString());assert.equal(calls.length,1);

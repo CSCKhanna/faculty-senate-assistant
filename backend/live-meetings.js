@@ -13,13 +13,21 @@ const MONTH_YEAR_PATTERN=/\b(January|February|March|April|May|June|July|August|S
 function requestedPeriod(text){
   const clean=removeBillDates(text),writtenDate=clean.match(DATE_PATTERN);
   if(writtenDate){const date=parseMeetingDate(writtenDate[0]);return date?{type:'date',...date}:{type:'invalid-date',label:writtenDate[0]};}
+  const academic=clean.match(/\b(20\d{2})\s*[-–—]\s*(20\d{2}|\d{2})\s+(?:academic|school)\s+year\b/i)
+    ||clean.match(/\b(?:academic|school)\s+year\s*:?\s*(20\d{2})\s*[-–—]\s*(20\d{2}|\d{2})\b/i)
+    ||clean.match(/\bAY\s*(20\d{2})\s*[-–—]\s*(20\d{2}|\d{2})\b/i);
+  if(academic){
+    const start=Number(academic[1]),end=academic[2].length===2?Math.floor(start/100)*100+Number(academic[2]):Number(academic[2]),label=`${start}–${end} academic year`;
+    // Keep the same July–June year classification as conversation.academicYear.
+    return end===start+1?{type:'academic-year',startDate:`${start}-07-01`,endDate:`${end}-06-30`,label}:{type:'invalid-period',label};
+  }
   const month=clean.match(MONTH_YEAR_PATTERN);
   if(month){const index=MONTHS.findIndex(s=>s.startsWith(month[1].toLowerCase().slice(0,3))),year=month[2];return {type:'month',month:`${year}-${String(index+1).padStart(2,'0')}`,label:`${MONTHS[index][0].toUpperCase()+MONTHS[index].slice(1)} ${year}`};}
   const year=clean.match(/\b(20\d{2})\b/);
   return year?{type:'year',year:year[1],label:year[1]}:null;
 }
 function requestedScope(messages){return requestedPeriod(latestQuestion(messages))||requestedPeriod(topicQuestion(messages));}
-function matchesScope(row,scope){return !scope||scope.type==='date'&&row.date===scope.date||scope.type==='month'&&row.date.startsWith(scope.month+'-')||scope.type==='year'&&row.date.startsWith(scope.year+'-');}
+function matchesScope(row,scope){return !scope||scope.type==='date'&&row.date===scope.date||scope.type==='month'&&row.date.startsWith(scope.month+'-')||scope.type==='year'&&row.date.startsWith(scope.year+'-')||scope.type==='academic-year'&&row.date>=scope.startDate&&row.date<=scope.endDate;}
 
 function latestQuestion(messages){return messages.filter(m=>m.role==='user').at(-1)?.content||'';}
 function topicQuestion(messages){
@@ -35,7 +43,7 @@ function topicQuestion(messages){
 }
 export function isLiveMeetingQuestion(messages,now=new Date()){
   const latest=latestQuestion(messages),topic=topicQuestion(messages);
-  const today=easternDate(now).date,scope=requestedScope(messages),currentPeriod=scope&&(scope.type==='date'?scope.date>=today:scope.type==='month'?scope.month>=today.slice(0,7):scope.type==='year'?scope.year>=today.slice(0,4):false);
+  const today=easternDate(now).date,scope=requestedScope(messages),currentPeriod=scope&&(scope.type==='date'?scope.date>=today:scope.type==='month'?scope.month>=today.slice(0,7):scope.type==='year'?scope.year>=today.slice(0,4):scope.type==='academic-year'?scope.endDate>=today:false);
   const currentQuery=Boolean(currentPeriod)||/\b(?:next|upcoming|current)\b/i.test(latest)&&!scope;
   if(!latest||historicQuestion(latest)&&!currentQuery||historicQuestion(topic)&&!currentQuery&&!LIVE.test(latest))return false;
   if(OTHER_COMMITTEE.test(latest)&&!/\bfaculty senate\b/i.test(latest)||(!/\bfaculty senate\b/i.test(latest)&&OTHER_COMMITTEE.test(topic)))return false;
