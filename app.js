@@ -185,7 +185,7 @@ async function loadInventory(){
   return inventoryPromise;
 }
 function openSources(){$('#source-dialog').showModal();loadInventory();}
-for(const id of ['sources-button','sources-mobile','about-service'])$('#'+id).addEventListener('click',openSources);
+for(const id of ['sources-button','sources-mobile'])$('#'+id).addEventListener('click',openSources);
 $('#close-dialog').addEventListener('click',()=>$('#source-dialog').close());
 $('#source-dialog').addEventListener('click',e=>{if(e.target===$('#source-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}});
 if(window.visualViewport){const viewport=()=>document.documentElement.style.setProperty('--viewport-height',window.visualViewport.height+'px');window.visualViewport.addEventListener('resize',viewport);viewport();}

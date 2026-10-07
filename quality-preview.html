@@ -64,7 +64,7 @@ dialog{width:min(850px,calc(100vw - 32px));max-height:90dvh;border:0;border-radi
           </section>
         </section>
         <div class="connection-status"><div id="load-status" class="status" role="status">Connecting to Senate resources…</div><button id="reconnect" type="button" hidden>Reconnect AI</button></div><div id="action-status" class="sr-only" role="status"></div>
-        <footer class="page-foot">QA preview: simulated replies; no AI requests. <button id="about-service" type="button">About this pilot & privacy</button><span class="privacy-line">Messages are processed through URI’s AI gateway. This visit is preserved only in this browser tab. Email drafts are never sent automatically.</span></footer>
+        <footer class="page-foot">QA preview: simulated replies; no AI requests. <span class="privacy-line">Messages are processed through URI’s AI gateway. This visit is preserved only in this browser tab. Email drafts are never sent automatically.</span></footer>
       </div>
     </main>
   </div>
@@ -1117,7 +1117,7 @@ function openSources() {
   $("#source-dialog").showModal();
   loadInventory();
 }
-for (const id of ["sources-button", "sources-mobile", "about-service"]) $("#" + id).addEventListener("click", openSources);
+for (const id of ["sources-button", "sources-mobile"]) $("#" + id).addEventListener("click", openSources);
 $("#close-dialog").addEventListener("click", () => $("#source-dialog").close());
 $("#source-dialog").addEventListener("click", (e) => {
   if (e.target === $("#source-dialog")) {
