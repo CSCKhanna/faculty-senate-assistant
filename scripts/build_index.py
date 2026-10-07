@@ -7,6 +7,7 @@ import concurrent.futures as cf
 import datetime as dt
 import io
 import json
+import os
 import pathlib
 import re
 import time
@@ -14,7 +15,7 @@ import urllib.parse as up
 import urllib.request as ur
 from html.parser import HTMLParser
 
-ROOT = pathlib.Path(__file__).resolve().parents[1]
+ROOT = pathlib.Path(os.environ.get('SOURCE_ROOT') or pathlib.Path(__file__).resolve().parents[1]).resolve()
 NOTION = 'https://gilded-toucan-d8a.notion.site'
 SENATE = 'https://web.uri.edu/facsen/'
 TOOLKIT = '3a57535b-f92c-80c7-8bac-d5b49e9c6c12'

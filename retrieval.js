@@ -1,6 +1,6 @@
-import {hydrateEvidence} from './corpus.js?v=2';
-import {buildSearch,tokens} from './search.js?v=8';
-import {activeMessages,isFollowUp,expandQuestion,academicYear} from './conversation.js?v=3';
+import {hydrateEvidence} from './corpus.js?v=3';
+import {buildSearch,tokens} from './search.js?v=9';
+import {activeMessages,isFollowUp,expandQuestion,academicYear} from './conversation.js?v=4';
 
 const searchCache=new WeakMap(),metadataCache=new WeakMap();
 function metadata(data){
@@ -20,14 +20,14 @@ export function retrieve(data,messages){
   const meta=metadata(data),{registry,bySource,byTitle,byHeading}=meta;
   const allUsers=messages.filter(m=>m.role==='user'),users=allUsers.length>4?[allUsers[0],...allUsers.slice(-3)]:allUsers;
   const search=searchCache.get(data);
-  const latest=expandQuestion(users.at(-1).content,data.builtAt);
+  const latest=expandQuestion(users.at(-1).content,data.currentDate||data.builtAt);
   // A short reply needs the question the assistant just asked as well as the user's topic.
   const previous=messages.slice(0,-1).filter(m=>m.role==='assistant').at(-1)?.content||'';
-  const combined=users.map(m=>expandQuestion(m.content,data.builtAt)).join(' ');
+  const combined=users.map(m=>expandQuestion(m.content,data.currentDate||data.builtAt)).join(' ');
   // Assistant prose can contain many unrelated names and dates. Only use its
   // last question for a short reply, and keep factual retrieval on user topics.
   const asked=previous.split(/\n/).at(-1)||'';
-  const queries=[combined,...users.slice(0,-1).reverse().map(m=>expandQuestion(m.content,data.builtAt))];
+  const queries=[combined,...users.slice(0,-1).reverse().map(m=>expandQuestion(m.content,data.currentDate||data.builtAt))];
   if(users.length===1||!isFollowUp(latest))queries.unshift(latest);
   if(latest.length<60&&asked.endsWith('?'))queries.push(latest+' '+asked.slice(0,250));
   if(/temporary/i.test(combined)&&/permanent/i.test(combined))queries.splice(1,0,'course modification start proposal');
@@ -92,7 +92,7 @@ export function retrieve(data,messages){
   }
   if(/after.*approv|once.*approv/i.test(latest)&&!guide){const p=(byTitle.get('When will my proposal be approved?')||[]).find(p=>/after the Senate Meeting/.test(p.heading));if(p)priority.push({p,source:registry.get(p.source)});}
   if(/contact|staff|office|located|location|address|phone|email/i.test(latest)&&/faculty senate|spitale|genvi[eé]ve/i.test(latest))for(const title of ['Staff','Contact'])priority.push(...(byTitle.get(title)||[]).slice(1).map(p=>({p,source:registry.get(p.source)})));
-  const entityQuestion=users.length>1&&isFollowUp(latest)?expandQuestion(users[0].content,data.builtAt):latest;
+  const entityQuestion=users.length>1&&isFollowUp(latest)?expandQuestion(users[0].content,data.currentDate||data.builtAt):latest;
   const entity=tokens(entityQuestion).filter(w=>!new Set('approval program major degree status proposal happened academic year last current any not approved start denied rejected bs ba ms phd'.split(' ')).has(w)&&!/^\d+$/.test(w));
   if(/approval|approved|status|happened|track/i.test(combined)&&entity.length){
     const year=latest.match(/(20\d{2})\s*[-–]\s*(20\d{2}|\d{2})/)?.[1];
@@ -117,10 +117,10 @@ function trackerYear(source){return Math.max(...(source.title.match(/20\d{2}/g)|
 // For a year-wide status question, inspect every primary program row before
 // producing a summary. Ranked excerpts cannot establish an exhaustive result.
 export async function gatherEvidence(data,messages,fetcher=fetch){
-  const scoped=activeMessages(messages),q=expandQuestion(scoped.at(-1).content,data.builtAt);
+  const scoped=activeMessages(messages),q=expandQuestion(scoped.at(-1).content,data.currentDate||data.builtAt);
   let passages=await hydrateEvidence(data,retrieve(data,messages),fetcher);
   if(!/\b(?:any|all|which|how many)\b/i.test(q)||!/program/i.test(q)||!/not approved|denied|rejected|status|pending|incomplete/i.test(q))return passages;
-  const year=q.match(/(20\d{2})\s*[-–]\s*(20\d{2}|\d{2})/)?.[1]||academicYear(data.builtAt).current.split('-')[0];
+  const year=q.match(/(20\d{2})\s*[-–]\s*(20\d{2}|\d{2})/)?.[1]||academicYear(data.currentDate||data.builtAt).current.split('-')[0];
   const source=data.sources.find(s=>s.kind==='Faculty Senate proposal tracker'&&s.title.includes(year));
   if(!source)return passages;
   const primary=data.passages.filter(p=>p.source===source.url&&/Sheet: [BC]\./.test(p.heading)&&/\| Row \d+ \|/.test(p.heading));

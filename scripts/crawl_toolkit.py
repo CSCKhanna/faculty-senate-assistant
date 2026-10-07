@@ -3,7 +3,7 @@ Raw cache stays outside the public repository. TOOLKIT_CACHE can reuse a reviewe
 """
 import datetime as dt
 import importlib.util,json,pathlib,concurrent.futures as cf,urllib.parse as up,urllib.request as ur,re,hashlib,time,os,tempfile
-ROOT=pathlib.Path(__file__).resolve().parents[1]; CACHE=pathlib.Path(os.environ.get('TOOLKIT_CACHE') or tempfile.mkdtemp(prefix='senate-toolkit-'));CACHE.mkdir(parents=True,exist_ok=True)
+ROOT=pathlib.Path(os.environ.get('SOURCE_ROOT') or pathlib.Path(__file__).resolve().parents[1]).resolve(); CACHE=pathlib.Path(os.environ.get('TOOLKIT_CACHE') or tempfile.mkdtemp(prefix='senate-toolkit-'));CACHE.mkdir(parents=True,exist_ok=True)
 spec=importlib.util.spec_from_file_location('idx',ROOT/'scripts/build_index.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 blocks={};collections={};views={};queried=set();loaded=set();failed={};assets={};links={};rowids=set();catalog={};source_lines={}
 def merge(j):
@@ -12,7 +12,7 @@ def merge(j):
   for k,v in rm.get(table,{}).items():dest[k]=m.unpack(v)
 def request(name,endpoint,payload):
  f=CACHE/(name+'.json')
- if f.exists():return json.loads(f.read_text())
+ if f.exists() and os.environ.get('TOOLKIT_REFRESH')!='1':return json.loads(f.read_text())
  raw,_=m.fetch(m.NOTION+'/api/v3/'+endpoint,payload);j=json.loads(raw);f.write_text(json.dumps(j));return j
 def load(bid):
  if bid in loaded:return

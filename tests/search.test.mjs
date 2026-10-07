@@ -1,8 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
 import {buildSearch,emailLink,conversationContext} from '../search.js';
-const data=JSON.parse(fs.readFileSync(new URL('../data/index.json',import.meta.url)));
+import {data} from './bootstrap-fixture.mjs';
 const search=buildSearch(data);
 test('temporary-to-permanent retrieves the toolkit classification, not a fabricated answer',()=>{
   const r=search('How do I make a temporary course permanent?');

@@ -1,14 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import {loadCorpus,hydrateEvidence} from '../corpus.js';
+import {hydrateEvidence} from '../corpus.js';
 import {retrieve,parseAnswer,validateMessages,converse} from '../backend/chat.js';
 import {conversationContext} from '../search.js';
 import {activeMessages} from '../conversation.js';
 import {billEvidence,isBillQuestion} from '../bills.js';
 import {answerBlocks,sourceUrl} from '../presentation.js';
-const root=new URL('../',import.meta.url),read=p=>JSON.parse(fs.readFileSync(new URL(p,root))),manifest=read('data/corpus-manifest.json');
-const local=async url=>new Response(fs.readFileSync(new URL(url.split('/faculty-senate-assistant/')[1],root))),corpus=await loadCorpus(manifest,local),bills=read(read('data/bills-manifest.json').path);
+import {data,read,manifest,local,corpus,bills} from './bootstrap-fixture.mjs';
 const m=q=>[{role:'user',content:q}];
 const cases=[
  ['How do I make a temporary course permanent?','Course Modification Proposal Walkthrough',/Propose Changes/],
@@ -94,8 +92,8 @@ test('large alternating conversations keep the anchor and final question within 
  const history=[...m('How do I make a temporary course permanent?')];for(let i=0;i<35;i++){history.push({role:'assistant',content:'Guidance '+i+' '+'.'.repeat(3500)},{role:'user',content:'Tell me more about that course. '+'.'.repeat(3500)});}
  const context=conversationContext(history);validateMessages(context);assert.equal(context[0].content,history[0].content);assert.equal(context.at(-1).content,history.at(-1).content);assert.ok(context.length<=16);assert.ok(context.reduce((n,m)=>n+m.content.length,0)<=20000);
 });
-test('the complete published corpus matches every source passage, not just spot checks',()=>{
- const full=read('data/index.json');let count=0;
+test('the retained bootstrap corpus matches every source passage, not just spot checks',()=>{
+ const full=data;let count=0;
  for(let shard=0;shard<Math.ceil(full.passages.length/corpus.shardSize);shard++){
   const texts=read(corpus.corpusBase+'/text-'+shard+'.json');
   for(let offset=0;offset<texts.length;offset++){const id=shard*corpus.shardSize+offset;assert.equal(texts[offset],full.passages[id].text);assert.equal(corpus.passages[id].source,full.passages[id].source);assert.equal(corpus.passages[id].heading,full.passages[id].heading);count++;}

@@ -1,8 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
 import {validateMessages,retrieve,parseAnswer,converse,gatherEvidence} from '../backend/chat.js';
-const data=JSON.parse(fs.readFileSync(new URL('../data/index.json',import.meta.url)));
+import {data} from './bootstrap-fixture.mjs';
 test('follow-up retains the proposal subject for retrieval',()=>{
   const messages=[{role:'user',content:'How do I make a temporary course permanent?'},{role:'assistant',content:'Use a course modification.'},{role:'user',content:'What happens next?'}];
   const result=retrieve(data,messages);assert.ok(result.some(r=>/modification/i.test(r.p.text)));assert.ok(result.length<=16);

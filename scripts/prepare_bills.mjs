@@ -31,5 +31,5 @@ for(const [passageId,p] of data.passages.entries()){
 }
 const index={builtAt:data.builtAt,corpusBase:manifest.corpusBase,shardSize:100,sources,records,terms,identifiers:byId};
 const content=JSON.stringify(index),hash=crypto.createHash('sha256').update(content).digest('hex').slice(0,12),path=`data/bills-${hash}.json`;
-fs.writeFileSync(path,content);fs.writeFileSync('data/bills-manifest.json',JSON.stringify({builtAt:data.builtAt,path,recordCount:records.length}));
+fs.writeFileSync(path,content);fs.writeFileSync('data/bills-manifest.json',JSON.stringify({builtAt:data.builtAt,corpusBase:manifest.corpusBase,path,recordCount:records.length}));
 console.log(JSON.stringify({path,records:records.length,bytes:Buffer.byteLength(content)}));

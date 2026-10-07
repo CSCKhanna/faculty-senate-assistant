@@ -1,12 +1,14 @@
-import {loadCorpus,hydrateEvidence} from './corpus.js?v=2';
-import {buildSearch,emailLink,conversationContext} from './search.js?v=8';
+import {loadCorpus,hydrateEvidence} from './corpus.js?v=3';
+import {loadSourceRelease} from './source-release.js?v=1';
+import {buildSearch,emailLink,conversationContext} from './search.js?v=9';
 import {renderAnswer,sourceUrl,referenceLabel} from './presentation.js?v=3';
-import {isFollowUp} from './conversation.js?v=3';
+import {isFollowUp} from './conversation.js?v=4';
 import {CHAT_API_URL} from './config.js';
 const $=s=>document.querySelector(s),results=$('#results'),status=$('#load-status'),input=$('#question'),submit=$('#submit'),scroller=$('#chat-scroll'),panel=$('#chat-panel');
 const VISIT_KEY='senate-assistant-visit-v1:'+location.pathname,BASE=new URL('./',location.href).href;
 let manifest,data,search,indexPromise,inventoryPromise,question='',messages=[],records=[],busy=false,connected=false,ready=false,lastAnswer,quotaUntil=0;
 const date=s=>new Date(s).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+const checkedTime=s=>new Date(s).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'});
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;}
 function link(label,url,cls){const n=el('a',label,cls);n.href=url;if(!url.startsWith('mailto:')){n.target='_blank';n.rel='noopener noreferrer';}return n;}
 function button(label,action,cls){const n=el('button',label,cls);n.type='button';n.addEventListener('click',action);return n;}
@@ -41,6 +43,10 @@ function messageBubble(role,text){
 function emailAction(original=question){return link('Email Genviéve with the original question',emailLink(original),'chat-email');}
 function renderResponse(bubble,answer){
   bubble.querySelector('.chat-text')?.remove();bubble.append(renderAnswer(answer.answer,answer.sources));
+  if(answer.liveMeeting){
+    const note=answer.checkedAt&&Number.isFinite(Date.parse(answer.checkedAt))?'Meeting sources checked '+checkedTime(answer.checkedAt)+'.':'Live meeting information could not be checked. Please retry or open the Senate meeting page.';
+    bubble.append(el('small',note,'chat-note'));
+  }else if(answer.sourceStatus==='last-good')bubble.append(el('small','The latest source update could not be loaded. This answer uses the last available source snapshot.','chat-note'));
   if(answer.followUp)bubble.append(el('p',answer.followUp,'chat-followup'));
   const sources=answer.sources.filter(sourceUrl);
   if(sources.length){
@@ -61,7 +67,7 @@ function renderResponse(bubble,answer){
     if(answer.escalatable!==false)actions.append(emailAction(answer.originalQuestion||question));bubble.append(actions);if(answer.escalatable!==false)bubble.append(el('small','Opens an unsent draft in your email app. Review it before sending.','chat-note'));
   }else{
     if(answer.kind==='answer')actions.append(button('Copy answer',async e=>{
-      const b=e.currentTarget,plain=answer.answer.replace(/\*\*|`/g,'')+(sources.length?'\n\nSources\n'+sources.map(s=>`[${s.id}] ${referenceLabel(s)} — ${sourceUrl(s)}`).join('\n'):'');
+      const b=e.currentTarget,plain=answer.answer.replace(/\*\*|`/g,'')+(answer.liveMeeting&&answer.checkedAt?'\n\nMeeting sources checked '+checkedTime(answer.checkedAt)+'.':'')+(sources.length?'\n\nSources\n'+sources.map(s=>`[${s.id}] ${referenceLabel(s)} — ${sourceUrl(s)}`).join('\n'):'');
       try{await navigator.clipboard.writeText(plain);b.textContent='Copied';$('#action-status').textContent='Answer and references copied.';}catch{b.textContent='Select answer to copy';$('#action-status').textContent='Clipboard access is unavailable. Select the answer text to copy it.';}
     },'copy-answer'));
     if(answer.kind==='answer'){const help=el('details',undefined,'staff-help');help.append(el('summary','Contact Faculty Senate'),emailAction(answer.originalQuestion||question),el('small','Genviéve Spitale · Specialist | Faculty Senate. Opens an unsent email draft.','chat-note'));actions.append(help);}
@@ -70,14 +76,14 @@ function renderResponse(bubble,answer){
 }
 async function ensureIndex(){
   if(!indexPromise)indexPromise=(async()=>{
-    if(!manifest?.corpusBase){const r=await fetch('data/corpus-manifest.json',{cache:'no-store'});if(!r.ok)throw new Error('Snapshot unavailable');manifest=await r.json();}
+    if(!manifest?.corpusBase)manifest=(await loadSourceRelease(fetch,BASE)).corpus;
     data=await loadCorpus(manifest,fetch,BASE);search=buildSearch(data);return data;
   })().catch(e=>{indexPromise=undefined;throw e;});
   return indexPromise;
 }
 async function sourceAnswer(original){
   await ensureIndex();
-  const {retrieve}=await import('./retrieval.js?v=2');
+  const {retrieve}=await import('./retrieval.js?v=3');
   const found=await hydrateEvidence(data,retrieve(data,conversationContext(messages)).slice(0,8),fetch);
   if(!found.length)return {kind:'unanswered',answer:'I couldn’t find a clear source match for this question. You can add a course code, program name, committee, or academic year, or ask Genviéve using the email option below.',sources:[],followUp:''};
   const unique=[];for(const r of found)if(!unique.some(x=>x.p.source===r.p.source))unique.push(r);
@@ -86,7 +92,7 @@ async function sourceAnswer(original){
 async function requestAnswer(original){
   if(!connected)await checkConnection();
   if(!connected)return sourceAnswer(original);
-  const response=await fetch(CHAT_API_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:conversationContext(messages)}),signal:AbortSignal.timeout(55000)});
+  const response=await fetch(CHAT_API_URL+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:conversationContext(messages)}),signal:AbortSignal.timeout(75000)});
   let answer;try{answer=await response.json();}catch{throw new Error('Invalid response');}
   if(response.status===429&&typeof answer.error==='string'&&/daily/i.test(answer.error)){
     const now=new Date();quotaUntil=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()+1);connected=false;syncMode();
@@ -179,5 +185,5 @@ $('#close-dialog').addEventListener('click',()=>$('#source-dialog').close());
 $('#source-dialog').addEventListener('click',e=>{if(e.target===$('#source-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close();}});
 if(window.visualViewport){const viewport=()=>document.documentElement.style.setProperty('--viewport-height',window.visualViewport.height+'px');window.visualViewport.addEventListener('resize',viewport);viewport();}
 restore();
-await Promise.allSettled([fetch('data/corpus-manifest.json',{cache:'no-store'}).then(async r=>{if(r.ok)manifest=await r.json();}),checkConnection()]);
+await Promise.allSettled([loadSourceRelease(fetch,BASE).then(release=>{manifest=release.corpus;}),checkConnection()]);
 ready=true;syncMode();setBusy(false);

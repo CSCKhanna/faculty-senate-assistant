@@ -1,6 +1,8 @@
 // Scope short replies to their topic while allowing a new question in the same chat.
 export function isFollowUp(text){
   const q=text.trim();
+  // Named meeting questions begin their own topic, including the email anchor.
+  if(/\bfaculty senate\b/i.test(q)&&/\b(?:meetings?|agenda)\b/i.test(q)&&!/^\s*(?:and|what about|how about)\b/i.test(q))return false;
   if(/^(?:yes|no|sure|okay|ok|the prerequisites|the credits|the title|the description)\b/i.test(q))return true;
   if(/\b(?:it|its|their|they|them|those|that|this|next|after that)\b/i.test(q))return true;
   if(/^(?:what(?:'s| is) (?:the )?bill number|is there a bill number|and (?:the )?bill number)[?.! ]*$/i.test(q))return true;

@@ -1,7 +1,7 @@
 """Audit all published Senate pages/posts and their public linked documents/trackers.
 Raw download caches stay outside the repository. No authenticated downloads.
 """
-import concurrent.futures as cf, datetime as dt, hashlib, io, json, os, pathlib, re, urllib.parse as up, subprocess, threading
+import concurrent.futures as cf, datetime as dt, hashlib, io, json, os, pathlib, re, urllib.parse as up, subprocess, threading, shutil
 from html.parser import HTMLParser
 import build_index as core
 ROOT=core.ROOT
@@ -93,8 +93,9 @@ def ocr_page(raw,n):
    from rapidocr_onnxruntime import RapidOCR
    _ocr_engine=RapidOCR(intra_op_num_threads=4,inter_op_num_threads=1)
   pdf=CACHE/(key+'.pdf');pdf.write_bytes(raw);prefix=CACHE/(key+'-render')
-  binary='/Users/admin/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override/pdftoppm'
-  subprocess.run([binary,'-f',str(n+1),'-l',str(n+1),'-singlefile','-r','160','-png',str(pdf),str(prefix)],check=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+  binary=os.environ.get('PDFTOPPM') or shutil.which('pdftoppm')
+  if not binary:raise RuntimeError('Poppler pdftoppm is required for scanned PDF extraction')
+  subprocess.run([binary,'-f',str(n+1),'-l',str(n+1),'-singlefile','-r','160','-png',str(pdf),str(prefix)],check=True,timeout=90,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
   result,_=_ocr_engine(str(prefix)+'.png')
   rows=[r[1] for r in result or []];out.write_text(json.dumps(rows));return rows
 
@@ -147,6 +148,12 @@ def read(url,label):
 def main():
  os.environ.setdefault('SENATE_REFRESH','1')
  pending={core.SENATE:'Faculty Senate'};published=[];issues=[];seen=set();items={};labels={};tracker_ids=set()
+ if os.environ.get('SOURCE_SEEDS'):
+  for seed in json.loads(pathlib.Path(os.environ['SOURCE_SEEDS']).read_text()):
+   url=normalize(seed['url'])
+   if url and (eligible(url) or up.urlsplit(url).netloc=='web.uri.edu'):
+    pending.setdefault(url,seed.get('title','Linked toolkit document'))
+    if 'spreadsheets/d/' in url and re.search(r'track|20\d\d\s*[-–]',seed.get('title',''),re.I):tracker_ids.add(url);labels[url]=seed.get('title','Curriculum Proposal Tracker')
  # Enumerate every publicly published page/post, including pages missing from menus.
  for endpoint in ('pages','posts'):
   page=1
@@ -176,7 +183,9 @@ def main():
     except Exception as e:issues.append({'url':url,'reason':str(e)[:180]});print('GAP',url,str(e)[:90],flush=True)
  # Correct tracker titles from the archive labels, never from arbitrary PDF mentions.
  for url in tracker_ids:
-  if url in items:items[url]['kind']='Faculty Senate proposal tracker';items[url]['title']=labels.get(url,items[url]['title'])+' Curriculum Proposal Tracker'
+  if url in items:
+   items[url]['kind']='Faculty Senate proposal tracker'
+   label=labels.get(url,items[url]['title']);items[url]['title']=label if 'curriculum proposal tracker' in label.lower() else label+' Curriculum Proposal Tracker'
  snapshot={'builtAt':STAMP,'publishedPages':sorted(set(published)),'items':list(items.values()),'trackers':[{'url':u,'title':items[u]['title'],'tabs':items[u]['tabs'],'rows':items[u]['rowCount']} for u in sorted(tracker_ids) if u in items],'gaps':issues,'attemptedSources':len(seen)}
  (ROOT/'data/senate-text.json').write_text(json.dumps(snapshot,ensure_ascii=False))
  print(json.dumps({'indexed':len(items),'publishedPages':len(set(published)),'trackers':len(snapshot['trackers']),'gaps':len(issues)}))

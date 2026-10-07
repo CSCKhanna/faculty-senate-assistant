@@ -1,8 +1,7 @@
-import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
+import test from 'node:test';import assert from 'node:assert/strict';
 import {identifiers,isBillQuestion,billEvidence,missingBillAnswer} from '../bills.js';
 import {hydrateEvidence} from '../corpus.js';import {answerEvidence} from '../backend/chat.js';
-const root=new URL('../',import.meta.url),read=p=>JSON.parse(fs.readFileSync(new URL(p,root))),manifest=read('data/bills-manifest.json'),index=read(manifest.path);
-const fetchLocal=async url=>new Response(fs.readFileSync(new URL(url.split('/faculty-senate-assistant/')[1],root)));
+import {bills as index,local as fetchLocal,manifest as corpusManifest} from './bootstrap-fixture.mjs';
 const evidence=async messages=>hydrateEvidence(index,billEvidence(index,messages),fetchLocal);
 const followUp=[{role:'user',content:'Do you know if the BS interdisciplinary AI major was approved yet?'},{role:'assistant',content:'The current tracker says To President. The earlier tracker says To FS, tabled.'},{role:'user',content:'Does it have a bill number?'}];
 test('the actual bill follow-up retrieves the minutes explicitly linking the BS to 08C',async()=>{
@@ -33,7 +32,7 @@ test('a new topic drops earlier program context and an unknown identifier never 
   assert.equal(billEvidence(index,[followUp.at(-1)]).length,0);assert.equal(missingBillAnswer(index,[followUp.at(-1)]).kind,'clarification');
 });
 test('bill evidence uses the same immutable corpus and keeps routing text-free',()=>{
-  const corpus=read('data/corpus-manifest.json');assert.equal(index.corpusBase,corpus.corpusBase);assert.equal(index.builtAt,corpus.builtAt);
+  const corpus=corpusManifest;assert.equal(index.corpusBase,corpus.corpusBase);assert.equal(index.builtAt,corpus.builtAt);
   assert.ok(index.records.length>2000);assert.ok(index.records.every(r=>Number.isInteger(r[2])&&r[2]<corpus.passageCount));
 });
 test('Sonnet gets the contextual bill question and cited source facts, with no general search required',async()=>{

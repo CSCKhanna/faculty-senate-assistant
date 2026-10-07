@@ -1,0 +1,5 @@
+# Public-source extraction; no AI gateway key is needed for a refresh.
+pypdf==6.19.0
+openpyxl==3.1.5
+rapidocr-onnxruntime==1.4.4
+wordninja==2.0.0

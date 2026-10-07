@@ -24,9 +24,9 @@ def main():
   if parent==c.core.SENATE or any(x in parent for x in ('/people/','/committees/')):continue
   for u in p.images:
    if up.urlsplit(u).netloc!='web.uri.edu':continue
-   u=up.quote(u,safe=':/?#&%=');key=hashlib.sha256(u.encode()).hexdigest();out=c.CACHE/(key+'-image-ocr.json')
+   u=up.quote(u,safe=':/?#&%=');key=hashlib.sha256(u.encode()).hexdigest()
    try:
-    raw,_=c.cached(u);file=c.CACHE/(key+'-image.png');file.write_bytes(raw)
+    raw,_=c.cached(u);file=c.CACHE/(key+'-image.png');file.write_bytes(raw);out=c.CACHE/(hashlib.sha256(raw).hexdigest()+'-image-ocr.json')
     if out.exists():lines=json.loads(out.read_text())
     else:
      if engine is None:

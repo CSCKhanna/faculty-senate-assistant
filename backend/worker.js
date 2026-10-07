@@ -1,17 +1,9 @@
-import manifest from '../data/corpus-manifest.json' with {type:'json'};
-import {loadCorpus,hydrateEvidence} from '../corpus.js';
-import billManifest from '../data/bills-manifest.json' with {type:'json'};
+import fallbackRelease from '../data/source-release.json' with {type:'json'};
+import {hydrateEvidence} from '../corpus.js';
+import {createSourceStore} from './source-store.js';
+import {isLiveMeetingQuestion,getLiveMeetingEvidence,liveMeetingFallback} from './live-meetings.js';
 import {isBillQuestion,billEvidence,missingBillAnswer} from '../bills.js';
-let billPromise;
-async function getBills(){
-  if(!billPromise)billPromise=fetch('https://csckhanna.github.io/faculty-senate-assistant/'+billManifest.path).then(async r=>{
-    if(!r.ok)throw new Error('Bill lookup unavailable');const index=await r.json();
-    if(index.builtAt!==billManifest.builtAt||index.builtAt!==manifest.builtAt||index.corpusBase!==manifest.corpusBase)throw new Error('Bill snapshot mismatch');return index;
-  }).catch(e=>{billPromise=undefined;throw e;});
-  return billPromise;
-}
-let corpusPromise;
-async function getCorpus(){if(!corpusPromise)corpusPromise=loadCorpus(manifest).catch(e=>{corpusPromise=undefined;throw e;});return corpusPromise;}
+const sourceStore=createSourceStore({fallback:fallbackRelease});
 import {validateMessages,converse,answerEvidence} from './chat.js';
 
 export async function reserveBudget(db,key,cap=100,now=Date.now()){
@@ -36,7 +28,10 @@ export default {
     const headers={'Content-Type':'application/json','Cache-Control':'no-store','Vary':'Origin',...(permitted?{'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Content-Type'}:{})};
     const reply=(obj,status=200)=>new Response(JSON.stringify(obj),{status,headers});
     const url=new URL(request.url);
-    if(url.pathname==='/health')return reply({ready:Boolean(env.URI_API_KEY&&env.PILOT_DB),snapshot:manifest.builtAt,sourceCount:manifest.sourceCount,model:env.AI_MODEL||'its_direct/pt3-claude-sonnet-5.5-1m-us'});
+    if(url.pathname==='/health'){
+      const state=env.URI_API_KEY&&env.PILOT_DB?await sourceStore.get():{release:fallbackRelease,releaseStatus:'bundled'},release=state.release;
+      return reply({ready:Boolean(env.URI_API_KEY&&env.PILOT_DB),snapshot:release.corpus.builtAt,sourceCount:release.corpus.sourceCount,sourceCheckedAt:release.checkedAt,sourceStatus:state.releaseStatus,refreshSchedule:'daily',liveMeetings:true,model:env.AI_MODEL||'its_direct/pt3-claude-sonnet-5.5-1m-us'});
+    }
     if(!permitted)return reply({error:'This origin is not allowed.'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers});
     if(url.pathname!=='/chat'||request.method!=='POST')return reply({error:'Not found.'},404);
@@ -53,11 +48,20 @@ export default {
       const key=Array.from(new Uint8Array(digest),x=>x.toString(16).padStart(2,'0')).join('');
       const limit=await reserveBudget(env.PILOT_DB,key,Number(env.DAILY_REQUEST_LIMIT||100));
       if(!limit.allowed)return reply({error:limit.reason},429);
-      if(isBillQuestion(messages)){
-        const index=await getBills(),selected=billEvidence(index,messages),passages=await hydrateEvidence(index,selected);
-        return reply(passages.length?await answerEvidence(index,messages,env,passages):missingBillAnswer(index,messages));
+      if(isLiveMeetingQuestion(messages)){
+        const live=await getLiveMeetingEvidence(messages),{attachments,...facts}=live,context={builtAt:live.checkedAt||fallbackRelease.corpus.builtAt,currentDate:new Date().toISOString(),live:facts,attachments};
+        let answer=live.evidence?.length?await answerEvidence(context,messages,env,live.evidence):liveMeetingFallback(live);
+        if(attachments?.length&&answer.kind==='sources')answer=liveMeetingFallback({...live,status:'agenda-unavailable'});
+        const liveStatus=attachments?.length?(answer.sources.some(s=>attachments.some(a=>a.sourceUrl===s.url))?'agenda-read':'agenda-unavailable'):live.status;
+        return reply({...answer,checkedAt:live.checkedAt||null,liveStatus,liveMeeting:true});
       }
-      return reply(await converse(await getCorpus(),messages,env));
-    }catch{return reply({kind:'unanswered',answer:'The source service is temporarily unavailable. Please try again shortly, or open the toolkit directly.',sources:[],followUp:'',retryable:true,snapshotDate:manifest.builtAt});}
+      return reply(await sourceStore.run(async release=>{
+        if(isBillQuestion(messages)){
+          const index={...await sourceStore.billIndex(release),currentDate:new Date().toISOString()},selected=billEvidence(index,messages),passages=await hydrateEvidence(index,selected);
+          return passages.length?await answerEvidence(index,messages,env,passages):missingBillAnswer(index,messages);
+        }
+        return converse({...await sourceStore.corpus(release),currentDate:new Date().toISOString()},messages,env);
+      }));
+    }catch{return reply({kind:'unanswered',answer:'The source service is temporarily unavailable. Please try again shortly, or open the toolkit directly.',sources:[],followUp:'',retryable:true,snapshotDate:fallbackRelease.corpus.builtAt});}
   }
 };

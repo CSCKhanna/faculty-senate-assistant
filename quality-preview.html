@@ -68,7 +68,7 @@ dialog{width:min(850px,calc(100vw - 32px));max-height:90dvh;border:0;border-radi
       </div>
     </main>
   </div>
-  <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-top"><div><span class="eyebrow blue">SOURCE TRANSPARENCY</span><h2 id="source-title">Sources and service information</h2></div><button id="close-dialog" type="button" aria-label="Close source list">✕</button></div><div class="service-info"><p>This pilot is not an official URI service. It answers questions using public Faculty Senate resources and a dated source snapshot. Restricted or unreadable documents are listed below.</p><p>Messages are processed through URI’s AI gateway. Your current visit is saved in this tab’s session storage so refreshing does not erase the conversation. New conversation clears that visit. No transcript is stored by this application’s backend. Email links open an unsent draft containing your original question.</p><p><a href="https://gilded-toucan-d8a.notion.site/URI-Faculty-Senate-Curriculum-Toolkit-3a57535bf92c80c78bacd5b49e9c6c12" target="_blank" rel="noopener">Open Curriculum Toolkit ↗</a> · <a href="https://web.uri.edu/facsen/" target="_blank" rel="noopener">Open Faculty Senate website ↗</a></p></div><div id="coverage"></div><div id="source-list"></div></dialog>
+  <dialog id="source-dialog" aria-labelledby="source-title"><div class="dialog-top"><div><span class="eyebrow blue">SOURCE TRANSPARENCY</span><h2 id="source-title">Sources and service information</h2></div><button id="close-dialog" type="button" aria-label="Close source list">✕</button></div><div class="service-info"><p>This pilot is not an official URI service. It answers questions using public Faculty Senate resources refreshed daily. Questions about upcoming or recent Senate meetings check the public meeting page and linked agendas directly; a checked time appears with the answer. Restricted or unreadable documents are listed below.</p><p>Messages are processed through URI’s AI gateway. Your current visit is saved in this tab’s session storage so refreshing does not erase the conversation. New conversation clears that visit. No transcript is stored by this application’s backend. Email links open an unsent draft containing your original question.</p><p><a href="https://gilded-toucan-d8a.notion.site/URI-Faculty-Senate-Curriculum-Toolkit-3a57535bf92c80c78bacd5b49e9c6c12" target="_blank" rel="noopener">Open Curriculum Toolkit ↗</a> · <a href="https://web.uri.edu/facsen/" target="_blank" rel="noopener">Open Faculty Senate website ↗</a></p></div><div id="coverage"></div><div id="source-list"></div></dialog>
   <script type="module">var __defProp = Object.defineProperty;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __esm = (fn, res) => function __init() {
@@ -110,13 +110,13 @@ var init_quality_fixtures = __esm({
   }
 });
 
-// corpus.js?v=2
+// corpus.js?v=3
 async function loadCorpus(manifest2, fetcher = qualityFetch, base = BASE) {
   if (!/^data\/corpus-[a-f0-9]{12}$/.test(manifest2.corpusBase)) throw new Error("Invalid corpus revision");
-  const [a, b] = await Promise.all([fetcher(base + manifest2.corpusBase + "/routing.json"), fetcher(base + manifest2.corpusBase + "/postings.bin")]);
+  const [a, b] = await Promise.all([fetcher(base + manifest2.corpusBase + "/routing.json", { signal: AbortSignal.timeout(15e3) }), fetcher(base + manifest2.corpusBase + "/postings.bin", { signal: AbortSignal.timeout(15e3) })]);
   if (!a.ok || !b.ok) throw new Error("Corpus unavailable");
   const [routing, buffer] = await Promise.all([a.json(), b.arrayBuffer()]);
-  if (routing.builtAt !== manifest2.builtAt) throw new Error("Corpus mismatch");
+  if (routing.builtAt !== manifest2.builtAt || routing.corpusBase !== manifest2.corpusBase || routing.sources?.length !== manifest2.sourceCount || routing.docs?.length !== manifest2.passageCount) throw new Error("Corpus mismatch");
   const sources2 = routing.sources;
   return { ...routing, base, postings: new Uint32Array(buffer), passages: routing.docs.map((d, id) => ({ id, source: sources2[d[0]].url, heading: d[1], text: d[3] })) };
 }
@@ -124,7 +124,7 @@ async function hydrateEvidence(data2, evidence, fetcher = qualityFetch) {
   if (!data2.corpusBase) return evidence;
   const shardIds = [...new Set(evidence.map((r) => Math.floor(r.p.id / data2.shardSize)))];
   const shards = new Map(await Promise.all(shardIds.map(async (id) => {
-    const r = await fetcher((data2.base || BASE) + data2.corpusBase + "/text-" + id + ".json");
+    const r = await fetcher((data2.base || BASE) + data2.corpusBase + "/text-" + id + ".json", { signal: AbortSignal.timeout(15e3) });
     if (!r.ok) throw new Error("Source text unavailable");
     return [id, await r.json()];
   })));
@@ -136,15 +136,16 @@ async function hydrateEvidence(data2, evidence, fetcher = qualityFetch) {
 }
 var BASE;
 var init_corpus = __esm({
-  "corpus.js?v=2"() {
+  "corpus.js?v=3"() {
     init_quality_fixtures();
     BASE = "https://csckhanna.github.io/faculty-senate-assistant/";
   }
 });
 
-// conversation.js?v=3
+// conversation.js?v=4
 function isFollowUp(text) {
   const q = text.trim();
+  if (/\bfaculty senate\b/i.test(q) && /\b(?:meetings?|agenda)\b/i.test(q) && !/^\s*(?:and|what about|how about)\b/i.test(q)) return false;
   if (/^(?:yes|no|sure|okay|ok|the prerequisites|the credits|the title|the description)\b/i.test(q)) return true;
   if (/\b(?:it|its|their|they|them|those|that|this|next|after that)\b/i.test(q)) return true;
   if (/^(?:what(?:'s| is) (?:the )?bill number|is there a bill number|and (?:the )?bill number)[?.! ]*$/i.test(q)) return true;
@@ -166,12 +167,12 @@ function expandQuestion(text, snapshot) {
   return text.replace(/\bAI\b/gi, "Artificial Intelligence").replace(/\blast academic year\b/gi, y.previous + " academic year").replace(/\b(?:this|current) academic year\b/gi, y.current + " academic year");
 }
 var init_conversation = __esm({
-  "conversation.js?v=3"() {
+  "conversation.js?v=4"() {
     init_quality_fixtures();
   }
 });
 
-// search.js?v=8
+// search.js?v=9
 function buildSearch(data2) {
   if (data2.postings && data2.terms) return buildCompiledSearch(data2);
   const sourceMap = new Map(data2.sources.map((s) => [s.url, s]));
@@ -316,7 +317,7 @@ function buildCompiledSearch(data2) {
 }
 var STOP, normalize, tokens, SYNONYMS;
 var init_search = __esm({
-  "search.js?v=8"() {
+  "search.js?v=9"() {
     init_quality_fixtures();
     init_conversation();
     STOP = new Set("difference between compare versus vs a an the of to for and or in on at is are be was were it this that i my me we our you your how do does did can could would should what when where who which with have has want need please about from as by into all get getting like know find tell more help question teach teaching taught wondering trying someone anyone something use using information explain regarding".split(" "));
@@ -326,7 +327,7 @@ var init_search = __esm({
   }
 });
 
-// retrieval.js?v=2
+// retrieval.js?v=3
 var retrieval_exports = {};
 __export(retrieval_exports, {
   gatherEvidence: () => gatherEvidence,
@@ -354,11 +355,11 @@ function retrieve(data2, messages2) {
   const meta = metadata(data2), { registry, bySource, byTitle, byHeading } = meta;
   const allUsers = messages2.filter((m) => m.role === "user"), users = allUsers.length > 4 ? [allUsers[0], ...allUsers.slice(-3)] : allUsers;
   const search2 = searchCache.get(data2);
-  const latest = expandQuestion(users.at(-1).content, data2.builtAt);
+  const latest = expandQuestion(users.at(-1).content, data2.currentDate || data2.builtAt);
   const previous = messages2.slice(0, -1).filter((m) => m.role === "assistant").at(-1)?.content || "";
-  const combined = users.map((m) => expandQuestion(m.content, data2.builtAt)).join(" ");
+  const combined = users.map((m) => expandQuestion(m.content, data2.currentDate || data2.builtAt)).join(" ");
   const asked = previous.split(/\n/).at(-1) || "";
-  const queries = [combined, ...users.slice(0, -1).reverse().map((m) => expandQuestion(m.content, data2.builtAt))];
+  const queries = [combined, ...users.slice(0, -1).reverse().map((m) => expandQuestion(m.content, data2.currentDate || data2.builtAt))];
   if (users.length === 1 || !isFollowUp(latest)) queries.unshift(latest);
   if (latest.length < 60 && asked.endsWith("?")) queries.push(latest + " " + asked.slice(0, 250));
   if (/temporary/i.test(combined) && /permanent/i.test(combined)) queries.splice(1, 0, "course modification start proposal");
@@ -434,7 +435,7 @@ function retrieve(data2, messages2) {
     if (p) priority.push({ p, source: registry.get(p.source) });
   }
   if (/contact|staff|office|located|location|address|phone|email/i.test(latest) && /faculty senate|spitale|genvi[eé]ve/i.test(latest)) for (const title of ["Staff", "Contact"]) priority.push(...(byTitle.get(title) || []).slice(1).map((p) => ({ p, source: registry.get(p.source) })));
-  const entityQuestion = users.length > 1 && isFollowUp(latest) ? expandQuestion(users[0].content, data2.builtAt) : latest;
+  const entityQuestion = users.length > 1 && isFollowUp(latest) ? expandQuestion(users[0].content, data2.currentDate || data2.builtAt) : latest;
   const entity = tokens(entityQuestion).filter((w) => !new Set("approval program major degree status proposal happened academic year last current any not approved start denied rejected bs ba ms phd".split(" ")).has(w) && !/^\d+$/.test(w));
   if (/approval|approved|status|happened|track/i.test(combined) && entity.length) {
     const year = latest.match(/(20\d{2})\s*[-–]\s*(20\d{2}|\d{2})/)?.[1];
@@ -467,10 +468,10 @@ function trackerYear(source) {
   return Math.max(...(source.title.match(/20\d{2}/g) || ["0"]).map(Number));
 }
 async function gatherEvidence(data2, messages2, fetcher = qualityFetch) {
-  const scoped = activeMessages(messages2), q = expandQuestion(scoped.at(-1).content, data2.builtAt);
+  const scoped = activeMessages(messages2), q = expandQuestion(scoped.at(-1).content, data2.currentDate || data2.builtAt);
   let passages = await hydrateEvidence(data2, retrieve(data2, messages2), fetcher);
   if (!/\b(?:any|all|which|how many)\b/i.test(q) || !/program/i.test(q) || !/not approved|denied|rejected|status|pending|incomplete/i.test(q)) return passages;
-  const year = q.match(/(20\d{2})\s*[-–]\s*(20\d{2}|\d{2})/)?.[1] || academicYear(data2.builtAt).current.split("-")[0];
+  const year = q.match(/(20\d{2})\s*[-–]\s*(20\d{2}|\d{2})/)?.[1] || academicYear(data2.currentDate || data2.builtAt).current.split("-")[0];
   const source = data2.sources.find((s) => s.kind === "Faculty Senate proposal tracker" && s.title.includes(year));
   if (!source) return passages;
   const primary = data2.passages.filter((p) => p.source === source.url && /Sheet: [BC]\./.test(p.heading) && /\| Row \d+ \|/.test(p.heading));
@@ -491,7 +492,7 @@ async function gatherEvidence(data2, messages2, fetcher = qualityFetch) {
 }
 var searchCache, metadataCache;
 var init_retrieval = __esm({
-  "retrieval.js?v=2"() {
+  "retrieval.js?v=3"() {
     init_quality_fixtures();
     init_corpus();
     init_search();
@@ -504,6 +505,24 @@ var init_retrieval = __esm({
 // app.js
 init_quality_fixtures();
 init_corpus();
+
+// source-release.js?v=1
+init_quality_fixtures();
+var SOURCE_BASE = "https://csckhanna.github.io/faculty-senate-assistant/";
+var validDate = (value) => typeof value === "string" && Number.isFinite(Date.parse(value));
+function validateRelease(value) {
+  const c = value?.corpus, b = value?.bills;
+  if (value?.version !== 1 || !validDate(value.checkedAt) || !c || !b || !validDate(c.builtAt) || b.builtAt !== c.builtAt || b.corpusBase !== c.corpusBase || !/^data\/corpus-[a-f0-9]{12}$/.test(c.corpusBase) || !/^data\/bills-[a-f0-9]{12}\.json$/.test(b.path)) throw new Error("Invalid source release");
+  if (!Number.isInteger(c.sourceCount) || c.sourceCount < 1 || c.sourceCount > 2e4 || !Number.isInteger(c.passageCount) || c.passageCount < 1 || c.passageCount >= 65536 || !Number.isInteger(b.recordCount) || b.recordCount < 0 || b.recordCount > c.passageCount) throw new Error("Invalid source counts");
+  return value;
+}
+async function loadSourceRelease(fetcher = qualityFetch, base = SOURCE_BASE) {
+  const response = await fetcher(base + "data/source-release.json", { cache: "no-store", signal: AbortSignal.timeout(1e4) });
+  if (!response.ok) throw new Error("Source release unavailable");
+  return validateRelease(await response.json());
+}
+
+// app.js
 init_search();
 
 // presentation.js?v=3
@@ -622,6 +641,7 @@ var ready = false;
 var lastAnswer;
 var quotaUntil = 0;
 var date = (s) => new Date(s).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+var checkedTime = (s) => new Date(s).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" });
 function el(tag, text, cls) {
   const n = document.createElement(tag);
   if (text !== void 0) n.textContent = text;
@@ -708,6 +728,10 @@ function emailAction(original = question) {
 function renderResponse(bubble, answer2) {
   bubble.querySelector(".chat-text")?.remove();
   bubble.append(renderAnswer(answer2.answer, answer2.sources));
+  if (answer2.liveMeeting) {
+    const note = answer2.checkedAt && Number.isFinite(Date.parse(answer2.checkedAt)) ? "Meeting sources checked " + checkedTime(answer2.checkedAt) + "." : "Live meeting information could not be checked. Please retry or open the Senate meeting page.";
+    bubble.append(el("small", note, "chat-note"));
+  } else if (answer2.sourceStatus === "last-good") bubble.append(el("small", "The latest source update could not be loaded. This answer uses the last available source snapshot.", "chat-note"));
   if (answer2.followUp) bubble.append(el("p", answer2.followUp, "chat-followup"));
   const sources2 = answer2.sources.filter(sourceUrl);
   if (sources2.length) {
@@ -742,7 +766,7 @@ function renderResponse(bubble, answer2) {
     if (answer2.escalatable !== false) bubble.append(el("small", "Opens an unsent draft in your email app. Review it before sending.", "chat-note"));
   } else {
     if (answer2.kind === "answer") actions.append(button("Copy answer", async (e) => {
-      const b = e.currentTarget, plain = answer2.answer.replace(/\*\*|`/g, "") + (sources2.length ? "\n\nSources\n" + sources2.map((s) => `[${s.id}] ${referenceLabel(s)} \u2014 ${sourceUrl(s)}`).join("\n") : "");
+      const b = e.currentTarget, plain = answer2.answer.replace(/\*\*|`/g, "") + (answer2.liveMeeting && answer2.checkedAt ? "\n\nMeeting sources checked " + checkedTime(answer2.checkedAt) + "." : "") + (sources2.length ? "\n\nSources\n" + sources2.map((s) => `[${s.id}] ${referenceLabel(s)} \u2014 ${sourceUrl(s)}`).join("\n") : "");
       try {
         await navigator.clipboard.writeText(plain);
         b.textContent = "Copied";
@@ -762,11 +786,7 @@ function renderResponse(bubble, answer2) {
 }
 async function ensureIndex() {
   if (!indexPromise) indexPromise = (async () => {
-    if (!manifest?.corpusBase) {
-      const r = await qualityFetch("data/corpus-manifest.json", { cache: "no-store" });
-      if (!r.ok) throw new Error("Snapshot unavailable");
-      manifest = await r.json();
-    }
+    if (!manifest?.corpusBase) manifest = (await loadSourceRelease(qualityFetch, BASE2)).corpus;
     data = await loadCorpus(manifest, qualityFetch, BASE2);
     search = buildSearch(data);
     return data;
@@ -788,7 +808,7 @@ async function sourceAnswer(original) {
 async function requestAnswer(original) {
   if (!connected) await checkConnection();
   if (!connected) return sourceAnswer(original);
-  const response = await qualityFetch(CHAT_API_URL + "/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: conversationContext(messages) }), signal: AbortSignal.timeout(55e3) });
+  const response = await qualityFetch(CHAT_API_URL + "/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: conversationContext(messages) }), signal: AbortSignal.timeout(75e3) });
   let answer2;
   try {
     answer2 = await response.json();
@@ -1047,8 +1067,8 @@ if (window.visualViewport) {
   viewport();
 }
 restore();
-await Promise.allSettled([qualityFetch("data/corpus-manifest.json", { cache: "no-store" }).then(async (r) => {
-  if (r.ok) manifest = await r.json();
+await Promise.allSettled([loadSourceRelease(qualityFetch, BASE2).then((release) => {
+  manifest = release.corpus;
 }), checkConnection()]);
 ready = true;
 syncMode();

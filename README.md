@@ -15,11 +15,11 @@ The October 6, 2026 snapshot has **1,321 sources and 28,573 passages**:
 
 **The 2019–2020 tracker requires access (HTTP 401) and is not indexed.** The audit records 595 unavailable/unreadable linked resources, including broken legacy links, refused DigitalCommons downloads, restricted documents, malformed files, and a video without an imported transcript. These are link-level gaps; some historical material is also available through another indexed copy. See the live app’s source coverage dialog and `data/coverage.json` for the exact inventory.
 
-This is a dated snapshot, not live Kuali access. Historical proposals, reports, and blank approval fields do not establish current policy or completed approvals. OCR cannot reliably establish diagram relationships, chart values, handwriting, checkmarks, or signatures; verify the original. Some published pages are explicitly under construction.
+Public source snapshots refresh daily; meeting and agenda questions also check the Senate website directly. This is not live Kuali access. Historical proposals, reports, and blank approval fields do not establish current policy or completed approvals. OCR cannot reliably establish diagram relationships, chart values, handwriting, checkmarks, or signatures; verify the original. Some published pages are explicitly under construction.
 
 ## Retrieval and chat
 
-`prepare_corpus.mjs` builds an immutable corpus revision: compact lexical postings, passage metadata, and text shards. The Worker searches the compact index and fetches only the selected source text before calling Sonnet. The full corpus remains available without embedding tens of megabytes in the Worker or sending every document in each prompt. Both frontend and backend use the same pinned source revision.
+`prepare_corpus.mjs` builds an immutable corpus revision: compact lexical postings, passage metadata, and text shards. The Worker searches the compact index and fetches only the selected source text before calling Sonnet. The full corpus remains available without embedding tens of megabytes in the Worker or sending every document in each prompt. A single public release pointer selects matching immutable corpus and bill indexes. The backend checks for an updated release every five minutes and retains the last readable generation when a publication or download fails. A new source refresh does not need a Worker redeployment.
 
 Answers include validated source citations and retain context for short replies while keeping independent questions separate. Wrapped JSON is extracted before display; malformed transport fields cannot appear as an answer. The interface renders paragraphs, steps, emphasis, and clickable citation markers safely, with source notes grouped in expandable references. Procedural retrieval includes course classifications, start instructions, and submission steps. Named approval lookups prioritize matching tracker rows, including common AI wording. Year-wide program status questions inspect every recorded-status row in the primary B/C tracker tabs and distinguish pending or tabled proposals from denials. Tracker coverage is supplied separately so the assistant can explicitly identify the unavailable 2019–2020 archive rather than substitute another year.
 
@@ -31,18 +31,17 @@ The Worker uses the existing D1 usage database, `faculty-senate-pilot-usage`. Th
 
 The Worker permits the configured GitHub origin. Credentials are used only in the gateway Authorization header. Source downloads go to the public GitHub corpus without credentials or conversation text. Generated links and source IDs are checked against retrieved evidence.
 
-## Refreshing sources
+## Automatic source updates
 
-Keep raw downloads and private configuration outside the repository. Python requires `pypdf` and `openpyxl`; image recovery optionally uses `rapidocr-onnxruntime` and `wordninja`, plus Poppler `pdftoppm`.
+The **Refresh sources and publish assistant** GitHub Actions workflow runs daily at **10:17 UTC** (6:17 a.m. Eastern during daylight saving time, 5:17 a.m. during standard time). GitHub may delay scheduled runs. It can also be started from Actions with **Run workflow**. The default manual run refreshes the public toolkit, Senate pages, linked documents, and every readable tracker tab before publishing. A code push publishes the tested current source generation without recrawling.
 
-1. Run `scripts/crawl_toolkit.py` / `scripts/build_index.py` for a fresh public toolkit import. Changed toolkit images/files are explicitly reported for review; their existing transcriptions are reused only when the attachment reference matches.
-2. Run `scripts/crawl_senate.py` to refresh the published website inventory and linked public documents. It follows Google redirects, preserves required query parameters, and exports all spreadsheet tabs. `SENATE_REFRESH=0` reuses an existing download cache; normal crawl runs refresh downloads. `SENATE_CACHE` selects an external cache directory.
-3. Run `scripts/crawl_senate_media.py` for instructional website image OCR. Decorative photos/headshots are excluded. Video transcript gaps remain explicit.
-4. Run `scripts/recover_senate_cached.py` to attach already recovered OCR and attempt image-only documents with a bounded extraction time. Existing readable text is preserved when image recovery fails.
-5. Run `scripts/merge_senate.py`, then `npm run prepare:corpus` and `npm test`.
-6. Publish the static corpus on GitHub Pages, bundle the backend with `npm run bundle:backend`, deploy it to the existing Worker, and verify live answers and matching snapshot counts.
+Refreshes use public sources and the workflow's temporary repository token; they do not need the AI key or a Cloudflare deployment credential. Extraction runs in a staging directory. Every passage, source identity, corpus/bill generation, text shard, and posting identifier is validated before publication. Failed downloads retain their last readable text and original extraction date, with a visible source qualification. Restricted documents remain unavailable. Changed or new toolkit media are declared as gaps until their transcription is reviewed; existing reviewed image text retains its actual extraction date.
 
-Keep previously deployed immutable corpus revisions until no deployed Worker references them. Do not import account-only Kuali contents or publish restricted material without authorization. Public-link access failures require an accessible public copy or staff assistance.
+A single `data/source-release.json` pointer publishes corpus and bill indexes together. The Worker reads it at most every five minutes; it validates the immutable assets before adopting a generation. A temporary pointer or text download failure falls back to the previous readable generation and marks the answer. Four recent generations plus the original bootstrap remain available. Source coverage reports the current snapshot, source extraction dates, and unresolved links.
+
+Questions about the next or recent Faculty Senate meeting read the current [meeting page](https://web.uri.edu/facsen/meetings/) and its public agenda link for that question, independently of the daily crawl. A scheduled date without an agenda link is reported accurately. The assistant does not replace an upcoming agenda with an older one. Meeting answers show the successful checked time; failed checks preserve the question and offer retry or an unsent staff email draft. Other committee and historical questions use the source corpus.
+
+For a local refresh, install `requirements-refresh.txt` and Poppler, then run `python3 scripts/refresh_sources.py`. `--dry-run` fetches and validates without modifying published source data. `SOURCE_CACHE` chooses an external public download/OCR cache. `npm test` validates application and source invariants; `node scripts/build_pages.mjs` prepares only public files for Pages. Raw downloads, private configuration, and transcripts stay outside the published artifact.
 
 ## Validation
 
