@@ -1,25 +1,25 @@
 {
   "version": 1,
   "corpus": {
-    "builtAt": "2026-10-13T17:38:51.001683+00:00",
-    "sourceCount": 1346,
-    "passageCount": 31165,
-    "corpusBase": "data/corpus-914d049b8656"
+    "builtAt": "2026-10-14T15:13:08.779572+00:00",
+    "sourceCount": 1347,
+    "passageCount": 31190,
+    "corpusBase": "data/corpus-b38a7b76d053"
   },
   "bills": {
-    "builtAt": "2026-10-13T17:38:51.001683+00:00",
-    "corpusBase": "data/corpus-914d049b8656",
-    "path": "data/bills-1a4c96eed09c.json",
+    "builtAt": "2026-10-14T15:13:08.779572+00:00",
+    "corpusBase": "data/corpus-b38a7b76d053",
+    "path": "data/bills-45110c040611.json",
     "recordCount": 7234
   },
-  "checkedAt": "2026-10-13T17:38:51.001683+00:00",
+  "checkedAt": "2026-10-14T15:13:08.779572+00:00",
   "refresh": {
     "status": "complete",
     "cadence": "daily",
     "scheduleUtc": "10:17",
-    "freshSources": 1270,
+    "freshSources": 1271,
     "retainedSources": 76,
-    "gapCount": 581,
+    "gapCount": 582,
     "toolkitChecked": true,
     "websiteChecked": true,
     "websiteRootChecked": true,
