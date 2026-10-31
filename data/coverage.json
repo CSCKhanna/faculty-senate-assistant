@@ -1,15 +1,15 @@
 {
-  "builtAt": "2026-10-30T16:44:34.378169+00:00",
-  "sourceCount": 1467,
-  "passageCount": 36064,
+  "builtAt": "2026-10-31T15:46:25.935834+00:00",
+  "sourceCount": 1470,
+  "passageCount": 36092,
   "toolkit": {
     "pages": 24,
     "databaseEntries": 272,
     "databases": {
       "FAQs": 1,
       "Curriculum Calendar": 69,
-      "Curricular Process Directory": 140,
-      "Curriculum Proposal Requirements": 62
+      "Curriculum Proposal Requirements": 62,
+      "Curricular Process Directory": 140
     },
     "attachmentsAndImages": 59,
     "unresolvedBlocks": 0
@@ -30,11 +30,11 @@
     "Trackers record proposal status at extraction time; they are not live Kuali status or approval guarantees."
   ],
   "website": {
-    "builtAt": "2026-10-30T16:44:54.154938+00:00",
+    "builtAt": "2026-10-31T15:46:50.384735+00:00",
     "publishedPages": 48,
     "publishedPagesIndexed": 48,
-    "attemptedSources": 1647,
-    "indexedSources": 1062,
+    "attemptedSources": 1650,
+    "indexedSources": 1065,
     "instructionalImages": 33,
     "trackers": [
       {
@@ -474,6 +474,38 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
+        "url": "https://web.uri.edu/p/3a57535bf92c80a18c5dd6f6b155ade9/?pvs=25",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/p/3a57535bf92c80a0b323c7b5b349ca55/?pvs=25",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/p/3a57535bf92c803ca243ded334546183/?pvs=25",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/p/3a57535bf92c801e8f33f39c6543047c/?pvs=25",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/p/3a57535bf92c808d99f2c28516f29419/?pvs=25",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/p/3a57535bf92c8096bd9ad21559638204/?pvs=25",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/p/3a57535bf92c80748fb6ebd24c3e4184/?pvs=25",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/p/3a57535bf92c8023b4b5fc9af0ff34cd/?pvs=25",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://web.uri.edu/p/3a57535bf92c80168546de1b6a998856/?pvs=25",
         "reason": "HTTP Error 404: Not Found"
       },
@@ -486,7 +518,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/p/3a57535bf92c8023b4b5fc9af0ff34cd/?pvs=25",
+        "url": "https://web.uri.edu/p/3a57535bf92c80dbbd21da84a300809c/?pvs=25",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -494,7 +526,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/p/3a57535bf92c80dbbd21da84a300809c/?pvs=25",
+        "url": "https://web.uri.edu/p/3a57535bf92c8093b39aecfe371e0498/?pvs=25",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -506,10 +538,6 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/p/3a57535bf92c8093b39aecfe371e0498/?pvs=25",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://web.uri.edu/p/3a57535bf92c80acb690cbf42faf5a03/?pvs=25",
         "reason": "HTTP Error 404: Not Found"
       },
@@ -518,15 +546,11 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/p/3c67535bf92c80e3958bfff902fad8b2/?pvs=25",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://web.uri.edu/p/3a57535bf92c801dba91d924a9507677/?pvs=25",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/p/3a57535bf92c80a0b323c7b5b349ca55/?pvs=25",
+        "url": "https://web.uri.edu/p/3c67535bf92c80e3958bfff902fad8b2/?pvs=25",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -534,7 +558,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/p/3a57535bf92c803ca243ded334546183/?pvs=25",
+        "url": "https://web.uri.edu/p/3a57535bf92c8003b719daccbe327c3d/?pvs=25",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -542,72 +566,16 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/p/3a57535bf92c8003b719daccbe327c3d/?pvs=25",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/p/3a57535bf92c80a18c5dd6f6b155ade9/?pvs=25",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/p/3a57535bf92c801e8f33f39c6543047c/?pvs=25",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/p/3a57535bf92c80748fb6ebd24c3e4184/?pvs=25",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/p/3a57535bf92c808d99f2c28516f29419/?pvs=25",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/p/3a57535bf92c8096bd9ad21559638204/?pvs=25",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1dVTjCxB_975WMn5mvTmG5H2ruFjf5vT_/view",
-        "reason": "Public file download requires access or returned an HTML page"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1arb5NQLU3q5qKnqfpwelzVpTTZ8YPvhQ/view",
-        "reason": "Public file download requires access or returned an HTML page"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-12.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-18.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Roman_overview_10172019-1.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/15_B8xUd0GfuNR6gB07X4yChDxFQ9OrFC/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1nN42egUuKyarRF4klu5Bd8RBophbsVR2/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1SXx0nfHiEj6DMaXOLcCK_55A4eSuiFr3/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1052&context=facsen_agen",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1055&context=facsen_agen",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1122&context=facsen_min",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1054&context=facsen_agen",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://drive.google.com/file/d/1p4XQS1cbmBP7z0kDKs1oPN34ICj472JO/view",
-        "reason": "HTTP Error 404: Not Found"
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1124&context=facsen_min",
+        "reason": "HTTP Error 403: Forbidden"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1051&context=facsen_agen",
@@ -618,7 +586,11 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1124&context=facsen_min",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1052&context=facsen_agen",
+        "reason": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1122&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
@@ -626,11 +598,19 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1054&context=facsen_agen",
+        "url": "https://drive.google.com/file/d/1dVTjCxB_975WMn5mvTmG5H2ruFjf5vT_/view",
+        "reason": "Public file download requires access or returned an HTML page"
+      },
+      {
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1057&context=facsen_agen",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1055&context=facsen_agen",
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-12.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1058&context=facsen_agen",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
@@ -638,32 +618,60 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1127&context=facsen_min",
-        "reason": "HTTP Error 403: Forbidden"
-      },
-      {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1126&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1057&context=facsen_agen",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1127&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1058&context=facsen_agen",
-        "reason": "HTTP Error 403: Forbidden"
+        "url": "https://drive.google.com/file/d/15_B8xUd0GfuNR6gB07X4yChDxFQ9OrFC/view",
+        "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://drive.google.com/file/d/1xRjGbKDYlSa2i5Is7MMk3WVuTKWMvvjx/view",
+        "url": "https://drive.google.com/file/d/1arb5NQLU3q5qKnqfpwelzVpTTZ8YPvhQ/view",
         "reason": "Public file download requires access or returned an HTML page"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1SXx0nfHiEj6DMaXOLcCK_55A4eSuiFr3/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Roman_overview_10172019-1.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1nN42egUuKyarRF4klu5Bd8RBophbsVR2/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-18.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1p4XQS1cbmBP7z0kDKs1oPN34ICj472JO/view",
+        "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://docs.google.com/spreadsheets/d/12ENXKwvwdiEsJ9tDV8gI8V-FHasMhvs0cEmSi0oOwE0/edit",
         "reason": "HTTP Error 401: Unauthorized"
       },
       {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_19-20-16.pdf",
+        "url": "https://drive.google.com/file/d/1xRjGbKDYlSa2i5Is7MMk3WVuTKWMvvjx/view",
+        "reason": "Public file download requires access or returned an HTML page"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1YTRsgtZN9OizHT7bH9hL1knYqMq9nSZy/view",
         "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1nle_jcuEapfmOYWctLnraww3dCuFB-vI/view",
+        "reason": "'NameObject' object has no attribute 'get'"
+      },
+      {
+        "url": "https://web.uri.edu/facsen/curriculum/uri-course-glossary/",
+        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1005&context=facsen_min",
@@ -674,20 +682,12 @@
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://drive.google.com/file/d/1YTRsgtZN9OizHT7bH9hL1knYqMq9nSZy/view",
-        "reason": "HTTP Error 404: Not Found"
+        "url": "https://drive.google.com/file/d/1ciYTyla1YCAdi1NPltcNFSa7W5-8XrV-/view",
+        "reason": "'NameObject' object has no attribute 'get'"
       },
       {
         "url": "https://web.uri.edu/facsen/senate-meetings/october-16th-2014-agenda/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1nle_jcuEapfmOYWctLnraww3dCuFB-vI/view",
-        "reason": "'NameObject' object has no attribute 'get'"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1ciYTyla1YCAdi1NPltcNFSa7W5-8XrV-/view",
-        "reason": "'NameObject' object has no attribute 'get'"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1006&context=facsen_min",
@@ -698,20 +698,20 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1008&context=facsen_min",
-        "reason": "HTTP Error 403: Forbidden"
-      },
-      {
         "url": "https://web.uri.edu/facsen/senate-meetings/november-20th-2014-agenda/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/december-11th-2014-agenda/",
-        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1008&context=facsen_min",
+        "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1001&context=facsen_min",
-        "reason": "HTTP Error 403: Forbidden"
+        "url": "https://docs.google.com/spreadsheets/d/1K5SaNrKHTDAwFeyAKBa3-uYrNHCju9H7A9s6EYh7dBg/edit",
+        "reason": "HTTP Error 401: Unauthorized"
+      },
+      {
+        "url": "https://web.uri.edu/facsen/senate-meetings/december-11th-2014-agenda/",
+        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
         "url": "https://web.uri.edu/facsen/senate-meetings/february-19-2015-agenda/",
@@ -722,11 +722,11 @@
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/march-12-2015-agenda/",
-        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1001&context=facsen_min",
+        "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/april-16-2015-agenda/",
+        "url": "https://web.uri.edu/facsen/senate-meetings/march-12-2015-agenda/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
@@ -738,12 +738,16 @@
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
+        "url": "https://web.uri.edu/facsen/senate-meetings/april-16-2015-agenda/",
+        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
+      },
+      {
         "url": "https://web.uri.edu/facsen/senate-meetings/may-7-2015-minutes/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/september-10th-2015-minutes/",
-        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Memo_Special_FS_Meeting_9-10-15.pdf",
+        "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://web.uri.edu/facsen/senate-meetings/september-17th-2015-agenda/",
@@ -754,8 +758,8 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Memo_Special_FS_Meeting_9-10-15.pdf",
-        "reason": "HTTP Error 404: Not Found"
+        "url": "https://web.uri.edu/facsen/senate-meetings/september-10th-2015-minutes/",
+        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1014&context=facsen_min",
@@ -778,15 +782,11 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1009&context=facsen_min",
-        "reason": "HTTP Error 403: Forbidden"
-      },
-      {
         "url": "https://web.uri.edu/facsen/senate-meetings/december-10th-2015-faculty-senate-meeting/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1010&context=facsen_min",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1009&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
@@ -794,12 +794,16 @@
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/february-18th-2016-faculty-senate-meeting/",
-        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1010&context=facsen_min",
+        "reason": "HTTP Error 403: Forbidden"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1011&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://web.uri.edu/facsen/senate-meetings/february-18th-2016-faculty-senate-meeting/",
+        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
         "url": "https://web.uri.edu/facsen/senate-meetings/march-31st-2016-faculty-senate-meeting/",
@@ -814,12 +818,12 @@
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/september-22nd-2016-faculty-senate-meeting/",
-        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
-      },
-      {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1023&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://web.uri.edu/facsen/senate-meetings/september-22nd-2016-faculty-senate-meeting/",
+        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1024&context=facsen_min",
@@ -830,11 +834,11 @@
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/november-17th-2016-faculty-senate-meeting/",
+        "url": "https://web.uri.edu/facsen/senate-meetings/december-8th-2016-faculty-senate-meeting/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/december-8th-2016-faculty-senate-meeting/",
+        "url": "https://web.uri.edu/facsen/senate-meetings/november-17th-2016-faculty-senate-meeting/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
@@ -846,10 +850,6 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1019&context=facsen_min",
-        "reason": "HTTP Error 403: Forbidden"
-      },
-      {
         "url": "https://web.uri.edu/facsen/senate-meetings/january-26-2017-faculty-senate-meeting/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
@@ -858,8 +858,8 @@
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/march-23-2017-faculty-senate-meeting/",
-        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1019&context=facsen_min",
+        "reason": "HTTP Error 403: Forbidden"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1020&context=facsen_min",
@@ -874,11 +874,11 @@
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/may-4-2017-faculty-senate-meeting/",
+        "url": "https://web.uri.edu/facsen/senate-meetings/march-23-2017-faculty-senate-meeting/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/may-4-2017-minutes/",
+        "url": "https://web.uri.edu/facsen/senate-meetings/may-4-2017-faculty-senate-meeting/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
@@ -887,6 +887,10 @@
       },
       {
         "url": "https://web.uri.edu/facsen/september-21st-2017-faculty-senate-meeting/",
+        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
+      },
+      {
+        "url": "https://web.uri.edu/facsen/senate-meetings/may-4-2017-minutes/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
@@ -906,10 +910,6 @@
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/december-7th-2017-faculty-senate-meeting/",
-        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
-      },
-      {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1035&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
@@ -918,15 +918,19 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
+        "url": "https://web.uri.edu/facsen/senate-meetings/december-7th-2017-faculty-senate-meeting/",
+        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
+      },
+      {
+        "url": "https://web.uri.edu/facsen/senate-meetings/january-25th-2018-faculty-senate-meeting/",
+        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
+      },
+      {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1028&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
         "url": "https://web.uri.edu/facsen/senate-meetings/february-22nd-2018-faculty-senate-meeting/",
-        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
-      },
-      {
-        "url": "https://web.uri.edu/facsen/senate-meetings/january-25th-2018-faculty-senate-meeting/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
@@ -938,16 +942,20 @@
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/april-19th-2018-faculty-senate-meeting/",
-        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
-      },
-      {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1030&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
+        "url": "https://web.uri.edu/facsen/senate-meetings/april-19th-2018-faculty-senate-meeting/",
+        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
+      },
+      {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1031&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/1_FS_MEETING_AGENDA_09-20-18_FINAL.pdf",
+        "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://web.uri.edu/facsen/senate-meetings/may-3rd-2018-faculty-senate-meeting/",
@@ -958,19 +966,11 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1064&context=facsen_min",
-        "reason": "HTTP Error 403: Forbidden"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/1_FS_MEETING_AGENDA_09-20-18_FINAL.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://web.uri.edu/wp-content/uploads/sites/97/2_FS_MEETING_AGENDA_10_18-18_FINAL-11.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1066&context=facsen_min",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1064&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
@@ -982,36 +982,40 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/5_FS_MEETING_AGENDA_1-24-19_FINAL-10.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/6_FS_MEETING_AGENDA_2-21-19_FINAL-10.pdf",
-        "reason": "HTTP Error 404: Not Found"
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1066&context=facsen_min",
+        "reason": "HTTP Error 403: Forbidden"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1059&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1069&context=facsen_min",
-        "reason": "HTTP Error 403: Forbidden"
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/6_FS_MEETING_AGENDA_2-21-19_FINAL-10.pdf",
+        "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://web.uri.edu/wp-content/uploads/sites/97/7_FS_MEETING_AGENDA_3-21-19_FINAL-10.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1062&context=facsen_min",
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/5_FS_MEETING_AGENDA_1-24-19_FINAL-10.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1069&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/9_FS_MEETING_AGENDA_5-2-19_FINAL-10.pdf",
+        "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://web.uri.edu/wp-content/uploads/sites/97/8_FS_MEETING_AGENDA_4-18-19_FINAL-10.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/9_FS_MEETING_AGENDA_5-2-19_FINAL-10.pdf",
-        "reason": "HTTP Error 404: Not Found"
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1062&context=facsen_min",
+        "reason": "HTTP Error 403: Forbidden"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1072&context=facsen_min",
@@ -1022,20 +1026,16 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/faculty-senate-meeting-september-19-2019/",
+        "url": "https://web.uri.edu/facsen/senate-meetings/faculty-senate-meeting-october-24-2019/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/faculty-senate-meeting-october-24-2019/",
+        "url": "https://web.uri.edu/facsen/senate-meetings/faculty-senate-meeting-september-19-2019/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
         "url": "https://web.uri.edu/facsen/senate-meetings/faculty-senate-meeting-november-21-2019/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
-      },
-      {
-        "url": "https://web.uri.edu/facsen/14311-2/",
-        "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1075&context=facsen_min",
@@ -1046,6 +1046,10 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
+        "url": "https://web.uri.edu/facsen/14311-2/",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1077&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
@@ -1054,11 +1058,11 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://web.uri.edu/facsen/faculty-senate-meeting-7-march-19-2020/",
+        "url": "https://web.uri.edu/facsen/senate-meetings/faculty-senate-meeting-6-february-20-2020/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/faculty-senate-meeting-6-february-20-2020/",
+        "url": "https://web.uri.edu/facsen/faculty-senate-meeting-7-march-19-2020/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
@@ -1074,11 +1078,15 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/faculty-senate-meeting-9-may-7-2020/",
+        "url": "https://web.uri.edu/facsen/senate-meetings/uri-general-faculty-graduate-faculty-meeting-and-faculty-senate-meeting-8/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
-        "url": "https://web.uri.edu/facsen/senate-meetings/uri-general-faculty-graduate-faculty-meeting-and-faculty-senate-meeting-8/",
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/APPROVED_MINUTES_9_FS_MEETING_MAY-7-2020.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/facsen/senate-meetings/faculty-senate-meeting-9-may-7-2020/",
         "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
       },
       {
@@ -1088,10 +1096,6 @@
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1082&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/APPROVED_MINUTES_9_FS_MEETING_MAY-7-2020.pdf",
-        "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1013&context=facsen_agen",
@@ -1122,6 +1126,10 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
+        "url": "https://drive.google.com/file/d/1EP67au1XW7JMSDYgh4Odf0yvKrpPtoFP/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1086&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
@@ -1134,10 +1142,6 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://drive.google.com/file/d/1EP67au1XW7JMSDYgh4Odf0yvKrpPtoFP/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1004&context=facsen_agen",
         "reason": "HTTP Error 403: Forbidden"
       },
@@ -1146,11 +1150,11 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1089&context=facsen_min",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1023&context=facsen_agen",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1023&context=facsen_agen",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1089&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
@@ -1178,11 +1182,11 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1092&context=facsen_min",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1027&context=facsen_agen",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1027&context=facsen_agen",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1092&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
@@ -1262,11 +1266,11 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1102&context=facsen_min",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1028&context=facsen_agen",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1028&context=facsen_agen",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1102&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
@@ -1282,11 +1286,11 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1031&context=facsen_agen",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1104&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1104&context=facsen_min",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1031&context=facsen_agen",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
@@ -1306,19 +1310,19 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1034&context=facsen_agen",
-        "reason": "HTTP Error 403: Forbidden"
-      },
-      {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1107&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1109&context=facsen_min",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1034&context=facsen_agen",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1108&context=facsen_min",
+        "reason": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1109&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
@@ -1398,20 +1402,20 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1120&context=facsen_min",
-        "reason": "HTTP Error 403: Forbidden"
+        "url": "https://web.uri.edu/wp-content/uploads/sites/242/01-02-27.pdf",
+        "reason": "Stream has ended unexpectedly"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1048&context=facsen_agen",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1121&context=facsen_min",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1120&context=facsen_min",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/242/01-02-27.pdf",
-        "reason": "Stream has ended unexpectedly"
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1121&context=facsen_min",
+        "reason": "HTTP Error 403: Forbidden"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=1049&context=facsen_agen",
@@ -1422,19 +1426,11 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://web.uri.edu/facsen/curriculum/uri-course-glossary/",
-        "reason": "HTTP Error 301: The HTTP server returned a redirect error that would lead to an infinite loop.\nThe last 30x error message was:\nMoved Permanently"
-      },
-      {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3266&context=facsen_bills",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://docs.google.com/spreadsheets/d/1K5SaNrKHTDAwFeyAKBa3-uYrNHCju9H7A9s6EYh7dBg/edit",
-        "reason": "HTTP Error 401: Unauthorized"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_18-19-24.pdf",
+        "url": "https://drive.google.com/file/d/1BMpBgnInaQLY1KUBk-BTwsgF--1zFBLH/view",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1442,7 +1438,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://drive.google.com/file/d/1BMpBgnInaQLY1KUBk-BTwsgF--1zFBLH/view",
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-23.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1450,11 +1446,15 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_18-19-24.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://drive.google.com/file/d/1RFz3LpsAWhonqMpFzVbDh6KiyX7j8_ts/view",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-23.pdf",
+        "url": "https://drive.google.com/file/d/1YitYwVX9Am9dYst_EWFaeBBNnZGGa67v/view",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1470,20 +1470,16 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://drive.google.com/file/d/1YitYwVX9Am9dYst_EWFaeBBNnZGGa67v/view",
-        "reason": "HTTP Error 404: Not Found"
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3255&context=facsen_bills",
+        "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3255&context=facsen_bills",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3247&context=facsen_bills",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
         "url": "https://web.uri.edu/wp-content/uploads/sites/242/02-03-21.pdf",
         "reason": "Stream has ended unexpectedly"
-      },
-      {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3247&context=facsen_bills",
-        "reason": "HTTP Error 403: Forbidden"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3267&context=facsen_bills",
@@ -1510,23 +1506,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-26E.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://drive.google.com/file/d/1UidX1BXhYNrdjaesvCDxC4QFWgZ9KrG9/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1cpD5uwlo3KHM5fQSxbuj17kvMuvJhoDH/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1WjA-_-4FUBQCIHZGVR2nCJdG4_w8CRhV/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_18-19-34.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1534,7 +1514,43 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-26E.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1WjA-_-4FUBQCIHZGVR2nCJdG4_w8CRhV/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1cpD5uwlo3KHM5fQSxbuj17kvMuvJhoDH/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_18-19-34.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-24.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3217&context=facsen_bills",
+        "reason": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_19-20-16.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-26D.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3139&context=facsen_bills",
+        "reason": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1zU-CLELo6UlFiv4rMnw1GLjilGT8y8xi/view",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1546,28 +1562,12 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3139&context=facsen_bills",
-        "reason": "HTTP Error 403: Forbidden"
-      },
-      {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3217&context=facsen_bills",
-        "reason": "HTTP Error 403: Forbidden"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-26D.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1zU-CLELo6UlFiv4rMnw1GLjilGT8y8xi/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_18-19-17D_HL-PRES-only.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://drive.google.com/file/d/18DX8_j4c5NCqcBoeR6Go6Oek2x_C82qy/view",
         "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1btQMWdAt5jd-rQh-WRkazxLsKstHb6U2/view",
+        "reason": "Public file download requires access or returned an HTML page"
       },
       {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3131&context=facsen_bills",
@@ -1578,27 +1578,19 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://drive.google.com/file/d/1btQMWdAt5jd-rQh-WRkazxLsKstHb6U2/view",
-        "reason": "Public file download requires access or returned an HTML page"
-      },
-      {
         "url": "http://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3075&context=facsen_bills",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_19-20-30.pdf",
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_18-19-17D_HL-PRES-only.pdf",
         "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3249&context=facsen_bills",
-        "reason": "HTTP Error 403: Forbidden"
       },
       {
         "url": "https://drive.google.com/file/d/1QpqC0ZOG91zvY6buaS746oqpjHWrY9TP/view",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/budget/files/FY2022-Organizational-Chart.pdf",
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_19-20-30.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1606,11 +1598,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=2823&context=facsen_bills",
-        "reason": "HTTP Error 403: Forbidden"
-      },
-      {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3192&context=facsen_bills",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3249&context=facsen_bills",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
@@ -1622,7 +1610,15 @@
         "reason": "Public file download requires access or returned an HTML page"
       },
       {
-        "url": "https://drive.google.com/file/d/1pdkrqDPB6R29gscbOPxx8fjUkYlT2afm/view",
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=2823&context=facsen_bills",
+        "reason": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3192&context=facsen_bills",
+        "reason": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://web.uri.edu/budget/files/FY2022-Organizational-Chart.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1630,19 +1626,11 @@
         "reason": "Public file download requires access or returned an HTML page"
       },
       {
+        "url": "https://drive.google.com/file/d/1pdkrqDPB6R29gscbOPxx8fjUkYlT2afm/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-11.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-17.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-28.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_18-19-32.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1650,8 +1638,24 @@
         "reason": "Public file download requires access or returned an HTML page"
       },
       {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-28.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-17.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://drive.google.com/file/d/14C05Bz7aDFewZJXc6jugE6LCnIiILJF9/view",
         "reason": "Public file download requires access or returned an HTML page"
+      },
+      {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_18-19-32.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-19.pdf",
+        "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://drive.google.com/file/d/1Oz4etWy4doQGpiytUtBUBnCTuyl_NQVG/view",
@@ -1659,10 +1663,6 @@
       },
       {
         "url": "https://drive.google.com/file/d/1SOIemj6ctwFFZqSTKDmNLCfxTsEVZq5S/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-19.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1678,15 +1678,7 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://web.uri.edu/facsen/files/Bill_17-18-11.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://drive.google.com/file/d/1EtBNY4K4gBbTES_ALe5-nq0GdDbE1odn/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/facsen/files/Bill_17-18-17.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1694,12 +1686,20 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/facsen/files/Bill_17-18-12.pdf",
+        "url": "https://web.uri.edu/facsen/files/Bill_17-18-11.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/facsen/files/Bill_17-18-17.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://drive.google.com/file/d/1gsBxD76UVVjjg0KwqdgcQdQ9I6BEsYC1/view",
         "reason": "Public file download requires access or returned an HTML page"
+      },
+      {
+        "url": "https://web.uri.edu/facsen/files/Bill_17-18-12.pdf",
+        "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://web.uri.edu/facsen/files/Bill_17-18-28.pdf",
@@ -1718,10 +1718,6 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://web.uri.edu/manual/files/13-14-13.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://web.uri.edu/manual/files/Administrative_Report_UNIV_MAN_SEPT_2015.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
@@ -1730,15 +1726,19 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
+        "url": "https://web.uri.edu/manual/files/13-14-13.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1_mwwWwXiSCqGq7ZP7DlUNSDXlg-nzYnf/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://web.uri.edu/manual/files/01-02-21.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://web.uri.edu/academic-planning/files/academic_plan_handbook.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1_mwwWwXiSCqGq7ZP7DlUNSDXlg-nzYnf/view",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1754,15 +1754,15 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
+        "url": "https://web.uri.edu/policies/files/Sexual-Misconduct-20210201a-version-2.0-APPROVED.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://web.uri.edu/manual/files/10-11-29.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://web.uri.edu/manual/files/14-15-25.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/policies/files/Sexual-Misconduct-20210201a-version-2.0-APPROVED.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1778,20 +1778,12 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/Administrative-January-2013.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://web.uri.edu/manual/files/Administrative_Report_January_2017_v7.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/01-02-29.pdf",
+        "url": "https://web.uri.edu/manual/files/Administrative-January-2013.pdf",
         "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=2754&context=facsen_bills",
-        "reason": "HTTP Error 403: Forbidden"
       },
       {
         "url": "https://web.uri.edu/manual/files/03-04-23.pdf",
@@ -1802,12 +1794,20 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
+        "url": "https://drive.google.com/file/d/1jmu1jYFnMQhoZWNGRi4zUaX4y_hS_z4B/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://web.uri.edu/manual/files/02-03-33.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://drive.google.com/file/d/1jmu1jYFnMQhoZWNGRi4zUaX4y_hS_z4B/view",
+        "url": "https://web.uri.edu/manual/files/01-02-29.pdf",
         "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=2754&context=facsen_bills",
+        "reason": "HTTP Error 403: Forbidden"
       },
       {
         "url": "https://web.uri.edu/manual/files/07-08-34.pdf",
@@ -1822,6 +1822,10 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
+        "url": "https://web.uri.edu/facsen/files/Bill_18-19-33.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://web.uri.edu/manual/files/13-14-26.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
@@ -1830,11 +1834,11 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/facsen/files/Bill_18-19-33.pdf",
+        "url": "https://web.uri.edu/transfer/files/jaasguide.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/transfer/files/jaasguide.pdf",
+        "url": "https://drive.google.com/file/d/13nWbm3m9qk7JP0mRRRvWJsnVU_A4rVdt/view",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1842,7 +1846,7 @@
         "reason": "Public file download requires access or returned an HTML page"
       },
       {
-        "url": "https://drive.google.com/file/d/13nWbm3m9qk7JP0mRRRvWJsnVU_A4rVdt/view",
+        "url": "https://web.uri.edu/wp-content/uploads/sites/928/Sexual-Misconduct-20210201a-version-2.0-APPROVED.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1850,19 +1854,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3228&context=facsen_bills",
-        "reason": "HTTP Error 403: Forbidden"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/928/Sexual-Misconduct-20210201a-version-2.0-APPROVED.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_18-19-6.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_18-19-33.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1870,12 +1862,24 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/1779/Agenda-for-Change-2021.Final_.pdf",
-        "reason": "HTTP Error 404: Not Found"
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3228&context=facsen_bills",
+        "reason": "HTTP Error 403: Forbidden"
       },
       {
         "url": "https://drive.google.com/file/d/1-eaa-yGKsmLyB9AVdE1BwTkODWF3snH5/view",
         "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_18-19-33.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/1779/Agenda-for-Change-2021.Final_.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://docs.google.com/document/d/1Q3T19okuDXIFoK_DcJ00BC4FdefCLLDyAtQXKRCaUtQ/edit",
+        "reason": "HTTP Error 401: Unauthorized"
       },
       {
         "url": "https://drive.google.com/file/d/1MsfD9EuROCiEgixwJ6i6hBiznuL_UDHq/view",
@@ -1894,59 +1898,11 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://docs.google.com/document/d/1Q3T19okuDXIFoK_DcJ00BC4FdefCLLDyAtQXKRCaUtQ/edit",
-        "reason": "HTTP Error 401: Unauthorized"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1pcFmAd_FfNql4DPiwdsmvd8oo_dxbvE8/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1TAhgZwMP2y8RB75Abjq9t0u25X8UWYJ4/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1RwmBc60LhB548k06XthmqqxqqP6K24mN/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1SvpaQDE6XHzJMFVvDzLxpnHiCQAXVcSQ/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1bVPzJIjVGHLNRC2e5dPs-G2rsjp0qN0i/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1SfsQXtzG1y4zAM3mvTPxVFTvAeCIfJCe/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1J5Bagkxuvrm9BYzrgoYu1F4Ni1A0MSgG/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1cQgKFKkp32JYVe67xHjk_67kSreWYbn4/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1N6RM-IuDkX9XefgYkfmX636RpUII_20f/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/policies/files/Policy-on-Policies-20220215-CLEAN-APPROVED-01.101.2-2.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://docs.google.com/presentation/d/1zUvXb6hmkvafge3s2h1TQfKR65waMWxW/edit",
-        "reason": "HTTP Error 410: Gone"
-      },
-      {
         "url": "https://web.uri.edu/policies/files/External-Speakers-on-Campus-20190805-APPROVED-new-template.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/policies/files/Animals-on-Campus-Policy-20211027-FINAL.pdf",
+        "url": "https://web.uri.edu/policies/files/Policy-on-Policies-20220215-CLEAN-APPROVED-01.101.2-2.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1958,15 +1914,19 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/policies/files/COVID-19-Health-Data-Use-20211214-APPROVED-1.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://web.uri.edu/policies/files/Hunting-on-University-Property-20200803-APPROVED-1.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
+        "url": "https://web.uri.edu/policies/files/Animals-on-Campus-Policy-20211027-FINAL.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://web.uri.edu/policies/files/COVID-19-and-Campus-Health-and-Safety-20220111.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/policies/files/COVID-19-Health-Data-Use-20211214-APPROVED-1.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1975,10 +1935,6 @@
       },
       {
         "url": "https://web.uri.edu/policies/files/Weather-and-Other-Emergencies-20220607-01.110.1.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/policies/files/Graffiti-Policy-20211101.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -1998,11 +1954,11 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/policies/files/Fire-Protection-Impairment-Policy-2018-APPROVED-FY19-new-template.pdf",
+        "url": "https://web.uri.edu/policies/files/Graffiti-Policy-20211101.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/policies/files/Fire-Drill-Policy-20200203-APPROVED-new-template.pdf",
+        "url": "https://web.uri.edu/policies/files/Fire-Protection-Impairment-Policy-2018-APPROVED-FY19-new-template.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2010,11 +1966,11 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/policies/files/Access-Box-Policy-2018-APPROVED-FY19-new-template.pdf",
+        "url": "https://web.uri.edu/policies/files/Fire-Drill-Policy-20200203-APPROVED-new-template.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/policies/files/Laboratory-Cleanout-Policy-20220412-02.111.2.pdf",
+        "url": "https://web.uri.edu/policies/files/Access-Box-Policy-2018-APPROVED-FY19-new-template.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2023,6 +1979,10 @@
       },
       {
         "url": "https://web.uri.edu/policies/files/EHS-Policy-20201023-APPROVED.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/policies/files/Laboratory-Cleanout-Policy-20220412-02.111.2.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2046,11 +2006,11 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/policies/files/BOT-Policy-on-Policies-20210528a-FINAL.pdf",
+        "url": "https://web.uri.edu/policies/files/Consensual-Relationships-Policy-20210528-APPROVED.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/policies/files/Consensual-Relationships-Policy-20210528-APPROVED.pdf",
+        "url": "https://web.uri.edu/policies/files/BOT-Policy-on-Policies-20210528a-FINAL.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2066,15 +2026,15 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/policies/files/Intellectual-Property-New-20211104-APPROVED.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://web.uri.edu/policies/files/Ethics-and-Conflict-of-Interest-202101105-APPROVED-1.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/policies/files/Presidential-Performance-20220624-FINAL-01.012.1.pdf",
+        "url": "https://web.uri.edu/policies/files/Intellectual-Property-New-20211104-APPROVED.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/policies/files/Conflict-of-Interest-in-Research-20211105-APPROVED.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2082,7 +2042,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/policies/files/Conflict-of-Interest-in-Research-20211105-APPROVED.pdf",
+        "url": "https://web.uri.edu/policies/files/Presidential-Performance-20220624-FINAL-01.012.1.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2114,16 +2074,56 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/242/04-05-9.pdf",
-        "reason": "Stream has ended unexpectedly"
+        "url": "https://drive.google.com/file/d/1pcFmAd_FfNql4DPiwdsmvd8oo_dxbvE8/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1TAhgZwMP2y8RB75Abjq9t0u25X8UWYJ4/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1RwmBc60LhB548k06XthmqqxqqP6K24mN/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1SfsQXtzG1y4zAM3mvTPxVFTvAeCIfJCe/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1SvpaQDE6XHzJMFVvDzLxpnHiCQAXVcSQ/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1J5Bagkxuvrm9BYzrgoYu1F4Ni1A0MSgG/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1bVPzJIjVGHLNRC2e5dPs-G2rsjp0qN0i/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1cQgKFKkp32JYVe67xHjk_67kSreWYbn4/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1N6RM-IuDkX9XefgYkfmX636RpUII_20f/view",
+        "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-34.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
+        "url": "https://docs.google.com/presentation/d/1zUvXb6hmkvafge3s2h1TQfKR65waMWxW/edit",
+        "reason": "HTTP Error 410: Gone"
+      },
+      {
         "url": "https://drive.google.com/file/d/14SUTn98dtl5TWU2_qZua14mKdGPcS3zA/view",
         "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/242/04-05-9.pdf",
+        "reason": "Stream has ended unexpectedly"
       },
       {
         "url": "https://drive.google.com/file/d/1Jkr6Mhi06eItiPCQP-uloRY_LuPWQgK0/view",
@@ -2134,19 +2134,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/facsen/curricular-matters/program-procedures/",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3238&context=facsen_bills",
-        "reason": "HTTP Error 403: Forbidden"
-      },
-      {
         "url": "https://drive.google.com/file/d/1n8FXiPOGMCVcd9cW57WqBjOtTWk54ykQ/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-29A.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2158,15 +2146,19 @@
         "reason": "Public file download requires access or returned an HTML page"
       },
       {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_16-17-23.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://drive.google.com/file/d/1Ut3YhDPN1Nl36zPLPiaF-edIgL95Pl_S/view",
         "reason": "Public file download requires access or returned an HTML page"
       },
       {
-        "url": "http://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=2976&context=facsen_bills",
+        "url": "https://web.uri.edu/facsen/curricular-matters/program-procedures/",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_17-18-29A.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3238&context=facsen_bills",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
@@ -2174,7 +2166,7 @@
         "reason": "Public file download requires access or returned an HTML page"
       },
       {
-        "url": "https://drive.google.com/file/d/1XlqSOuKERd_Y6K0WFIExcj3piek-0k3z/view",
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_16-17-23.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2182,16 +2174,28 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://drive.google.com/file/d/1qkKG40Izpe3sn66Z8_cW8cWUSFnARZOf/view",
+        "url": "http://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=2976&context=facsen_bills",
+        "reason": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1XlqSOuKERd_Y6K0WFIExcj3piek-0k3z/view",
         "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1UwUOdueEVkyyeR8vamzbhus9Hp9a7dJ9/view",
+        "reason": "Public file download requires access or returned an HTML page"
       },
       {
         "url": "https://drive.google.com/file/d/1M3XJta29JJ5sJ5oux8IfeJmDw16WIOI2/view",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://drive.google.com/file/d/1UwUOdueEVkyyeR8vamzbhus9Hp9a7dJ9/view",
+        "url": "https://drive.google.com/file/d/1a-sBVNqxKfLLqP_vczITfM1rWziKQWCS/view",
         "reason": "Public file download requires access or returned an HTML page"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1qkKG40Izpe3sn66Z8_cW8cWUSFnARZOf/view",
+        "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://drive.google.com/file/d/1eoKVnC1KgEljuvajCfAzj_TftBB-FRdJ/view",
@@ -2200,10 +2204,6 @@
       {
         "url": "https://drive.google.com/file/d/1Yi8mHW5psm-qLZnpcoX4ACFtWauW1X_e/view",
         "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1a-sBVNqxKfLLqP_vczITfM1rWziKQWCS/view",
-        "reason": "Public file download requires access or returned an HTML page"
       },
       {
         "url": "https://drive.google.com/file/d/1HnZWMqlv1dFwjVv7I7RPiUXM39gbm-D9/view",
@@ -2222,16 +2222,12 @@
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3226&context=facsen_bills",
-        "reason": "HTTP Error 403: Forbidden"
-      },
-      {
         "url": "https://drive.google.com/file/d/1EGYAblcvdTUPvN2f5SALa1f6GN593hUM/view",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_16-17-16.pdf",
-        "reason": "HTTP Error 404: Not Found"
+        "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3226&context=facsen_bills",
+        "reason": "HTTP Error 403: Forbidden"
       },
       {
         "url": "https://drive.google.com/file/d/1a18thoa24K7El7-nf6z1VCIyH34dbX4I/view",
@@ -2239,6 +2235,10 @@
       },
       {
         "url": "https://drive.google.com/file/d/1MOOurRGpP5opiVEosin0bkTyl-4ZYiRY/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/wp-content/uploads/sites/97/Bill_16-17-16.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2250,15 +2250,15 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://drive.google.com/file/d/1LT7XD_9bPQ-k0dsk68d43XHet2R7Qu-t/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://drive.google.com/file/d/1MmLf6WB6tU4bpSiInQoyyk8INlanAX2v/view",
         "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://drive.google.com/file/d/1MpBqMeNphkEzYhF2jEXSFlkYiQb9vvOV/view",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1LT7XD_9bPQ-k0dsk68d43XHet2R7Qu-t/view",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2270,19 +2270,15 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://drive.google.com/file/d/1MixNSSd02TqsMqOZFZg6Oaq5Qz0BRx5z/view",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3208&context=facsen_bills",
         "reason": "HTTP Error 403: Forbidden"
       },
       {
-        "url": "https://web.uri.edu/manual/files/11-12-25.pdf",
+        "url": "https://drive.google.com/file/d/1MixNSSd02TqsMqOZFZg6Oaq5Qz0BRx5z/view",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/02-03-14.pdf",
+        "url": "https://web.uri.edu/manual/files/11-12-25.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2294,8 +2290,16 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
+        "url": "https://web.uri.edu/manual/files/02-03-14.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://drive.google.com/file/d/1LPgMSk9YmxbH9o7hELRrslAl5VnP1Y76/view",
         "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1DfKmQAUgkSvFIG5kMUpSa_XHum12s5Cf/view",
+        "reason": "Public file download requires access or returned an HTML page"
       },
       {
         "url": "https://web.uri.edu/manual/files/09-10-16.pdf",
@@ -2310,11 +2314,19 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
+        "url": "https://web.uri.edu/manual/files/05-06-28.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/honors/files/Course-Proposal-Cover-Sheet-.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://web.uri.edu/facsen/files/Bill_17-18-26D.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/05-06-28.pdf",
+        "url": "https://web.uri.edu/manual/files/08-09-24.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2322,8 +2334,8 @@
         "reason": "HTTP Error 401: Unauthorized"
       },
       {
-        "url": "https://web.uri.edu/manual/files/08-09-24.pdf",
-        "reason": "HTTP Error 404: Not Found"
+        "url": "https://docs.google.com/document/d/1tsYZ7iyQ9t2vQStrfQgZbxmxfBm-HUCrc0B2S3N-wEQ/edit",
+        "reason": "HTTP Error 401: Unauthorized"
       },
       {
         "url": "https://web.uri.edu/manual/files/03-04-11.pdf",
@@ -2338,15 +2350,11 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/03-04-18.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://web.uri.edu/manual/files/04-05-10.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/04-05-12.pdf",
+        "url": "https://web.uri.edu/manual/files/03-04-18.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2354,7 +2362,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/09-10-32.pdf",
+        "url": "https://web.uri.edu/manual/files/04-05-12.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2362,11 +2370,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/facsen/files/Bill_18-19-31.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/manual/files/12-13-36.pdf",
+        "url": "https://web.uri.edu/manual/files/09-10-32.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2374,15 +2378,23 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
+        "url": "https://web.uri.edu/facsen/files/Bill_18-19-31.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://web.uri.edu/manual/files/14-15-15.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/03-04-9.pdf",
+        "url": "https://web.uri.edu/manual/files/12-13-36.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://web.uri.edu/manual/files/General-Faculty-Meeting-12-14-00.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/manual/files/03-04-9.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2402,7 +2414,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/12-13-04.pdf",
+        "url": "https://web.uri.edu/manual/files/12-13-1.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2410,15 +2422,11 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
+        "url": "https://web.uri.edu/manual/files/12-13-04.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://web.uri.edu/manual/files/05-06-1.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/manual/files/12-13-1.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/manual/files/07-08-40.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2434,11 +2442,19 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/05-06-22.pdf",
+        "url": "https://web.uri.edu/manual/files/07-08-40.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://web.uri.edu/manual/files/12-13-30.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/manual/files/05-06-22.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/manual/files/12-13-21.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2450,10 +2466,6 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/12-13-21.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://web.uri.edu/facsen/files/Bill_17-18-29A.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
@@ -2462,11 +2474,11 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/13-14-29.pdf",
+        "url": "https://web.uri.edu/manual/files/02-03-32.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/02-03-32.pdf",
+        "url": "https://web.uri.edu/manual/files/Bill_15-16-28.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2474,7 +2486,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/Bill_15-16-28.pdf",
+        "url": "https://web.uri.edu/manual/files/13-14-29.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2494,15 +2506,11 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/00-01-13.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://web.uri.edu/manual/files/00-01-12.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/00-01-29.pdf",
+        "url": "https://web.uri.edu/manual/files/00-01-13.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2510,11 +2518,15 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/06-07-32.pdf",
+        "url": "https://web.uri.edu/manual/files/00-01-29.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://web.uri.edu/manual/files/05-06-31.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/manual/files/06-07-32.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2530,7 +2542,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/facsen/files/Bill_17-18-26E.pdf",
+        "url": "https://web.uri.edu/facsen/files/Bill_17-18-6.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2538,7 +2550,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/facsen/files/Bill_17-18-6.pdf",
+        "url": "https://web.uri.edu/facsen/files/Bill_17-18-26E.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2546,11 +2558,11 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/facsen/files/Bill_17-18-24.pdf",
+        "url": "https://web.uri.edu/manual/files/12-13-24.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/12-13-24.pdf",
+        "url": "https://web.uri.edu/facsen/files/Bill_17-18-24.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2562,10 +2574,6 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/01-02-27.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://web.uri.edu/facsen/files/Bill_18-19-24.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
@@ -2574,7 +2582,11 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/14-15-6.pdf",
+        "url": "https://web.uri.edu/manual/files/01-02-27.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://web.uri.edu/manual/files/09-10-29.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2582,7 +2594,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/09-10-29.pdf",
+        "url": "https://web.uri.edu/manual/files/14-15-6.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2630,11 +2642,11 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/05-06-2B.pdf",
+        "url": "https://web.uri.edu/manual/files/05-06-2A.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/05-06-2A.pdf",
+        "url": "https://web.uri.edu/manual/files/05-06-2B.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2646,11 +2658,11 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/09-10-1.pdf",
+        "url": "https://web.uri.edu/manual/files/01-02-8.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/01-02-8.pdf",
+        "url": "https://web.uri.edu/manual/files/09-10-1.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2662,11 +2674,11 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/07-08-8.pdf",
+        "url": "https://web.uri.edu/facsen/files/Bill_17-18-34.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/facsen/files/Bill_17-18-34.pdf",
+        "url": "https://web.uri.edu/manual/files/07-08-8.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2682,6 +2694,10 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
+        "url": "https://web.uri.edu/manual/files/Policy_on_Grants_Contracts_Gifts.pdf",
+        "reason": "HTTP Error 404: Not Found"
+      },
+      {
         "url": "https://digitalcommons.uri.edu/cgi/viewcontent.cgi?article=3227&context=facsen_bills",
         "reason": "HTTP Error 403: Forbidden"
       },
@@ -2690,7 +2706,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/manual/files/Policy_on_Grants_Contracts_Gifts.pdf",
+        "url": "https://web.uri.edu/facsen/files/Bill_19-20-30.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2698,7 +2714,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://web.uri.edu/facsen/files/Bill_19-20-30.pdf",
+        "url": "https://web.uri.edu/facsen/files/Bill_19-20-34.pdf",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2706,27 +2722,7 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://drive.google.com/file/d/1DfKmQAUgkSvFIG5kMUpSa_XHum12s5Cf/view",
-        "reason": "Public file download requires access or returned an HTML page"
-      },
-      {
-        "url": "https://web.uri.edu/facsen/files/Bill_19-20-34.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
         "url": "https://web.uri.edu/facsen/files/Bill_19-20-8.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://web.uri.edu/honors/files/Course-Proposal-Cover-Sheet-.pdf",
-        "reason": "HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://docs.google.com/document/d/1tsYZ7iyQ9t2vQStrfQgZbxmxfBm-HUCrc0B2S3N-wEQ/edit",
-        "reason": "HTTP Error 401: Unauthorized"
-      },
-      {
-        "url": "https://drive.google.com/file/d/1AZz3en-zysKgrKXkqOlKEZVsKUVuJCH7/view",
         "reason": "HTTP Error 404: Not Found"
       },
       {
@@ -2734,16 +2730,20 @@
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://drive.google.com/file/d/1s6FfR963TcdKIPEAbXombaDk1PVFFOz2/view",
+        "url": "https://drive.google.com/file/d/1AZz3en-zysKgrKXkqOlKEZVsKUVuJCH7/view",
         "reason": "HTTP Error 404: Not Found"
       },
       {
-        "url": "https://drive.google.com/file/d/1v1xjI6PEeJY9RluTgHwe2TsBdEtaE5B5/view",
+        "url": "https://drive.google.com/file/d/1s6FfR963TcdKIPEAbXombaDk1PVFFOz2/view",
         "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://docs.google.com/document/d/1-Vd3huBNv5Trq5kPhHF7noX-aMT6gi0V6Fyc-h_5m_M/edit",
         "reason": "HTTP Error 401: Unauthorized"
+      },
+      {
+        "url": "https://drive.google.com/file/d/1v1xjI6PEeJY9RluTgHwe2TsBdEtaE5B5/view",
+        "reason": "HTTP Error 404: Not Found"
       },
       {
         "url": "https://drive.google.com/file/d/1pDFpXOVx5o1cRw9H0Pt9y3YHRC6F8Mpp/view",
@@ -2758,8 +2758,8 @@
     "discovery": {
       "complete": true,
       "method": "wordpress-sitemap",
-      "checkedAt": "2026-10-30T16:44:54.154938+00:00",
-      "lastCompleteAt": "2026-10-30T16:44:54.154938+00:00",
+      "checkedAt": "2026-10-31T15:46:50.384735+00:00",
+      "lastCompleteAt": "2026-10-31T15:46:50.384735+00:00",
       "errors": [
         {
           "method": "wordpress-rest",
@@ -2773,7 +2773,7 @@
     "status": "complete",
     "cadence": "daily",
     "scheduleUtc": "10:17",
-    "freshSources": 1391,
+    "freshSources": 1394,
     "retainedSources": 76,
     "gapCount": 586,
     "toolkitChecked": true,
