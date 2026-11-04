@@ -1,23 +1,23 @@
 {
   "version": 1,
   "corpus": {
-    "builtAt": "2026-11-03T17:54:03.384310+00:00",
-    "sourceCount": 1478,
-    "passageCount": 36127,
-    "corpusBase": "data/corpus-c94220e75bfb"
+    "builtAt": "2026-11-04T18:03:23.172711+00:00",
+    "sourceCount": 1480,
+    "passageCount": 36176,
+    "corpusBase": "data/corpus-53209e529038"
   },
   "bills": {
-    "builtAt": "2026-11-03T17:54:03.384310+00:00",
-    "corpusBase": "data/corpus-c94220e75bfb",
-    "path": "data/bills-628700381798.json",
-    "recordCount": 7272
+    "builtAt": "2026-11-04T18:03:23.172711+00:00",
+    "corpusBase": "data/corpus-53209e529038",
+    "path": "data/bills-35c47720da2a.json",
+    "recordCount": 7278
   },
-  "checkedAt": "2026-11-03T17:54:03.384310+00:00",
+  "checkedAt": "2026-11-04T18:03:23.172711+00:00",
   "refresh": {
     "status": "complete",
     "cadence": "daily",
     "scheduleUtc": "10:17",
-    "freshSources": 1402,
+    "freshSources": 1404,
     "retainedSources": 76,
     "gapCount": 585,
     "toolkitChecked": true,
