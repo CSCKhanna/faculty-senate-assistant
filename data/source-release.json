@@ -1,18 +1,18 @@
 {
   "version": 1,
   "corpus": {
-    "builtAt": "2026-11-10T17:55:45.249900+00:00",
+    "builtAt": "2026-11-11T17:56:21.265524+00:00",
     "sourceCount": 1481,
-    "passageCount": 36212,
-    "corpusBase": "data/corpus-a32ad68467fa"
+    "passageCount": 36210,
+    "corpusBase": "data/corpus-5b9fc41bb520"
   },
   "bills": {
-    "builtAt": "2026-11-10T17:55:45.249900+00:00",
-    "corpusBase": "data/corpus-a32ad68467fa",
-    "path": "data/bills-fed936dca4b5.json",
+    "builtAt": "2026-11-11T17:56:21.265524+00:00",
+    "corpusBase": "data/corpus-5b9fc41bb520",
+    "path": "data/bills-5f4cc959ed39.json",
     "recordCount": 7278
   },
-  "checkedAt": "2026-11-10T17:55:45.249900+00:00",
+  "checkedAt": "2026-11-11T17:56:21.265524+00:00",
   "refresh": {
     "status": "complete",
     "cadence": "daily",
